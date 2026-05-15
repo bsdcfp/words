@@ -1,0 +1,28 @@
+{
+  "generated_at": "2026-05-14T12:38:59.691Z",
+  "curriculum": {
+    "source": "普通高中英语课程标准（2017年版2020年修订）附录2词汇表",
+    "source_url": "https://www.pep.com.cn/xw/zt/rjwy/gzkb2020/202205/P020220517522153664167.pdf",
+    "total": 3000
+  },
+  "dictionary": {
+    "source": "ECDICT",
+    "source_url": "https://github.com/skywind3000/ECDICT",
+    "license": "MIT",
+    "matched": 3000,
+    "missing": 0
+  },
+  "assessment": {
+    "questions": 50
+  },
+  "by_star": {
+    "0": 1500,
+    "1": 499,
+    "2": 1001
+  },
+  "by_stage": {
+    "义务教育基础词": 1500,
+    "选择性必修词": 1001,
+    "高中必修词": 499
+  }
+}

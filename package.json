@@ -1,0 +1,15 @@
+{
+  "name": "word-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:words": "node tools/build-real-word-data.mjs",
+    "serve": "node tools/serve.mjs",
+    "test": "npm run test:data && npm run test:report && npm run test:flow && npm run test:e2e",
+    "test:data": "node tests/word-data.test.mjs",
+    "test:report": "node tests/reward-display.test.mjs",
+    "test:flow": "node tests/study-flow.test.mjs",
+    "test:e2e": "node tests/prototype-flow.test.mjs"
+  }
+}

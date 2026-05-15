@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>单词学习原型</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./styles/main.css" />
+  </head>
+  <body>
+    <main class="app-shell" aria-label="单词学习原型">
+      <section id="view-home" class="view active" data-view="home"></section>
+      <section id="view-test" class="view" data-view="test"></section>
+      <section id="view-test-result" class="view" data-view="test-result"></section>
+      <section id="view-precheck" class="view" data-view="precheck"></section>
+      <section id="view-word-study" class="view" data-view="word-study"></section>
+      <section id="view-group-review" class="view" data-view="group-review"></section>
+      <section id="view-audio-meaning" class="view" data-view="audio-meaning"></section>
+      <section id="view-wrong-book" class="view" data-view="wrong-book"></section>
+      <section id="view-daily-report" class="view" data-view="daily-report"></section>
+    </main>
+
+    <div id="detail-modal" class="modal" aria-hidden="true">
+      <div class="modal__scrim" data-action="close-detail"></div>
+      <article class="modal__panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+        <button class="icon-button modal__close" type="button" aria-label="关闭词卡" data-action="close-detail">×</button>
+        <div id="detail-content"></div>
+      </article>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
