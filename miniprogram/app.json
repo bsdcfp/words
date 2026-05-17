@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "今日单词",
+    "navigationBarBackgroundColor": "#d9c4ad",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#d9c4ad"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

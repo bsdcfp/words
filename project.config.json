@@ -1,0 +1,19 @@
+{
+  "description": "今日单词微信小程序测试号工程",
+  "appid": "wxb87a2e601b3d1820",
+  "projectname": "word-prototype-miniprogram",
+  "miniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "setting": {
+    "useCompilerPlugins": false,
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "coverView": true,
+    "showShadowRootInWxmlPanel": true
+  },
+  "libVersion": "latest",
+  "condition": {}
+}
