@@ -57,21 +57,28 @@
   </view>
 
   <view wx:elif="{{view == 'precheck'}}" class="view">
-    <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">训前检测</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">训前检测</text></view>
     <view wx:if="{{precheck.groupFeedback}}" class="completion-burst">{{precheck.groupFeedback}}</view>
     <view class="word-list">
       <view wx:for="{{precheck.candidates}}" wx:key="id" class="precheck-row {{item.selected ? 'picked' : ''}}">
-        <text class="index">{{item.index}}</text>
-        <button class="select-toggle {{item.selected ? 'on' : ''}}" data-word-id="{{item.id}}" bindtap="togglePrecheckWord">{{item.selected ? '✓' : '+'}}</button>
-        <button class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</button>
+        <view class="precheck-head">
+          <text class="index">{{item.index}}</text>
+          <view class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</view>
+          <view class="select-toggle {{item.selected ? 'on' : ''}}" data-word-id="{{item.id}}" bindtap="togglePrecheckWord">{{item.selected ? '✓' : '+'}}</view>
+        </view>
         <text class="meaning-inline">{{item.meaningText}}</text>
         <view class="segmented">
-          <button class="{{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</button>
-          <button class="{{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</button>
+          <view class="segmented-button {{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</view>
+          <view class="segmented-button {{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</view>
         </view>
       </view>
     </view>
-    <view class="bottom-actions"><text>已选 {{precheck.selectedCount}}/3</text><button class="secondary-button" bindtap="autoSelect">自动选词</button><button class="primary-button small" disabled="{{!precheck.canStart}}" bindtap="confirmPrecheck">开始识记</button></view>
+    <view class="bottom-actions precheck-actions">
+      <text class="selection-count">已选 {{precheck.selectedCount}}/3</text>
+      <view class="secondary-button" bindtap="autoSelect">自动选词</view>
+      <view wx:if="{{precheck.canStart}}" class="primary-button small" bindtap="confirmPrecheck">开始识记</view>
+      <view wx:else class="primary-button small disabled">开始识记</view>
+    </view>
   </view>
 
   <view wx:elif="{{view == 'word-study'}}" class="view">
@@ -86,7 +93,7 @@
       <button class="text-link" data-word-id="{{study.word.id}}" bindtap="openDetail">查看例句和搭配</button>
     </view>
     <view wx:else class="empty-state"><text>本组识记已完成</text><button class="primary-button" bindtap="startReview">进入本组复习</button></view>
-    <view wx:if="{{study.word}}" class="bottom-actions two"><button class="secondary-button" data-value="1" bindtap="markStudy">还不熟</button><button class="primary-button small" data-value="3" bindtap="markStudy">已记住</button></view>
+    <view wx:if="{{study.word}}" class="bottom-actions two"><view class="secondary-button" data-value="1" bindtap="markStudy">还不熟</view><view class="primary-button small" data-value="3" bindtap="markStudy">已记住</view></view>
   </view>
 
   <view wx:elif="{{view == 'group-review'}}" class="view">

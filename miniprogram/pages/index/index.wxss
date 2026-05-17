@@ -86,7 +86,7 @@
 .option-card,
 .icon-button,
 .text-link,
-.segmented button,
+.segmented-button,
 .sound-button,
 .speaker-tile,
 .sound-mini,
@@ -121,6 +121,10 @@ button::after {
 
 .primary-button[disabled] {
   opacity: 0.45;
+}
+
+.primary-button.disabled {
+  opacity: 0.38;
 }
 
 .primary-button.small {
@@ -316,6 +320,12 @@ button::after {
   box-sizing: border-box;
 }
 
+.precheck-actions {
+  display: grid;
+  grid-template-columns: 92rpx minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+}
+
 .bottom-actions.two {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -362,15 +372,23 @@ button::after {
 
 .precheck-row,
 .review-card {
-  display: grid;
-  grid-template-columns: 40rpx 68rpx minmax(0, 1fr);
-  align-items: center;
-  gap: 18rpx;
-  padding: 24rpx;
+  padding: 28rpx;
   border: 2rpx solid rgba(54, 45, 39, 0.14);
   border-radius: 16rpx;
   background: rgba(255, 255, 255, 0.62);
   box-sizing: border-box;
+}
+
+.precheck-row {
+  display: grid;
+  gap: 22rpx;
+}
+
+.precheck-head {
+  display: grid;
+  grid-template-columns: 44rpx minmax(0, 1fr) 68rpx;
+  align-items: center;
+  gap: 18rpx;
 }
 
 .precheck-row.picked {
@@ -384,6 +402,9 @@ button::after {
 
 .select-toggle,
 .sound-mini {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 64rpx;
   height: 64rpx;
   border-radius: 999rpx;
@@ -397,17 +418,24 @@ button::after {
 }
 
 .word-link {
-  padding: 0;
-  background: transparent;
-  text-align: left;
-  font-size: 36rpx;
+  display: block;
+  min-width: 0;
+  padding: 14rpx 28rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.84);
+  text-align: center;
+  font-size: 40rpx;
   font-weight: 900;
   overflow-wrap: anywhere;
+  line-height: 1.15;
 }
 
 .meaning-inline {
-  grid-column: 3;
+  display: block;
+  padding-left: 62rpx;
   color: #776d64;
+  font-size: 32rpx;
+  font-weight: 800;
   word-break: break-word;
 }
 
@@ -418,12 +446,18 @@ button::after {
   gap: 16rpx;
 }
 
-.segmented button {
+.segmented-button {
+  display: flex;
   width: 100%;
+  min-width: 0;
   min-height: 72rpx;
+  align-items: center;
+  justify-content: center;
   border-radius: 14rpx;
   background: #f6f2ec;
   color: #776d64;
+  font-weight: 800;
+  box-sizing: border-box;
 }
 
 .segmented .selected {
@@ -434,6 +468,15 @@ button::after {
 .segmented .danger {
   background: #f6d4d2;
   color: #a94240;
+}
+
+.selection-count {
+  display: block;
+  color: #221f1c;
+  font-size: 28rpx;
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
 }
 
 .completion-burst {
@@ -513,7 +556,10 @@ button::after {
 }
 
 .review-card {
+  display: grid;
   grid-template-columns: 96rpx 1fr;
+  align-items: center;
+  gap: 18rpx;
 }
 
 .review-card text {
