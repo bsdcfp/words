@@ -93,6 +93,8 @@ Page({
   },
 
   answerAudio(event) {
+    const question = flow.getCurrentAudioQuestion(this.state);
+    if (!question || question.answered) return;
     const result = flow.answerAudioQuestion(this.state, event.currentTarget.dataset.value);
     if (!result.isCorrect) {
       this.openDetailById(result.word.id);
@@ -106,6 +108,8 @@ Page({
   },
 
   answerMixed(event) {
+    const question = flow.getCurrentMixedReviewQuestion(this.state);
+    if (!question || question.answered) return;
     flow.answerMixedReviewQuestion(this.state, event.currentTarget.dataset.value);
     this.saveAndRender(VIEWS.GROUP_REVIEW);
   },

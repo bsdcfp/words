@@ -5,12 +5,12 @@
         <text class="eyebrow">{{home.userName}}</text>
         <text class="page-title">今日单词</text>
       </view>
-      <button class="icon-button" bindtap="resetData">↺</button>
+      <view class="icon-button" bindtap="resetData">↺</view>
     </view>
     <view class="hero-panel">
       <text class="section-label">今日任务</text>
       <text class="hero-title">老师带着学生先选 3 个不熟词</text>
-      <button class="primary-button" bindtap="startDailyLearning">开始今日学习</button>
+      <view class="primary-button" bindtap="startDailyLearning">开始今日学习</view>
     </view>
     <view class="coach-strip">
       <view><text>老师带学</text><text class="muted">选词、讲图、纠错</text></view>
@@ -33,26 +33,26 @@
   </view>
 
   <view wx:elif="{{view == 'test'}}" class="view">
-    <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="progress-label">{{test.progress}}</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="progress-label">{{test.progress}}</text></view>
     <view class="question-panel">
       <text class="section-label">词汇量测试</text>
       <text class="test-word">{{test.question.word}}</text>
       <text class="muted">下面只选释义，不确定时点“不认识”</text>
       <view class="option-stack">
-        <button wx:for="{{test.options}}" wx:key="*this" class="option-card" data-value="{{item}}" bindtap="answerTest">{{item}}</button>
+        <view wx:for="{{test.options}}" wx:key="*this" class="option-card" data-value="{{item}}" bindtap="answerTest">{{item}}</view>
       </view>
-      <button class="secondary-button unknown-button" data-value="不认识" bindtap="answerTest">我不认识</button>
+      <view class="secondary-button unknown-button" data-value="不认识" bindtap="answerTest">我不认识</view>
     </view>
     <view class="counter-bar"><text class="pill green">{{test.correct}}</text><text class="pill red">{{test.wrong}}</text><text class="pill blue">{{test.remain}}</text></view>
   </view>
 
   <view wx:elif="{{view == 'test-result'}}" class="view">
-    <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">测评结果</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">测评结果</text></view>
     <view class="result-panel">
       <text class="section-label">现实掌握词汇</text>
       <text class="vocab-number">{{testResult.vocabulary}}</text>
       <view class="copy-card"><text class="card-title">{{testResult.stage}}</text><text>正确率 {{testResult.accuracy}}%，不认识 {{testResult.unknown}} 个。{{testResult.advice}}</text></view>
-      <button class="primary-button" bindtap="goHome">返回首页</button>
+      <view class="primary-button" bindtap="goHome">返回首页</view>
     </view>
   </view>
 
@@ -82,62 +82,62 @@
   </view>
 
   <view wx:elif="{{view == 'word-study'}}" class="view">
-    <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="progress-label">{{study.progress}}</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="progress-label">{{study.progress}}</text></view>
     <view wx:if="{{study.word}}" class="study-card">
       <text class="section-label">单词识记</text>
       <view class="memory-image"><text class="memory-mark">记忆图</text><text class="strong">{{study.word.memoryMeaning}}</text><text>{{study.word.scene}}</text></view>
       <text class="study-word">{{study.word.syllables}}</text>
-      <button class="sound-button" data-word-id="{{study.word.id}}" bindtap="speak">播放</button>
+      <view class="sound-button" data-word-id="{{study.word.id}}" bindtap="speak">播放</view>
       <text class="ipa">{{study.word.ipa}}</text>
       <text class="meaning"><text>{{study.word.pos}}</text>{{study.word.meaningText}}</text>
-      <button class="text-link" data-word-id="{{study.word.id}}" bindtap="openDetail">查看例句和搭配</button>
+      <view class="text-link" data-word-id="{{study.word.id}}" bindtap="openDetail">查看例句和搭配</view>
     </view>
-    <view wx:else class="empty-state"><text>本组识记已完成</text><button class="primary-button" bindtap="startReview">进入本组复习</button></view>
+    <view wx:else class="empty-state"><text>本组识记已完成</text><view class="primary-button" bindtap="startReview">进入本组复习</view></view>
     <view wx:if="{{study.word}}" class="bottom-actions two"><view class="secondary-button" data-value="1" bindtap="markStudy">还不熟</view><view class="primary-button small" data-value="3" bindtap="markStudy">已记住</view></view>
   </view>
 
   <view wx:elif="{{view == 'group-review'}}" class="view">
-    <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">{{review.isMixed ? '混组复习' : '本组复习'}}</text><text class="progress-label">{{review.progress}}</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">{{review.isMixed ? '混组复习' : '本组复习'}}</text><text class="progress-label">{{review.progress}}</text></view>
     <view wx:if="{{!review.isMixed}}" class="review-stack">
-      <view wx:for="{{review.words}}" wx:key="id" class="review-card"><button class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</button><view><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}}</text></view></view>
-      <button class="primary-button" bindtap="finishReview">进入发音辨义</button>
+      <view wx:for="{{review.words}}" wx:key="id" class="review-card"><view class="review-copy"><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}}</text></view><view class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</view></view>
+      <view class="primary-button" bindtap="finishReview">进入发音辨义</view>
     </view>
     <view wx:else class="audio-panel">
-      <button class="speaker-tile" data-word-id="{{review.word.id}}" bindtap="speak">播放</button>
+      <view class="speaker-tile" data-word-id="{{review.word.id}}" bindtap="speak">播放</view>
       <text class="ipa">{{review.word.ipa}}</text>
       <view class="option-stack">
-        <button wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" disabled="{{review.question.answered}}" data-value="{{item.value}}" bindtap="answerMixed"><text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></button>
+        <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerMixed"><text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
       </view>
-      <button class="text-link centered" data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</button>
-      <view class="bottom-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组听音辨义'}}</text><button class="primary-button small" disabled="{{!review.question.answered}}" bindtap="nextMixed">继续</button></view>
+      <view class="text-link centered" data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view>
+      <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组听音辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
     </view>
   </view>
 
   <view wx:elif="{{view == 'audio-meaning'}}" class="view">
-    <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="progress-label">{{audio.progress}}</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="progress-label">{{audio.progress}}</text></view>
     <view class="audio-panel">
-      <button class="speaker-tile" data-word-id="{{audio.word.id}}" bindtap="speak">播放</button>
+      <view class="speaker-tile" data-word-id="{{audio.word.id}}" bindtap="speak">播放</view>
       <text class="ipa">{{audio.word.ipa}}</text>
       <text class="hint">先回想词义再选择，想不起来看答案</text>
       <view class="option-stack">
-        <button wx:for="{{audio.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" disabled="{{audio.question.answered}}" data-value="{{item.value}}" bindtap="answerAudio"><text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></button>
+        <view wx:for="{{audio.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerAudio"><text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
       </view>
-      <button class="text-link centered" data-word-id="{{audio.word.id}}" bindtap="openDetail">看答案</button>
+      <view class="text-link centered" data-word-id="{{audio.word.id}}" bindtap="openDetail">看答案</view>
     </view>
-    <view class="bottom-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}</text><button class="primary-button small" disabled="{{!audio.question.answered}}" bindtap="nextAudio">继续</button></view>
+    <view class="bottom-actions status-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}</text><view wx:if="{{audio.question.answered}}" class="primary-button small" bindtap="nextAudio">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
   </view>
 
   <view wx:elif="{{view == 'wrong-book'}}" class="view">
-    <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">错词本</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">错词本</text></view>
     <view class="review-summary"><text>{{wrongBook.count}} 个词</text><text>优先复盘听音辨义和混组复习里的错词</text></view>
     <view class="review-stack">
-      <view wx:for="{{wrongBook.words}}" wx:key="id" class="review-card"><button class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</button><view><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}} · 错 {{item.wrongCount}} 次</text><button class="text-link" data-word-id="{{item.id}}" bindtap="openDetail">查看词卡</button></view></view>
-      <view wx:if="{{!wrongBook.count}}" class="empty-state"><text>当前没有错词。</text><button class="primary-button" bindtap="startDailyLearning">开始今日学习</button></view>
+      <view wx:for="{{wrongBook.words}}" wx:key="id" class="review-card"><view class="review-copy"><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}} · 错 {{item.wrongCount}} 次</text><view class="text-link" data-word-id="{{item.id}}" bindtap="openDetail">查看词卡</view></view><view class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</view></view>
+      <view wx:if="{{!wrongBook.count}}" class="empty-state"><text>当前没有错词。</text><view class="primary-button" bindtap="startDailyLearning">开始今日学习</view></view>
     </view>
   </view>
 
   <view wx:elif="{{view == 'daily-report'}}" class="view">
-    <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">学习报告</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">学习报告</text></view>
     <view class="report-panel">
       <text class="report-ring">{{report.accuracy}}%</text>
       <text class="section-label">发音辨义正确率</text>
@@ -145,13 +145,13 @@
       <view class="copy-card"><text class="card-title">下次复习</text><text>{{report.nextReview}} 优先复盘错词和即将遗忘词。</text></view>
       <view class="copy-card"><text class="card-title">薄弱词</text><text>{{report.weakWordText}}</text></view>
       <view class="copy-card"><text class="card-title">建议</text><text>{{report.summary}}</text></view>
-      <button class="primary-button" bindtap="goHome">完成</button>
+      <view class="primary-button" bindtap="goHome">完成</view>
     </view>
   </view>
 
   <view wx:if="{{detail}}" class="modal-mask" bindtap="closeDetail">
     <view class="detail-card" catchtap="noop">
-      <button class="icon-button close" bindtap="closeDetail">×</button>
+      <view class="icon-button close" bindtap="closeDetail">×</view>
       <text class="section-label">详细词卡</text>
       <text class="detail-word">{{detail.syllables}}</text>
       <text class="ipa">{{detail.ipa}}</text>

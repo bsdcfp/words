@@ -96,6 +96,7 @@
   line-height: 1.2;
   margin: 0;
   box-sizing: border-box;
+  max-width: 100%;
 }
 
 button::after {
@@ -270,6 +271,7 @@ button::after {
 }
 
 .option-card {
+  display: block;
   width: 100%;
   min-height: 108rpx;
   padding: 28rpx;
@@ -279,6 +281,7 @@ button::after {
   text-align: left;
   font-weight: 800;
   white-space: normal;
+  overflow: hidden;
   word-break: break-word;
 }
 
@@ -330,6 +333,22 @@ button::after {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: stretch;
+}
+
+.bottom-actions.status-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 176rpx;
+  align-items: center;
+}
+
+.status-actions text {
+  display: block;
+  min-width: 0;
+  color: #776d64;
+  font-size: 26rpx;
+  font-weight: 900;
+  line-height: 1.25;
+  word-break: break-word;
 }
 
 .bottom-actions .primary-button,
@@ -405,16 +424,27 @@ button::after {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 64rpx;
-  height: 64rpx;
   border-radius: 999rpx;
   background: #fff;
   color: #0d8f7a;
+  font-weight: 900;
+}
+
+.select-toggle {
+  width: 64rpx;
+  height: 64rpx;
 }
 
 .select-toggle.on {
   background: #0d8f7a;
   color: #fff;
+}
+
+.sound-mini {
+  width: 124rpx;
+  min-width: 124rpx;
+  height: 72rpx;
+  font-size: 26rpx;
 }
 
 .word-link {
@@ -556,14 +586,22 @@ button::after {
 }
 
 .review-card {
-  display: grid;
-  grid-template-columns: 96rpx 1fr;
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 18rpx;
+}
+
+.review-copy {
+  flex: 1;
+  min-width: 0;
 }
 
 .review-card text {
   display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .review-summary {
@@ -646,8 +684,7 @@ button::after {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .list-button,
-  .bottom-actions {
+  .list-button {
     align-items: stretch;
     flex-direction: column;
   }
