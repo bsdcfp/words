@@ -181,12 +181,11 @@ Page({
     const word = flow.getWordById(wordId);
     if (!word) return;
     this.setData({
-      detail: {
-        ...word,
+      detail: Object.assign({}, word, {
         meaningText: word.cn.join("，"),
         tagText: word.tags.join("、"),
         collocationText: word.collocations.length ? word.collocations.map((item) => `${item.en}：${item.cn}`).join("\n") : "例句和搭配待自建"
-      }
+      })
     });
   }
 });
@@ -231,7 +230,22 @@ function buildPrecheckData(state) {
     .map(flow.getWordById)
     .filter((word) => word && !state.daily.completedWordIds.includes(word.id) && state.daily.precheck[word.id] !== "known")
     .map((word, index) => ({
-      ...word,
+      id: word.id,
+      word: word.word,
+      headword: word.headword,
+      syllables: word.syllables,
+      ipa: word.ipa,
+      pos: word.pos,
+      cn: word.cn,
+      memoryImage: word.memoryImage,
+      example_en: word.example_en,
+      example_cn: word.example_cn,
+      collocations: word.collocations,
+      level: word.level,
+      curriculumStage: word.curriculumStage,
+      starLevel: word.starLevel,
+      sourceIndex: word.sourceIndex,
+      tags: word.tags,
       index: index + 1,
       selected: selectedIds.includes(word.id),
       status: state.daily.precheck[word.id] || "",
@@ -286,34 +300,32 @@ function buildWrongBookData(state) {
     .map(([wordId, wordState]) => ({ word: flow.getWordById(wordId), wordState }))
     .filter((item) => item.word)
     .sort((a, b) => b.wordState.wrongCount - a.wordState.wrongCount)
-    .map((item) => ({ ...decorateWord(item.word), wrongCount: item.wordState.wrongCount }));
+    .map((item) => Object.assign({}, decorateWord(item.word), { wrongCount: item.wordState.wrongCount }));
   return { words, count: words.length };
 }
 
 function buildReportData(state) {
   const report = state.lastReport || buildDailyReport(state, require("../../data/words").words);
-  return {
-    ...report,
+  return Object.assign({}, report, {
     weakWordText: report.weakWords.length ? report.weakWords.map((word) => word.word).join("、") : "本轮没有新增错词",
     badgeText: state.user.badges.length ? state.user.badges.join("、") : "暂无"
-  };
+  });
 }
 
 function decorateWord(word) {
-  return {
-    ...word,
+  const memoryImage = word.memoryImage || {};
+  return Object.assign({}, word, {
     meaningText: word.cn.join("，"),
     tagText: word.tags.join("、"),
-    scene: word.memoryImage?.scene || "",
-    memoryMeaning: word.memoryImage?.meaning || word.cn.join("，")
-  };
+    scene: memoryImage.scene || "",
+    memoryMeaning: memoryImage.meaning || word.cn.join("，")
+  });
 }
 
 function decorateQuestion(question, word) {
   if (!question || !word) return null;
   const answer = word.cn.join("，");
-  return {
-    ...question,
+  return Object.assign({}, question, {
     options: question.options.map((option) => ({
       value: option,
       first: option.split("，")[0],
@@ -322,5 +334,5 @@ function decorateQuestion(question, word) {
       isSelected: option === question.selected,
       statusClass: !question.answered ? "" : option === answer ? "correct" : option === question.selected ? "wrong" : "muted-card"
     }))
-  };
+  });
 }

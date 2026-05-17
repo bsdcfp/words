@@ -38,8 +38,9 @@ function buildDailyReport(state, words) {
 }
 
 function getRewardStreakText(state) {
-  const current = Number(state.user?.streakDays || 0);
-  const longest = Number(state.user?.longestStreak || 0);
+  const user = state.user || {};
+  const current = Number(user.streakDays || 0);
+  const longest = Number(user.longestStreak || 0);
   return current > 0 ? `连续打卡 ${current} 天` : `最长连续打卡 ${longest} 天`;
 }
 

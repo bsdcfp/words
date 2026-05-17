@@ -109,11 +109,10 @@ function markStudyWord(state, familiarity) {
   const word = getCurrentStudyWord(state);
   if (!word) return;
   const current = state.userWordStates[word.id] || defaultWordState();
-  state.userWordStates[word.id] = {
-    ...current,
+  state.userWordStates[word.id] = Object.assign({}, current, {
     familiarity: Math.max(current.familiarity, familiarity),
     lastSeenAt: new Date().toISOString()
-  };
+  });
   state.daily.studyIndex += 1;
 }
 
@@ -220,13 +219,12 @@ function answerChoiceQuestion(state, question, selectedCn, type) {
   const word = getWordById(question.wordId);
   const isCorrect = word.cn.join("，") === selectedCn;
   const current = state.userWordStates[word.id] || defaultWordState();
-  state.userWordStates[word.id] = {
-    ...current,
+  state.userWordStates[word.id] = Object.assign({}, current, {
     familiarity: isCorrect ? Math.min(current.familiarity + 1, 5) : Math.max(current.familiarity - 1, 0),
     correctStreak: isCorrect ? current.correctStreak + 1 : 0,
     wrongCount: isCorrect ? current.wrongCount : current.wrongCount + 1,
     lastSeenAt: new Date().toISOString()
-  };
+  });
   state.answerRecords.push({
     id: `answer_${Date.now()}_${state.answerRecords.length}`,
     sessionId: state.daily.startedAt,
