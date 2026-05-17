@@ -104,9 +104,10 @@ button::after {
 
 .primary-button,
 .secondary-button {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
   min-height: 96rpx;
   border-radius: 16rpx;
   padding: 0 36rpx;
@@ -140,12 +141,27 @@ button::after {
 }
 
 .icon-button {
+  display: flex;
+  flex: 0 0 84rpx;
+  align-items: center;
+  justify-content: center;
   width: 84rpx;
+  min-width: 84rpx;
+  max-width: 84rpx;
   height: 84rpx;
+  padding: 0;
   border-radius: 16rpx;
   background: rgba(255, 255, 255, 0.54);
   color: #221f1c;
   font-size: 48rpx;
+  text-align: center;
+}
+
+.topbar.compact .icon-button {
+  flex: 0 0 84rpx;
+  width: 84rpx;
+  min-width: 84rpx;
+  max-width: 84rpx;
 }
 
 .coach-strip,
@@ -302,7 +318,17 @@ button::after {
 
 .bottom-actions.two {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+}
+
+.bottom-actions .primary-button,
+.bottom-actions .secondary-button {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 20rpx;
+  overflow: hidden;
 }
 
 .pill {
