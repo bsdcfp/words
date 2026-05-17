@@ -7,4 +7,10 @@ page {
 
 button {
   font: inherit;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+button::after {
+  border: 0;
 }

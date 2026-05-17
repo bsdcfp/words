@@ -26,9 +26,9 @@
       <view><text>释义来源</text><text class="strong">{{home.dictionary}}</text><text>开源预填，学习型释义待二次编辑</text></view>
     </view>
     <view class="action-list">
-      <button class="list-button" bindtap="startTest"><text>词汇量测试</text><text>{{home.testLabel}}</text></button>
-      <button class="list-button" bindtap="startDailyLearning"><text>继续今日任务</text><text>3 词识记、6/9 词混组</text></button>
-      <button class="list-button" bindtap="openWrongBook"><text>错词本</text><text>{{home.weakCount}} 个待复习</text></button>
+      <view class="list-button" bindtap="startTest"><text>词汇量测试</text><text>{{home.testLabel}}</text></view>
+      <view class="list-button" bindtap="startDailyLearning"><text>继续今日任务</text><text>3 词识记、6/9 词混组</text></view>
+      <view class="list-button" bindtap="openWrongBook"><text>错词本</text><text>{{home.weakCount}} 个待复习</text></view>
     </view>
   </view>
 
