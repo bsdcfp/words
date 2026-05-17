@@ -1,5 +1,5 @@
 <view class="app-shell">
-  <view wx:if="{{view === 'home'}}" class="view">
+  <view wx:if="{{view == 'home'}}" class="view">
     <view class="topbar">
       <view>
         <text class="eyebrow">{{home.userName}}</text>
@@ -32,7 +32,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view === 'test'}}" class="view">
+  <view wx:elif="{{view == 'test'}}" class="view">
     <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="progress-label">{{test.progress}}</text></view>
     <view class="question-panel">
       <text class="section-label">词汇量测试</text>
@@ -46,7 +46,7 @@
     <view class="counter-bar"><text class="pill green">{{test.correct}}</text><text class="pill red">{{test.wrong}}</text><text class="pill blue">{{test.remain}}</text></view>
   </view>
 
-  <view wx:elif="{{view === 'test-result'}}" class="view">
+  <view wx:elif="{{view == 'test-result'}}" class="view">
     <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">测评结果</text></view>
     <view class="result-panel">
       <text class="section-label">现实掌握词汇</text>
@@ -56,7 +56,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view === 'precheck'}}" class="view">
+  <view wx:elif="{{view == 'precheck'}}" class="view">
     <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">训前检测</text></view>
     <view wx:if="{{precheck.groupFeedback}}" class="completion-burst">{{precheck.groupFeedback}}</view>
     <view class="word-list">
@@ -66,15 +66,15 @@
         <button class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</button>
         <text class="meaning-inline">{{item.meaningText}}</text>
         <view class="segmented">
-          <button class="{{item.status === 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</button>
-          <button class="{{item.status === 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</button>
+          <button class="{{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</button>
+          <button class="{{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</button>
         </view>
       </view>
     </view>
     <view class="bottom-actions"><text>已选 {{precheck.selectedCount}}/3</text><button class="secondary-button" bindtap="autoSelect">自动选词</button><button class="primary-button small" disabled="{{!precheck.canStart}}" bindtap="confirmPrecheck">开始识记</button></view>
   </view>
 
-  <view wx:elif="{{view === 'word-study'}}" class="view">
+  <view wx:elif="{{view == 'word-study'}}" class="view">
     <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="progress-label">{{study.progress}}</text></view>
     <view wx:if="{{study.word}}" class="study-card">
       <text class="section-label">单词识记</text>
@@ -89,7 +89,7 @@
     <view wx:if="{{study.word}}" class="bottom-actions two"><button class="secondary-button" data-value="1" bindtap="markStudy">还不熟</button><button class="primary-button small" data-value="3" bindtap="markStudy">已记住</button></view>
   </view>
 
-  <view wx:elif="{{view === 'group-review'}}" class="view">
+  <view wx:elif="{{view == 'group-review'}}" class="view">
     <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">{{review.isMixed ? '混组复习' : '本组复习'}}</text><text class="progress-label">{{review.progress}}</text></view>
     <view wx:if="{{!review.isMixed}}" class="review-stack">
       <view wx:for="{{review.words}}" wx:key="id" class="review-card"><button class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</button><view><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}}</text></view></view>
@@ -106,7 +106,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view === 'audio-meaning'}}" class="view">
+  <view wx:elif="{{view == 'audio-meaning'}}" class="view">
     <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="progress-label">{{audio.progress}}</text></view>
     <view class="audio-panel">
       <button class="speaker-tile" data-word-id="{{audio.word.id}}" bindtap="speak">播放</button>
@@ -120,7 +120,7 @@
     <view class="bottom-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}</text><button class="primary-button small" disabled="{{!audio.question.answered}}" bindtap="nextAudio">继续</button></view>
   </view>
 
-  <view wx:elif="{{view === 'wrong-book'}}" class="view">
+  <view wx:elif="{{view == 'wrong-book'}}" class="view">
     <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">错词本</text></view>
     <view class="review-summary"><text>{{wrongBook.count}} 个词</text><text>优先复盘听音辨义和混组复习里的错词</text></view>
     <view class="review-stack">
@@ -129,7 +129,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view === 'daily-report'}}" class="view">
+  <view wx:elif="{{view == 'daily-report'}}" class="view">
     <view class="topbar compact"><button class="icon-button" bindtap="goHome">‹</button><text class="page-title">学习报告</text></view>
     <view class="report-panel">
       <text class="report-ring">{{report.accuracy}}%</text>
