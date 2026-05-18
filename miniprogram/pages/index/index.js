@@ -137,7 +137,17 @@ Page({
   answerMixed(event) {
     const question = flow.getCurrentMixedReviewQuestion(this.state);
     if (!question || question.answered) return;
-    flow.answerMixedReviewQuestion(this.state, event.currentTarget.dataset.value);
+    const result = flow.answerMixedReviewQuestion(this.state, event.currentTarget.dataset.value);
+    if (result.isCorrect) {
+      const phase = flow.moveToNextMixedReviewQuestion(this.state);
+      if (phase === "complete") {
+        const next = flow.completeMixedReview(this.state);
+        this.saveAndRender(next === "daily-report" ? VIEWS.DAILY_REPORT : VIEWS.PRECHECK);
+        return;
+      }
+      this.saveAndRender(VIEWS.GROUP_REVIEW);
+      return;
+    }
     this.saveAndRender(VIEWS.GROUP_REVIEW);
   },
 
