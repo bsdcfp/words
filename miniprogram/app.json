@@ -3,7 +3,7 @@
     "pages/index/index"
   ],
   "window": {
-    "navigationBarTitleText": "今日单词",
+    "navigationBarTitleText": "诊断页",
     "navigationBarBackgroundColor": "#d9c4ad",
     "navigationBarTextStyle": "black",
     "backgroundColor": "#d9c4ad"

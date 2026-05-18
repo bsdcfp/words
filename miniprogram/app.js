@@ -1,5 +1,5 @@
 App({
   globalData: {
-    appName: "今日单词"
+    appName: "今日单词诊断"
   }
 });
