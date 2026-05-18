@@ -366,11 +366,12 @@ button::after {
 .precheck-scroll {
   position: absolute;
   top: calc(env(safe-area-inset-top) + 132rpx);
-  right: 52rpx;
+  right: 0;
   bottom: calc(env(safe-area-inset-bottom) + 154rpx);
-  left: 52rpx;
+  left: 0;
   height: auto;
   min-height: 0;
+  overflow-x: hidden;
   box-sizing: border-box;
 }
 
@@ -381,10 +382,13 @@ button::after {
 .precheck-view .word-list {
   gap: 14rpx;
   margin: 0;
-  padding-bottom: 22rpx;
+  padding: 0 52rpx 22rpx;
 }
 
 .precheck-list {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
   box-sizing: border-box;
 }
 
@@ -474,12 +478,15 @@ button::after {
 }
 
 .precheck-view .precheck-row {
+  width: 100%;
+  min-width: 0;
   gap: 10rpx;
   padding: 16rpx 22rpx;
   border-color: rgba(54, 45, 39, 0.1);
   border-radius: 20rpx;
   background: rgba(255, 255, 255, 0.58);
   box-shadow: 0 14rpx 36rpx rgba(62, 48, 38, 0.08);
+  overflow: hidden;
 }
 
 .precheck-head {
@@ -492,6 +499,7 @@ button::after {
 .precheck-view .precheck-head {
   grid-template-columns: 34rpx minmax(0, 1fr) 52rpx;
   gap: 14rpx;
+  min-width: 0;
 }
 
 .precheck-row.picked {
@@ -590,6 +598,7 @@ button::after {
 
 .precheck-view .segmented {
   gap: 12rpx;
+  min-width: 0;
 }
 
 .segmented-button {
