@@ -33,7 +33,8 @@ Page({
     studyTransition: false,
     mixedTransition: false,
     mixedTransitionTitle: "",
-    mixedTransitionHint: ""
+    mixedTransitionHint: "",
+    precheckNotice: ""
   },
 
   onLoad() {
@@ -44,6 +45,7 @@ Page({
   onUnload() {
     this.clearStudyTransitionTimer();
     this.clearMixedTransitionTimer();
+    this.clearPrecheckNoticeTimer();
     this.clearAutoPlayTimer();
     this.stopCurrentAudio();
   },
@@ -195,6 +197,12 @@ Page({
     this.mixedTransitionTimer = null;
   },
 
+  clearPrecheckNoticeTimer() {
+    if (!this.precheckNoticeTimer) return;
+    clearTimeout(this.precheckNoticeTimer);
+    this.precheckNoticeTimer = null;
+  },
+
   clearAutoPlayTimer() {
     if (!this.autoPlayTimer) return;
     clearTimeout(this.autoPlayTimer);
@@ -232,7 +240,14 @@ Page({
     if (view === VIEWS.HOME) patch.home = buildHomeData(state);
     if (view === VIEWS.TEST) patch.test = buildTestData(state);
     if (view === VIEWS.TEST_RESULT) patch.testResult = state.assessment.result || {};
-    if (view === VIEWS.PRECHECK) patch.precheck = buildPrecheckData(state);
+    if (view === VIEWS.PRECHECK) {
+      patch.precheck = buildPrecheckData(state);
+      const precheckNotice = buildPrecheckNoticeData(state);
+      if (precheckNotice && this.lastPrecheckNoticeKey !== precheckNotice.key) {
+        this.lastPrecheckNoticeKey = precheckNotice.key;
+        patch.precheckNotice = precheckNotice.text;
+      }
+    }
     if (view === VIEWS.WORD_STUDY) patch.study = buildStudyData(state);
     if (view === VIEWS.GROUP_REVIEW) {
       patch.review = buildReviewData(state);
@@ -255,6 +270,13 @@ Page({
       this.mixedTransitionTimer = setTimeout(() => {
         this.mixedTransitionTimer = null;
         this.setData({ mixedTransition: false });
+      }, 1100);
+    }
+    if (patch.precheckNotice) {
+      this.clearPrecheckNoticeTimer();
+      this.precheckNoticeTimer = setTimeout(() => {
+        this.precheckNoticeTimer = null;
+        this.setData({ precheckNotice: "" });
       }, 1100);
     }
   },
@@ -380,8 +402,15 @@ function buildPrecheckData(state) {
   return {
     candidates,
     selectedCount: selectedIds.length,
-    groupFeedback: state.daily.groupFeedback,
     canStart: selectedIds.length === 3
+  };
+}
+
+function buildPrecheckNoticeData(state) {
+  if (!state.daily.groupFeedback) return null;
+  return {
+    key: `${state.daily.startedAt}_${state.daily.completedWordIds.join("_")}_${state.daily.groupFeedback}`,
+    text: state.daily.groupFeedback
   };
 }
 
