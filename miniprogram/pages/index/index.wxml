@@ -59,7 +59,7 @@
   <view wx:elif="{{view == 'precheck'}}" class="view precheck-view">
     <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">训前检测</text></view>
     <view wx:if="{{precheck.groupFeedback}}" class="completion-burst">{{precheck.groupFeedback}}</view>
-    <view class="word-list">
+    <scroll-view class="word-list precheck-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
       <view wx:for="{{precheck.candidates}}" wx:key="id" class="precheck-row {{item.selected ? 'picked' : ''}}">
         <view class="precheck-head">
           <text class="index">{{item.index}}</text>
@@ -72,7 +72,7 @@
           <view class="segmented-button {{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</view>
         </view>
       </view>
-    </view>
+    </scroll-view>
     <view class="bottom-actions precheck-actions">
       <text class="selection-count">已选 {{precheck.selectedCount}}/3</text>
       <view class="secondary-button" bindtap="autoSelect">自动选词</view>

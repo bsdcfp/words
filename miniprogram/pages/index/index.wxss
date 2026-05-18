@@ -335,7 +335,12 @@ button::after {
 }
 
 .precheck-view {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 232rpx);
+  display: flex;
+  height: 100vh;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 132rpx);
 }
 
 .precheck-view .topbar {
@@ -360,8 +365,16 @@ button::after {
 }
 
 .precheck-view .word-list {
+  flex: 1;
+  min-height: 0;
   gap: 14rpx;
   margin: 14rpx 0 0;
+  padding-bottom: 20rpx;
+}
+
+.precheck-scroll {
+  box-sizing: border-box;
+  height: 100%;
 }
 
 .precheck-view .precheck-actions {
