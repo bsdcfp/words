@@ -31,7 +31,7 @@
       "outputPath": ""
     }
   },
-  "libVersion": "2.31.0",
+  "libVersion": "3.16.0",
   "condition": {},
   "simulatorPluginLibVersion": {},
   "packOptions": {
