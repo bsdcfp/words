@@ -672,12 +672,16 @@ button::after {
 }
 
 .completion-burst {
-  margin-bottom: 24rpx;
+  width: calc(100% - 104rpx);
+  margin: 0 52rpx 24rpx;
   padding: 22rpx 28rpx;
   border-radius: 16rpx;
   background: #0d8f7a;
   color: #fff;
   font-weight: 900;
+  line-height: 1.25;
+  word-break: break-word;
+  box-sizing: border-box;
 }
 
 .memory-image {
