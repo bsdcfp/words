@@ -105,7 +105,6 @@
       <view class="primary-button" bindtap="finishReview">进入发音辨义</view>
     </view>
     <view wx:else class="audio-panel">
-      <view class="phase-banner"><text>{{review.phaseTitle}}</text><text>{{review.phaseHint}}</text></view>
       <view class="speaker-tile" data-word-id="{{review.word.id}}" bindtap="speak">播放</view>
       <text class="ipa">{{review.word.ipa}}</text>
       <view class="option-stack">
@@ -113,6 +112,9 @@
       </view>
       <view class="text-link centered" data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view>
       <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组听音辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
+    </view>
+    <view wx:if="{{mixedTransition}}" class="transition-mask">
+      <view class="transition-card mixed-transition-card"><text>{{mixedTransitionTitle}}</text><text>{{mixedTransitionHint}}</text></view>
     </view>
   </view>
 

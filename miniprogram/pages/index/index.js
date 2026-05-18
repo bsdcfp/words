@@ -30,7 +30,10 @@ Page({
     wrongBook: {},
     report: {},
     detail: null,
-    studyTransition: false
+    studyTransition: false,
+    mixedTransition: false,
+    mixedTransitionTitle: "",
+    mixedTransitionHint: ""
   },
 
   onLoad() {
@@ -40,6 +43,7 @@ Page({
 
   onUnload() {
     this.clearStudyTransitionTimer();
+    this.clearMixedTransitionTimer();
   },
 
   startTest() {
@@ -177,6 +181,12 @@ Page({
     this.studyTransitionTimer = null;
   },
 
+  clearMixedTransitionTimer() {
+    if (!this.mixedTransitionTimer) return;
+    clearTimeout(this.mixedTransitionTimer);
+    this.mixedTransitionTimer = null;
+  },
+
   goHome() {
     this.saveAndRender(VIEWS.HOME);
   },
@@ -197,17 +207,33 @@ Page({
 
   render(view) {
     const state = this.state;
-    const patch = { view, state, studyTransition: false };
+    const patch = { view, state, studyTransition: false, mixedTransition: false };
     if (view === VIEWS.HOME) patch.home = buildHomeData(state);
     if (view === VIEWS.TEST) patch.test = buildTestData(state);
     if (view === VIEWS.TEST_RESULT) patch.testResult = state.assessment.result || {};
     if (view === VIEWS.PRECHECK) patch.precheck = buildPrecheckData(state);
     if (view === VIEWS.WORD_STUDY) patch.study = buildStudyData(state);
-    if (view === VIEWS.GROUP_REVIEW) patch.review = buildReviewData(state);
+    if (view === VIEWS.GROUP_REVIEW) {
+      patch.review = buildReviewData(state);
+      const mixedNotice = buildMixedTransitionData(state);
+      if (mixedNotice && this.lastMixedTransitionKey !== mixedNotice.key) {
+        this.lastMixedTransitionKey = mixedNotice.key;
+        patch.mixedTransition = true;
+        patch.mixedTransitionTitle = mixedNotice.title;
+        patch.mixedTransitionHint = mixedNotice.hint;
+      }
+    }
     if (view === VIEWS.AUDIO_MEANING) patch.audio = buildAudioData(state);
     if (view === VIEWS.WRONG_BOOK) patch.wrongBook = buildWrongBookData(state);
     if (view === VIEWS.DAILY_REPORT) patch.report = buildReportData(state);
     this.setData(patch);
+    if (patch.mixedTransition) {
+      this.clearMixedTransitionTimer();
+      this.mixedTransitionTimer = setTimeout(() => {
+        this.mixedTransitionTimer = null;
+        this.setData({ mixedTransition: false });
+      }, 1100);
+    }
   },
 
   openDetailById(wordId) {
@@ -312,13 +338,22 @@ function buildReviewData(state) {
       question: decorateQuestion(question, word),
       word: word ? decorateWord(word) : null,
       count: state.daily.mixedReviewWordIds.length,
-      progress: question ? `${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}` : "",
-      phaseTitle: `${state.daily.mixedReviewWordIds.length} 词混组复习`,
-      phaseHint: "现在开始打乱前面学过的词，听发音后选中文意思。"
+      progress: question ? `${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}` : ""
     };
   }
   const words = state.daily.selectedWordIds.map(flow.getWordById).filter(Boolean).map(decorateWord);
   return { isMixed: false, words, count: words.length };
+}
+
+function buildMixedTransitionData(state) {
+  if (state.daily.reviewPhase !== "mixed") return null;
+  if (state.daily.mixedIndex !== 0) return null;
+  if (!state.daily.mixedReviewWordIds.length) return null;
+  return {
+    key: `${state.daily.startedAt}_${state.daily.mixedReviewWordIds.join("_")}`,
+    title: `${state.daily.mixedReviewWordIds.length} 词混组复习`,
+    hint: "现在开始打乱前面学过的词"
+  };
 }
 
 function buildAudioData(state) {
