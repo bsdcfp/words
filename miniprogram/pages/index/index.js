@@ -407,11 +407,13 @@ Page({
   playWordAudio(wordId) {
     const word = flow.getWordById(wordId);
     if (!word) return;
+    this.configureAudioPlayback();
     this.stopCurrentAudio();
     const audio = wx.createInnerAudioContext();
     this.currentAudio = audio;
-    audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word.word)}&type=2`;
     audio.obeyMuteSwitch = false;
+    audio.volume = 1;
+    audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word.word)}&type=2`;
     audio.onEnded(() => {
       if (this.currentAudio === audio) this.currentAudio = null;
       audio.destroy();
@@ -421,6 +423,21 @@ Page({
       audio.destroy();
     });
     audio.play();
+  },
+
+  configureAudioPlayback() {
+    const app = typeof getApp === "function" ? getApp() : null;
+    if (app && typeof app.configureAudioPlayback === "function") {
+      app.configureAudioPlayback();
+      return;
+    }
+    if (typeof wx !== "undefined" && typeof wx.setInnerAudioOption === "function") {
+      wx.setInnerAudioOption({
+        mixWithOther: true,
+        obeyMuteSwitch: false,
+        speakerOn: true
+      });
+    }
   },
 
   openDetailById(wordId) {
