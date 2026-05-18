@@ -92,8 +92,10 @@
       <text class="meaning"><text>{{study.word.pos}}</text>{{study.word.meaningText}}</text>
       <view class="text-link" data-word-id="{{study.word.id}}" bindtap="openDetail">查看例句和搭配</view>
     </view>
-    <view wx:else class="empty-state"><text>本组识记已完成</text><view class="primary-button" bindtap="startReview">进入本组复习</view></view>
     <view wx:if="{{study.word}}" class="bottom-actions two"><view class="secondary-button" data-value="1" bindtap="markStudy">还不熟</view><view class="primary-button small" data-value="3" bindtap="markStudy">已记住</view></view>
+    <view wx:if="{{studyTransition}}" class="transition-mask">
+      <view class="transition-card"><text>本组识记已完成</text><text>正在进入本组复习</text></view>
+    </view>
   </view>
 
   <view wx:elif="{{view == 'group-review'}}" class="view">

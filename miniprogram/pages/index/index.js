@@ -29,12 +29,17 @@ Page({
     audio: {},
     wrongBook: {},
     report: {},
-    detail: null
+    detail: null,
+    studyTransition: false
   },
 
   onLoad() {
     this.state = loadState();
     this.render(VIEWS.HOME);
+  },
+
+  onUnload() {
+    this.clearStudyTransitionTimer();
   },
 
   startTest() {
@@ -80,10 +85,23 @@ Page({
 
   markStudy(event) {
     flow.markStudyWord(this.state, Number(event.currentTarget.dataset.value));
+    if (!flow.getCurrentStudyWord(this.state)) {
+      saveState(this.state);
+      this.setData({ studyTransition: true });
+      this.clearStudyTransitionTimer();
+      this.studyTransitionTimer = setTimeout(() => {
+        this.studyTransitionTimer = null;
+        this.setData({ studyTransition: false });
+        this.render(VIEWS.GROUP_REVIEW);
+      }, 800);
+      return;
+    }
     this.saveAndRender(VIEWS.WORD_STUDY);
   },
 
   startReview() {
+    this.clearStudyTransitionTimer();
+    this.setData({ studyTransition: false });
     this.saveAndRender(VIEWS.GROUP_REVIEW);
   },
 
@@ -153,6 +171,12 @@ Page({
 
   noop() {},
 
+  clearStudyTransitionTimer() {
+    if (!this.studyTransitionTimer) return;
+    clearTimeout(this.studyTransitionTimer);
+    this.studyTransitionTimer = null;
+  },
+
   goHome() {
     this.saveAndRender(VIEWS.HOME);
   },
@@ -173,7 +197,7 @@ Page({
 
   render(view) {
     const state = this.state;
-    const patch = { view, state };
+    const patch = { view, state, studyTransition: false };
     if (view === VIEWS.HOME) patch.home = buildHomeData(state);
     if (view === VIEWS.TEST) patch.test = buildTestData(state);
     if (view === VIEWS.TEST_RESULT) patch.testResult = state.assessment.result || {};
