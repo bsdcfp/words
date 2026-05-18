@@ -329,6 +329,46 @@ button::after {
   align-items: center;
 }
 
+.precheck-view {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 232rpx);
+}
+
+.precheck-view .topbar {
+  min-height: 68rpx;
+  gap: 18rpx;
+  margin-bottom: 16rpx;
+}
+
+.precheck-view .icon-button {
+  flex-basis: 64rpx;
+  width: 64rpx;
+  min-width: 64rpx;
+  max-width: 64rpx;
+  height: 64rpx;
+  border-radius: 16rpx;
+  font-size: 38rpx;
+}
+
+.precheck-view .page-title {
+  font-size: 38rpx;
+  letter-spacing: -1rpx;
+}
+
+.precheck-view .word-list {
+  gap: 14rpx;
+  margin: 14rpx 0 0;
+}
+
+.precheck-view .precheck-actions {
+  width: calc(100vw - 104rpx);
+  max-width: 668px;
+  grid-template-columns: 76rpx minmax(0, 1fr) minmax(0, 1fr);
+  padding: 14rpx 16rpx;
+  border: 2rpx solid rgba(54, 45, 39, 0.08);
+  border-radius: 20rpx;
+  background: rgba(255, 251, 244, 0.96);
+}
+
 .bottom-actions.two {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -403,11 +443,25 @@ button::after {
   gap: 22rpx;
 }
 
+.precheck-view .precheck-row {
+  gap: 10rpx;
+  padding: 16rpx 22rpx;
+  border-color: rgba(54, 45, 39, 0.1);
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.58);
+  box-shadow: 0 14rpx 36rpx rgba(62, 48, 38, 0.08);
+}
+
 .precheck-head {
   display: grid;
   grid-template-columns: 44rpx minmax(0, 1fr) 68rpx;
   align-items: center;
   gap: 18rpx;
+}
+
+.precheck-view .precheck-head {
+  grid-template-columns: 34rpx minmax(0, 1fr) 52rpx;
+  gap: 14rpx;
 }
 
 .precheck-row.picked {
@@ -417,6 +471,10 @@ button::after {
 .index {
   color: #776d64;
   font-weight: 900;
+}
+
+.precheck-view .index {
+  font-size: 28rpx;
 }
 
 .select-toggle,
@@ -433,6 +491,13 @@ button::after {
 .select-toggle {
   width: 64rpx;
   height: 64rpx;
+}
+
+.precheck-view .select-toggle {
+  width: 52rpx;
+  height: 52rpx;
+  font-size: 28rpx;
+  box-shadow: 0 8rpx 20rpx rgba(13, 143, 122, 0.1);
 }
 
 .select-toggle.on {
@@ -460,6 +525,12 @@ button::after {
   line-height: 1.15;
 }
 
+.precheck-view .word-link {
+  padding: 8rpx 20rpx;
+  font-size: 32rpx;
+  background: rgba(255, 255, 255, 0.92);
+}
+
 .meaning-inline {
   display: block;
   padding-left: 62rpx;
@@ -469,11 +540,21 @@ button::after {
   word-break: break-word;
 }
 
+.precheck-view .meaning-inline {
+  padding-left: 48rpx;
+  font-size: 25rpx;
+  line-height: 1.3;
+}
+
 .segmented {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16rpx;
+}
+
+.precheck-view .segmented {
+  gap: 12rpx;
 }
 
 .segmented-button {
@@ -488,6 +569,13 @@ button::after {
   color: #776d64;
   font-weight: 800;
   box-sizing: border-box;
+}
+
+.precheck-view .segmented-button {
+  min-height: 54rpx;
+  border-radius: 14rpx;
+  background: rgba(255, 251, 244, 0.76);
+  font-size: 26rpx;
 }
 
 .segmented .selected {
@@ -507,6 +595,16 @@ button::after {
   font-weight: 900;
   line-height: 1.25;
   text-align: center;
+}
+
+.precheck-view .selection-count {
+  font-size: 23rpx;
+}
+
+.precheck-view .bottom-actions .primary-button,
+.precheck-view .bottom-actions .secondary-button {
+  min-height: 72rpx;
+  font-size: 28rpx;
 }
 
 .completion-burst {

@@ -56,7 +56,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view == 'precheck'}}" class="view">
+  <view wx:elif="{{view == 'precheck'}}" class="view precheck-view">
     <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">训前检测</text></view>
     <view wx:if="{{precheck.groupFeedback}}" class="completion-burst">{{precheck.groupFeedback}}</view>
     <view class="word-list">
