@@ -185,6 +185,10 @@ function getWordById(id) {
   return words.find((word) => word.id === id);
 }
 
+function getAllWords() {
+  return words;
+}
+
 function buildCandidateWordIds(userWordStates, excludedWordIds = []) {
   const excluded = {};
   excludedWordIds.forEach((id) => { excluded[id] = true; });
@@ -282,6 +286,7 @@ module.exports = {
   getCurrentMixedReviewQuestion,
   getCurrentStudyWord,
   getCurrentTestQuestion,
+  getAllWords,
   getWordById,
   markPrecheck,
   markStudyWord,

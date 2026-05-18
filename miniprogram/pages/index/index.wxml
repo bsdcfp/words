@@ -107,7 +107,7 @@
       <view class="speaker-tile" data-word-id="{{review.word.id}}" bindtap="speak">播放</view>
       <text class="ipa">{{review.word.ipa}}</text>
       <view class="option-stack">
-        <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerMixed"><text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
+        <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerMixed"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
       </view>
       <view class="text-link centered" data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view>
       <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组听音辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
@@ -121,7 +121,7 @@
       <text class="ipa">{{audio.word.ipa}}</text>
       <text class="hint">先回想词义再选择，想不起来看答案</text>
       <view class="option-stack">
-        <view wx:for="{{audio.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerAudio"><text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
+        <view wx:for="{{audio.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerAudio"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
       </view>
       <view class="text-link centered" data-word-id="{{audio.word.id}}" bindtap="openDetail">看答案</view>
     </view>

@@ -341,6 +341,7 @@ function decorateQuestion(question, word) {
   return Object.assign({}, question, {
     options: question.options.map((option) => ({
       value: option,
+      pos: getMeaningPos(option),
       first: option.split("，")[0],
       rest: option.split("，").slice(1).join("，"),
       isAnswer: option === answer,
@@ -348,4 +349,9 @@ function decorateQuestion(question, word) {
       statusClass: !question.answered ? "" : option === answer ? "correct" : option === question.selected ? "wrong" : "muted-card"
     }))
   });
+}
+
+function getMeaningPos(meaning) {
+  const matched = flow.getAllWords().find((item) => item.cn.join("，") === meaning);
+  return matched ? matched.pos : "";
 }

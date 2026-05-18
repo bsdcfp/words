@@ -299,6 +299,11 @@ button::after {
   opacity: 0.45;
 }
 
+.option-pos {
+  margin-right: 10rpx;
+  color: #0d8f7a;
+}
+
 .unknown-button {
   width: 100%;
   margin-top: 24rpx;
