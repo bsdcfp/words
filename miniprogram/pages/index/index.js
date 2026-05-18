@@ -96,6 +96,11 @@ Page({
     const question = flow.getCurrentAudioQuestion(this.state);
     if (!question || question.answered) return;
     const result = flow.answerAudioQuestion(this.state, event.currentTarget.dataset.value);
+    if (result.isCorrect) {
+      const phase = flow.moveToNextAudioQuestion(this.state);
+      this.saveAndRender(phase === "next-selection" ? VIEWS.PRECHECK : phase === "mixed-review" ? VIEWS.GROUP_REVIEW : VIEWS.AUDIO_MEANING);
+      return;
+    }
     if (!result.isCorrect) {
       this.openDetailById(result.word.id);
     }
@@ -265,9 +270,11 @@ function buildPrecheckData(state) {
 
 function buildStudyData(state) {
   const word = flow.getCurrentStudyWord(state);
+  const total = state.daily.selectedWordIds.length || 3;
+  const current = Math.min(state.daily.studyIndex + 1, total);
   return {
     word: word ? decorateWord(word) : null,
-    progress: `${state.daily.studyIndex + 1}/${state.daily.selectedWordIds.length || 3}`
+    progress: `${current}/${total}`
   };
 }
 
@@ -281,7 +288,9 @@ function buildReviewData(state) {
       question: decorateQuestion(question, word),
       word: word ? decorateWord(word) : null,
       count: state.daily.mixedReviewWordIds.length,
-      progress: question ? `${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}` : ""
+      progress: question ? `${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}` : "",
+      phaseTitle: `${state.daily.mixedReviewWordIds.length} 词混组复习`,
+      phaseHint: "现在开始打乱前面学过的词，听发音后选中文意思。"
     };
   }
   const words = state.daily.selectedWordIds.map(flow.getWordById).filter(Boolean).map(decorateWord);

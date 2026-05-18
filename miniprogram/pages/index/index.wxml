@@ -103,6 +103,7 @@
       <view class="primary-button" bindtap="finishReview">进入发音辨义</view>
     </view>
     <view wx:else class="audio-panel">
+      <view class="phase-banner"><text>{{review.phaseTitle}}</text><text>{{review.phaseHint}}</text></view>
       <view class="speaker-tile" data-word-id="{{review.word.id}}" bindtap="speak">播放</view>
       <text class="ipa">{{review.word.ipa}}</text>
       <view class="option-stack">
