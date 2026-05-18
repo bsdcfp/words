@@ -5,6 +5,8 @@ const defaultState = {
     id: "demo_student",
     name: "体验学生",
     level: "高二",
+    levelId: "senior_2",
+    levelLabel: "高二",
     activeGroup: "高考课标词",
     streakDays: 0,
     longestStreak: 0,

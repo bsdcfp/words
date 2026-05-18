@@ -6,6 +6,8 @@ const flow = require("../../utils/study-flow");
 
 const VIEWS = {
   HOME: "home",
+  PROFILE: "profile",
+  LEVEL_SELECT: "level-select",
   TEST: "test",
   TEST_RESULT: "test-result",
   PRECHECK: "precheck",
@@ -18,12 +20,62 @@ const VIEWS = {
 const NOTICE_DURATION_MS = 1500;
 const AUTO_PLAY_AFTER_NOTICE_MS = NOTICE_DURATION_MS + 120;
 const AUTO_PLAY_DELAY_MS = 180;
+const LEVEL_GROUPS = [
+  {
+    title: "小学",
+    options: [
+      { id: "primary_1", label: "一年级" },
+      { id: "primary_2", label: "二年级" },
+      { id: "primary_3", label: "三年级" },
+      { id: "primary_4", label: "四年级" },
+      { id: "primary_5", label: "五年级" },
+      { id: "primary_6", label: "六年级" }
+    ]
+  },
+  {
+    title: "初中",
+    options: [
+      { id: "junior_1", label: "初一" },
+      { id: "junior_2", label: "初二" },
+      { id: "junior_3", label: "初三" }
+    ]
+  },
+  {
+    title: "高中",
+    options: [
+      { id: "senior_1", label: "高一" },
+      { id: "senior_2", label: "高二" },
+      { id: "senior_3", label: "高三" }
+    ]
+  },
+  {
+    title: "大学",
+    options: [
+      { id: "college_1", label: "大一" },
+      { id: "college_2", label: "大二" },
+      { id: "college_3", label: "大三" },
+      { id: "college_4", label: "大四" },
+      { id: "master", label: "硕士" },
+      { id: "doctor", label: "博士" }
+    ]
+  },
+  {
+    title: "成人",
+    options: [
+      { id: "adult_daily", label: "日常英语" },
+      { id: "adult_work", label: "职场英语" },
+      { id: "adult_exam", label: "考试备考" }
+    ]
+  }
+];
 
 Page({
   data: {
     view: VIEWS.HOME,
     state: null,
     home: {},
+    profile: {},
+    levelSelect: {},
     test: {},
     testResult: {},
     precheck: {},
@@ -33,6 +85,7 @@ Page({
     wrongBook: {},
     report: {},
     detail: null,
+    studyImageMode: false,
     studyTransition: false,
     mixedTransition: false,
     mixedTransitionTitle: "",
@@ -56,6 +109,30 @@ Page({
   startTest() {
     flow.startAssessment(this.state);
     this.saveAndRender(VIEWS.TEST);
+  },
+
+  openWordsTab() {
+    this.saveAndRender(VIEWS.HOME);
+  },
+
+  openProfile() {
+    this.saveAndRender(VIEWS.PROFILE);
+  },
+
+  openLevelSelect() {
+    this.saveAndRender(VIEWS.LEVEL_SELECT);
+  },
+
+  selectLevel(event) {
+    const { levelId, levelLabel } = event.currentTarget.dataset;
+    this.state.user.levelId = levelId;
+    this.state.user.levelLabel = levelLabel;
+    this.state.user.level = levelLabel;
+    this.saveAndRender(VIEWS.PROFILE);
+  },
+
+  skipLevelSelect() {
+    this.saveAndRender(VIEWS.HOME);
   },
 
   answerTest(event) {
@@ -178,6 +255,10 @@ Page({
     this.playWordAudio(event.currentTarget.dataset.wordId);
   },
 
+  toggleStudyImageMode() {
+    this.setData({ studyImageMode: !this.data.studyImageMode });
+  },
+
   openDetail(event) {
     this.openDetailById(event.currentTarget.dataset.wordId);
   },
@@ -241,6 +322,8 @@ Page({
     const state = this.state;
     const patch = { view, state, studyTransition: false, mixedTransition: false };
     if (view === VIEWS.HOME) patch.home = buildHomeData(state);
+    if (view === VIEWS.PROFILE) patch.profile = buildProfileData(state);
+    if (view === VIEWS.LEVEL_SELECT) patch.levelSelect = buildLevelSelectData(state);
     if (view === VIEWS.TEST) patch.test = buildTestData(state);
     if (view === VIEWS.TEST_RESULT) patch.testResult = state.assessment.result || {};
     if (view === VIEWS.PRECHECK) {
@@ -345,12 +428,19 @@ function buildHomeData(state) {
   const result = state.assessment.result;
   const weakCount = Object.values(state.userWordStates).filter((wordState) => wordState.wrongCount > 0).length;
   const learnedCount = Object.values(state.userWordStates).filter((wordState) => wordState.familiarity > 0).length;
+  const todayDone = state.daily.sessionCompletedWordIds.length;
+  const planCount = 3;
+  const reviewCount = state.daily.mixedReviewWordIds.length || 0;
   return {
     userName: state.user.name,
+    levelLabel: state.user.levelLabel || state.user.level || "未选择",
     vocabulary: result ? result.vocabulary : "未测",
     testLabel: result ? `${result.stage} · ${result.accuracy}%` : "独立诊断入口",
     learnedCount,
     weakCount,
+    todayDone,
+    planCount,
+    reviewCount,
     streakDays: state.user.streakDays,
     streakText: getRewardStreakText(state),
     badges: state.user.badges.length ? state.user.badges.join("、") : "今日完成后获得起步徽章",
@@ -358,6 +448,41 @@ function buildHomeData(state) {
     total: wordDatasetMeta.total,
     miniProgramTotal: wordDatasetMeta.miniProgramTotal,
     dictionary: wordDatasetMeta.dictionary.source
+  };
+}
+
+function buildProfileData(state) {
+  const result = state.assessment.result;
+  const learnedCount = Object.values(state.userWordStates).filter((wordState) => wordState.familiarity > 0).length;
+  const weakCount = Object.values(state.userWordStates).filter((wordState) => wordState.wrongCount > 0).length;
+  const todayDone = state.daily.sessionCompletedWordIds.length;
+  const todayMinutes = todayDone ? Math.max(3, todayDone * 2) : 0;
+  const week = ["一", "二", "三", "四", "五", "六", "日"].map((day, index) => ({
+    day,
+    active: index < Math.min(state.user.streakDays, 7)
+  }));
+  return {
+    userName: state.user.name,
+    vocabulary: result ? result.vocabulary : "未测",
+    levelLabel: state.user.levelLabel || state.user.level || "未选择",
+    activeGroup: state.user.activeGroup || wordDatasetMeta.groupName,
+    total: wordDatasetMeta.total,
+    miniProgramTotal: wordDatasetMeta.miniProgramTotal,
+    learnedCount,
+    weakCount,
+    todayDone,
+    todayMinutes,
+    totalMinutes: learnedCount * 2,
+    streakDays: state.user.streakDays,
+    longestStreak: state.user.longestStreak || 0,
+    week
+  };
+}
+
+function buildLevelSelectData(state) {
+  return {
+    currentLevel: state.user.levelLabel || state.user.level || "未选择",
+    groups: LEVEL_GROUPS
   };
 }
 

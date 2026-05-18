@@ -376,6 +376,8 @@ button::after {
 }
 
 .precheck-view .word-list {
+  width: 100%;
+  box-sizing: border-box;
   gap: 14rpx;
   margin: 0;
   padding: 0 52rpx 22rpx;
@@ -813,7 +815,7 @@ button::after {
   display: grid;
   gap: 8rpx;
   min-width: 0;
-  width: calc(100% - 104rpx);
+  width: calc(100vw - 104rpx);
   max-width: 616px;
   padding: 34rpx 38rpx;
   border: 2rpx solid rgba(255, 255, 255, 0.5);
@@ -866,6 +868,331 @@ button::after {
   display: grid;
   gap: 24rpx;
   text-align: center;
+}
+
+.home-view,
+.profile-view {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 148rpx);
+}
+
+.profile-chip,
+.level-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 64rpx;
+  padding: 0 28rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.58);
+  color: #221f1c;
+  font-size: 26rpx;
+  font-weight: 900;
+}
+
+.plan-panel,
+.profile-hero,
+.profile-card,
+.level-panel,
+.study-focus-card {
+  width: 100%;
+  min-width: 0;
+  border: 2rpx solid rgba(54, 45, 39, 0.12);
+  border-radius: 24rpx;
+  background: rgba(255, 251, 244, 0.62);
+  box-shadow: 0 24rpx 60rpx rgba(62, 48, 38, 0.13);
+  box-sizing: border-box;
+}
+
+.plan-panel {
+  display: grid;
+  gap: 24rpx;
+  padding: 40rpx 36rpx;
+}
+
+.plan-panel .hero-title {
+  margin-bottom: 0;
+}
+
+.plan-copy {
+  display: block;
+  color: #665d55;
+  font-size: 28rpx;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.plan-panel .primary-button {
+  width: 100%;
+  margin: 6rpx 0 0;
+}
+
+.plan-grid,
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16rpx;
+  margin: 24rpx 0;
+}
+
+.plan-grid view,
+.profile-grid view {
+  min-width: 0;
+  padding: 24rpx 12rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.48);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.plan-grid text:first-child,
+.profile-grid text:first-child {
+  display: block;
+  color: #221f1c;
+  font-size: 42rpx;
+  font-weight: 900;
+}
+
+.plan-grid text:last-child,
+.profile-grid text:last-child {
+  display: block;
+  color: #776d64;
+  font-size: 23rpx;
+  font-weight: 800;
+}
+
+.today-card {
+  display: grid;
+  gap: 16rpx;
+}
+
+.today-card view {
+  padding: 26rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.42);
+  box-sizing: border-box;
+}
+
+.tab-bar {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 22rpx);
+  z-index: 7;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10rpx;
+  width: calc(100vw - 56rpx);
+  max-width: 680px;
+  padding: 10rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.28);
+  border-radius: 24rpx;
+  background: rgba(37, 76, 68, 0.92);
+  box-shadow: 0 20rpx 54rpx rgba(22, 39, 35, 0.24);
+  transform: translateX(-50%);
+  box-sizing: border-box;
+}
+
+.tab-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 76rpx;
+  border-radius: 18rpx;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 900;
+}
+
+.tab-item.active {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b6f61;
+}
+
+.profile-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24rpx;
+  padding: 34rpx;
+}
+
+.profile-book {
+  display: block;
+  margin-bottom: 10rpx;
+  color: #221f1c;
+  font-size: 42rpx;
+  font-weight: 900;
+}
+
+.profile-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.profile-card {
+  display: grid;
+  gap: 24rpx;
+  padding: 30rpx;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.week-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10rpx;
+}
+
+.week-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 58rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.56);
+  color: #776d64;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.week-dot.active {
+  background: rgba(13, 143, 122, 0.16);
+  color: #07705f;
+}
+
+.profile-list {
+  display: grid;
+  gap: 18rpx;
+  margin-top: 24rpx;
+}
+
+.level-panel {
+  display: grid;
+  gap: 30rpx;
+  padding: 34rpx;
+}
+
+.level-group {
+  display: grid;
+  gap: 16rpx;
+}
+
+.level-title {
+  color: #776d64;
+  font-size: 28rpx;
+  font-weight: 900;
+}
+
+.level-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14rpx;
+}
+
+.level-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 74rpx;
+  border-radius: 18rpx;
+  background: rgba(255, 255, 255, 0.78);
+  color: #221f1c;
+  font-size: 26rpx;
+  font-weight: 900;
+}
+
+.study-view {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 168rpx);
+}
+
+.study-focus-card {
+  display: grid;
+  gap: 20rpx;
+  padding: 38rpx 34rpx;
+}
+
+.study-focus-card .study-word {
+  margin: 18rpx 0 0;
+  font-size: 72rpx;
+  letter-spacing: -2rpx;
+}
+
+.study-focus-card .meaning {
+  margin: 0;
+}
+
+.study-tool-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.tool-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 66rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.7);
+  color: #665d55;
+  font-size: 25rpx;
+  font-weight: 900;
+}
+
+.tool-button.active,
+.tool-button.primary {
+  background: #0d8f7a;
+  color: #fff;
+}
+
+.audio-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 168rpx);
+}
+
+.audio-minimal {
+  display: grid;
+  gap: 28rpx;
+  padding: 38rpx 34rpx;
+}
+
+.audio-minimal .speaker-tile {
+  width: 168rpx;
+  height: 168rpx;
+  min-height: 168rpx;
+  margin: 0 auto;
+  border-radius: 44rpx;
+  background: rgba(255, 255, 255, 0.82);
+  color: #0d8f7a;
+  box-shadow: 0 18rpx 42rpx rgba(13, 143, 122, 0.14);
+  font-size: 30rpx;
+}
+
+.audio-minimal .option-stack {
+  margin: 0;
+  gap: 18rpx;
+}
+
+.audio-tools {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+}
+
+.audio-tools view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 68rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.56);
+  color: #07705f;
+  font-weight: 900;
 }
 
 @media (max-width: 360px) {
