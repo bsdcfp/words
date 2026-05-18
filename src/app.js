@@ -107,16 +107,16 @@ function renderHome() {
     </header>
     <section class="hero-panel">
       <p class="section-label">今日任务</p>
-      <h2>老师带着学生先选 3 个不熟词</h2>
+      <h2>先选 3 个不熟词，开始今日识记</h2>
       <button class="primary-button" type="button" data-action="start-daily">开始今日学习</button>
     </section>
-    <section class="coach-strip" aria-label="人物合作流程">
+    <section class="coach-strip" aria-label="学习流程">
       <article>
-        <span>老师带学</span>
-        <small>选词、讲图、纠错</small>
+        <span>自主选词</span>
+        <small>先测熟悉度</small>
       </article>
       <article>
-        <span>学生跟读</span>
+        <span>分步练习</span>
         <small>识记、复述、辨义</small>
       </article>
     </section>

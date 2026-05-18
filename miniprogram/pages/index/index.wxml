@@ -9,12 +9,12 @@
     </view>
     <view class="hero-panel">
       <text class="section-label">今日任务</text>
-      <text class="hero-title">老师带着学生先选 3 个不熟词</text>
+      <text class="hero-title">先选 3 个不熟词，开始今日识记</text>
       <view class="primary-button" bindtap="startDailyLearning">开始今日学习</view>
     </view>
     <view class="coach-strip">
-      <view><text>老师带学</text><text class="muted">选词、讲图、纠错</text></view>
-      <view><text>学生跟读</text><text class="muted">识记、复述、辨义</text></view>
+      <view><text>自主选词</text><text class="muted">先测熟悉度</text></view>
+      <view><text>分步练习</text><text class="muted">识记、复述、辨义</text></view>
     </view>
     <view class="stats-grid">
       <view class="metric"><text>{{home.vocabulary}}</text><text>现实词汇量</text></view>

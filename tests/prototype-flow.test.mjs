@@ -64,8 +64,9 @@ try {
   await page.getByRole("button", { name: "重置体验数据" }).click();
   assert.match(await page.locator("#view-home").innerText(), /高考课标词/);
   assert.match(await page.locator("#view-home").innerText(), /3000 词/);
-  assert.match(await page.locator("#view-home").innerText(), /老师带学/);
-  assert.match(await page.locator("#view-home").innerText(), /学生跟读/);
+  assert.match(await page.locator("#view-home").innerText(), /自主选词/);
+  assert.match(await page.locator("#view-home").innerText(), /分步练习/);
+  assert.doesNotMatch(await page.locator("#view-home").innerText(), /老师/);
   assert.match(await page.locator("#view-home").innerText(), /错词本/);
 
   await page.getByRole("button", { name: "词汇量测试" }).click();
