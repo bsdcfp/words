@@ -335,12 +335,11 @@ button::after {
 }
 
 .precheck-view {
-  display: flex;
+  position: relative;
   height: 100vh;
   min-height: 0;
-  flex-direction: column;
   overflow: hidden;
-  padding-bottom: calc(env(safe-area-inset-bottom) + 132rpx);
+  padding-bottom: 0;
 }
 
 .precheck-view .topbar {
@@ -364,17 +363,29 @@ button::after {
   letter-spacing: -1rpx;
 }
 
-.precheck-view .word-list {
-  flex: 1;
+.precheck-scroll {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 132rpx);
+  right: 52rpx;
+  bottom: calc(env(safe-area-inset-bottom) + 154rpx);
+  left: 52rpx;
+  height: auto;
   min-height: 0;
-  gap: 14rpx;
-  margin: 14rpx 0 0;
-  padding-bottom: 20rpx;
+  box-sizing: border-box;
 }
 
-.precheck-scroll {
+.precheck-scroll.has-feedback {
+  top: calc(env(safe-area-inset-top) + 198rpx);
+}
+
+.precheck-view .word-list {
+  gap: 14rpx;
+  margin: 0;
+  padding-bottom: 22rpx;
+}
+
+.precheck-list {
   box-sizing: border-box;
-  height: 100%;
 }
 
 .precheck-view .precheck-actions {

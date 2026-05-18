@@ -59,17 +59,19 @@
   <view wx:elif="{{view == 'precheck'}}" class="view precheck-view">
     <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">训前检测</text></view>
     <view wx:if="{{precheck.groupFeedback}}" class="completion-burst">{{precheck.groupFeedback}}</view>
-    <scroll-view class="word-list precheck-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
-      <view wx:for="{{precheck.candidates}}" wx:key="id" class="precheck-row {{item.selected ? 'picked' : ''}}">
-        <view class="precheck-head">
-          <text class="index">{{item.index}}</text>
-          <view class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</view>
-          <view class="select-toggle {{item.selected ? 'on' : ''}}" data-word-id="{{item.id}}" bindtap="togglePrecheckWord">{{item.selected ? '✓' : '+'}}</view>
-        </view>
-        <text class="meaning-inline"><text>{{item.pos}}</text>{{item.meaningText}}</text>
-        <view class="segmented">
-          <view class="segmented-button {{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</view>
-          <view class="segmented-button {{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</view>
+    <scroll-view class="precheck-scroll {{precheck.groupFeedback ? 'has-feedback' : ''}}" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
+      <view class="word-list precheck-list">
+        <view wx:for="{{precheck.candidates}}" wx:key="id" class="precheck-row {{item.selected ? 'picked' : ''}}">
+          <view class="precheck-head">
+            <text class="index">{{item.index}}</text>
+            <view class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</view>
+            <view class="select-toggle {{item.selected ? 'on' : ''}}" data-word-id="{{item.id}}" bindtap="togglePrecheckWord">{{item.selected ? '✓' : '+'}}</view>
+          </view>
+          <text class="meaning-inline"><text>{{item.pos}}</text>{{item.meaningText}}</text>
+          <view class="segmented">
+            <view class="segmented-button {{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</view>
+            <view class="segmented-button {{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</view>
+          </view>
         </view>
       </view>
     </scroll-view>
