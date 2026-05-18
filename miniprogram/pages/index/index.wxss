@@ -364,9 +364,10 @@ button::after {
   max-width: 668px;
   grid-template-columns: 76rpx minmax(0, 1fr) minmax(0, 1fr);
   padding: 14rpx 16rpx;
-  border: 2rpx solid rgba(54, 45, 39, 0.08);
-  border-radius: 20rpx;
-  background: rgba(255, 251, 244, 0.96);
+  border: 2rpx solid rgba(255, 255, 255, 0.2);
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, rgba(30, 55, 49, 0.98), rgba(13, 143, 122, 0.92));
+  box-shadow: 0 22rpx 54rpx rgba(22, 39, 35, 0.28);
 }
 
 .bottom-actions.two {
@@ -603,6 +604,10 @@ button::after {
 }
 
 .precheck-view .selection-count {
+  padding: 8rpx 6rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
   font-size: 23rpx;
 }
 
@@ -610,6 +615,22 @@ button::after {
 .precheck-view .bottom-actions .secondary-button {
   min-height: 72rpx;
   font-size: 28rpx;
+}
+
+.precheck-view .bottom-actions .secondary-button {
+  background: rgba(255, 255, 255, 0.92);
+  color: #0b6f61;
+}
+
+.precheck-view .bottom-actions .primary-button {
+  background: #f4d98b;
+  color: #173b34;
+}
+
+.precheck-view .bottom-actions .primary-button.disabled {
+  background: rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.68);
+  opacity: 1;
 }
 
 .completion-burst {
