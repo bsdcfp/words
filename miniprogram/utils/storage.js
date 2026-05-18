@@ -45,12 +45,12 @@ const defaultState = {
 
 function loadState() {
   const raw = wx.getStorageSync(STORAGE_KEY);
-  if (!raw) return clone(defaultState);
+  if (!raw) return normaliseState(clone(defaultState));
   try {
-    return mergeState(clone(defaultState), JSON.parse(raw));
+    return normaliseState(mergeState(clone(defaultState), JSON.parse(raw)));
   } catch (error) {
     wx.removeStorageSync(STORAGE_KEY);
-    return clone(defaultState);
+    return normaliseState(clone(defaultState));
   }
 }
 
@@ -77,6 +77,36 @@ function mergeState(base, patch) {
     }
   });
   return base;
+}
+
+function normaliseState(state) {
+  if (!state || typeof state !== "object") return clone(defaultState);
+  if (!state.user || typeof state.user !== "object") state.user = clone(defaultState.user);
+  if (!state.assessment || typeof state.assessment !== "object") state.assessment = clone(defaultState.assessment);
+  if (!state.daily || typeof state.daily !== "object") state.daily = clone(defaultState.daily);
+  if (!state.userWordStates || typeof state.userWordStates !== "object") state.userWordStates = {};
+  if (!Array.isArray(state.answerRecords)) state.answerRecords = [];
+  if (!Array.isArray(state.user.badges)) state.user.badges = [];
+  ensureArrayFields(state.assessment, ["answers"]);
+  ensureArrayFields(state.daily, [
+    "selectedWordIds",
+    "groupQueue",
+    "batchWordIds",
+    "completedWordIds",
+    "sessionCompletedWordIds",
+    "mixedReviewWordIds",
+    "candidateWordIds",
+    "audioQuestions",
+    "mixedQuestions"
+  ]);
+  if (!state.daily.precheck || typeof state.daily.precheck !== "object") state.daily.precheck = {};
+  return mergeState(clone(defaultState), state);
+}
+
+function ensureArrayFields(target, fields) {
+  fields.forEach((field) => {
+    if (!Array.isArray(target[field])) target[field] = [];
+  });
 }
 
 module.exports = {

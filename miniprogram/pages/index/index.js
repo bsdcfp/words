@@ -85,6 +85,7 @@ Page({
     wrongBook: {},
     report: {},
     detail: null,
+    bootError: "",
     studyImageMode: false,
     studyTransition: false,
     mixedTransition: false,
@@ -94,8 +95,18 @@ Page({
   },
 
   onLoad() {
-    this.state = loadState();
-    this.render(VIEWS.HOME);
+    try {
+      this.state = loadState();
+      this.render(VIEWS.HOME);
+    } catch (error) {
+      this.state = resetState();
+      this.setData({
+        view: VIEWS.HOME,
+        state: this.state,
+        home: buildHomeData(this.state),
+        bootError: error && error.message ? error.message : String(error)
+      });
+    }
   },
 
   onUnload() {
@@ -310,6 +321,7 @@ Page({
 
   resetData() {
     this.state = resetState();
+    this.setData({ bootError: "" });
     this.saveAndRender(VIEWS.HOME);
   },
 

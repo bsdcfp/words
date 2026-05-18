@@ -7,6 +7,11 @@
       </view>
       <view class="profile-chip" bindtap="openProfile">我的</view>
     </view>
+    <view wx:if="{{bootError}}" class="boot-error-card">
+      <text class="card-title">启动时遇到问题</text>
+      <text class="muted">{{bootError}}</text>
+      <view class="secondary-button" bindtap="resetData">重置体验数据</view>
+    </view>
     <view class="plan-panel">
       <text class="section-label">按记忆曲线安排</text>
       <text class="hero-title">先选 3 个不熟词</text>

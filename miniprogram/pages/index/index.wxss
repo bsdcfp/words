@@ -891,7 +891,8 @@ button::after {
 .profile-hero,
 .profile-card,
 .level-panel,
-.study-focus-card {
+.study-focus-card,
+.boot-error-card {
   width: 100%;
   min-width: 0;
   border: 2rpx solid rgba(54, 45, 39, 0.12);
@@ -905,6 +906,14 @@ button::after {
   display: grid;
   gap: 24rpx;
   padding: 40rpx 36rpx;
+}
+
+.boot-error-card {
+  display: grid;
+  gap: 18rpx;
+  margin-bottom: 24rpx;
+  padding: 28rpx;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .plan-panel .hero-title {
