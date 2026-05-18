@@ -107,7 +107,7 @@ function renderHome() {
     </header>
     <section class="hero-panel">
       <p class="section-label">今日任务</p>
-      <h2>先选 3 个不熟词，开始今日识记</h2>
+      <h2>先选 3 个不熟词</h2>
       <button class="primary-button" type="button" data-action="start-daily">开始今日学习</button>
     </section>
     <section class="coach-strip" aria-label="学习流程">
