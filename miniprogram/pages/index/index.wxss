@@ -698,7 +698,6 @@ button::after {
   font-weight: 900;
 }
 
-.sound-button,
 .speaker-tile {
   display: flex;
   align-items: center;
@@ -708,6 +707,22 @@ button::after {
   border-radius: 999rpx;
   background: #221f1c;
   color: #fff;
+  font-weight: 900;
+}
+
+.sound-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 148rpx;
+  min-height: 58rpx;
+  margin: 4rpx 0 8rpx;
+  padding: 0 26rpx;
+  border: 2rpx solid rgba(13, 143, 122, 0.22);
+  border-radius: 999rpx;
+  background: rgba(13, 143, 122, 0.1);
+  color: #07705f;
+  font-size: 25rpx;
   font-weight: 900;
 }
 
