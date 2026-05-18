@@ -15,6 +15,9 @@ const VIEWS = {
   WRONG_BOOK: "wrong-book",
   DAILY_REPORT: "daily-report"
 };
+const NOTICE_DURATION_MS = 2000;
+const AUTO_PLAY_AFTER_NOTICE_MS = NOTICE_DURATION_MS + 120;
+const AUTO_PLAY_DELAY_MS = 180;
 
 Page({
   data: {
@@ -101,7 +104,7 @@ Page({
         this.studyTransitionTimer = null;
         this.setData({ studyTransition: false });
         this.render(VIEWS.GROUP_REVIEW);
-      }, 800);
+      }, NOTICE_DURATION_MS);
       return;
     }
     this.saveAndRender(VIEWS.WORD_STUDY);
@@ -263,21 +266,21 @@ Page({
     if (view === VIEWS.WRONG_BOOK) patch.wrongBook = buildWrongBookData(state);
     if (view === VIEWS.DAILY_REPORT) patch.report = buildReportData(state);
     this.setData(patch, () => {
-      this.scheduleAutoPlay(view, patch.mixedTransition ? 1200 : 180);
+      this.scheduleAutoPlay(view, patch.mixedTransition ? AUTO_PLAY_AFTER_NOTICE_MS : AUTO_PLAY_DELAY_MS);
     });
     if (patch.mixedTransition) {
       this.clearMixedTransitionTimer();
       this.mixedTransitionTimer = setTimeout(() => {
         this.mixedTransitionTimer = null;
         this.setData({ mixedTransition: false });
-      }, 1100);
+      }, NOTICE_DURATION_MS);
     }
     if (patch.precheckNotice) {
       this.clearPrecheckNoticeTimer();
       this.precheckNoticeTimer = setTimeout(() => {
         this.precheckNoticeTimer = null;
         this.setData({ precheckNotice: "" });
-      }, 1100);
+      }, NOTICE_DURATION_MS);
     }
   },
 
