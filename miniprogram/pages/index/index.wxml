@@ -101,7 +101,7 @@
   <view wx:elif="{{view == 'group-review'}}" class="view">
     <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">{{review.isMixed ? '混组复习' : '本组复习'}}</text><text class="progress-label">{{review.progress}}</text></view>
     <view wx:if="{{!review.isMixed}}" class="review-stack">
-      <view wx:for="{{review.words}}" wx:key="id" class="review-card"><view class="review-copy"><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}}</text></view><view class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</view></view>
+      <view wx:for="{{review.words}}" wx:key="id" class="review-card"><view class="review-copy"><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text></view><view class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</view></view>
       <view class="primary-button" bindtap="finishReview">进入发音辨义</view>
     </view>
     <view wx:else class="audio-panel">
