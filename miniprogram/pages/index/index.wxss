@@ -540,6 +540,11 @@ button::after {
   word-break: break-word;
 }
 
+.meaning-inline text {
+  margin-right: 10rpx;
+  color: #0d8f7a;
+}
+
 .precheck-view .meaning-inline {
   padding-left: 48rpx;
   font-size: 25rpx;

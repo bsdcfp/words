@@ -66,7 +66,7 @@
           <view class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</view>
           <view class="select-toggle {{item.selected ? 'on' : ''}}" data-word-id="{{item.id}}" bindtap="togglePrecheckWord">{{item.selected ? '✓' : '+'}}</view>
         </view>
-        <text class="meaning-inline">{{item.meaningText}}</text>
+        <text class="meaning-inline"><text>{{item.pos}}</text>{{item.meaningText}}</text>
         <view class="segmented">
           <view class="segmented-button {{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</view>
           <view class="segmented-button {{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</view>
