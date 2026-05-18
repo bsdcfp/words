@@ -130,7 +130,7 @@
       <view wx:else class="primary-button small disabled">开始识记</view>
     </view>
     <view wx:if="{{precheckNotice}}" class="transition-mask notice-mask">
-      <view class="transition-card precheck-notice-card"><text>{{precheckNotice}}</text></view>
+      <view class="transition-card"><text>{{precheckNotice}}</text></view>
     </view>
   </view>
 
@@ -151,7 +151,7 @@
     </view>
     <view wx:if="{{study.word}}" class="bottom-actions two"><view class="secondary-button" data-value="1" bindtap="markStudy">还不熟</view><view class="primary-button small" data-value="3" bindtap="markStudy">已记住</view></view>
     <view wx:if="{{studyTransition}}" class="transition-mask">
-      <view class="transition-card"><text>本组识记已完成</text><text>正在进入本组复习</text></view>
+      <view class="transition-card"><text>本组识记已完成，自动进入下一组</text></view>
     </view>
   </view>
 
@@ -170,7 +170,7 @@
       <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组听音辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
     </view>
     <view wx:if="{{mixedTransition}}" class="transition-mask">
-      <view class="transition-card mixed-transition-card"><text>{{mixedTransitionTitle}}</text><text>{{mixedTransitionHint}}</text></view>
+      <view class="transition-card"><text>{{mixedTransitionTitle}}</text><text>{{mixedTransitionHint}}</text></view>
     </view>
   </view>
 

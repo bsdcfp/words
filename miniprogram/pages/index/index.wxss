@@ -807,17 +807,17 @@ button::after {
   align-items: center;
   justify-content: center;
   padding: 48rpx;
-  background: rgba(34, 31, 28, 0.22);
+  background: rgba(34, 31, 28, 0.18);
   box-sizing: border-box;
 }
 
 .transition-card {
   display: grid;
-  gap: 8rpx;
+  gap: 10rpx;
   min-width: 0;
   width: calc(100vw - 104rpx);
   max-width: 616px;
-  padding: 34rpx 38rpx;
+  padding: 36rpx 40rpx;
   border: 2rpx solid rgba(255, 255, 255, 0.5);
   border-radius: 24rpx;
   background: rgba(255, 251, 244, 0.92);
@@ -831,6 +831,7 @@ button::after {
   font-size: 32rpx;
   line-height: 1.3;
   font-weight: 900;
+  word-break: break-word;
 }
 
 .transition-card text:last-child {
@@ -838,14 +839,11 @@ button::after {
   font-size: 26rpx;
   line-height: 1.3;
   font-weight: 800;
+  word-break: break-word;
 }
 
 .notice-mask {
-  background: rgba(34, 31, 28, 0.12);
-}
-
-.precheck-notice-card {
-  border-color: rgba(13, 143, 122, 0.18);
+  background: rgba(34, 31, 28, 0.18);
 }
 
 .detail-card {
