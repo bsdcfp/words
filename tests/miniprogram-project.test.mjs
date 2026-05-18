@@ -15,5 +15,7 @@ assert.ok(wordsFile.size < 1_500_000, "mini program word data should stay below 
 const pageJs = await readFile("miniprogram/pages/index/index.js", "utf8");
 assert.match(pageJs, /Page\(/);
 assert.match(pageJs, /startDailyLearning/);
+assert.match(pageJs, /scheduleAutoPlay/);
+assert.match(pageJs, /playWordAudio/);
 
 console.log("miniprogram project checks passed");

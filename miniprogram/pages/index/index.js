@@ -44,6 +44,8 @@ Page({
   onUnload() {
     this.clearStudyTransitionTimer();
     this.clearMixedTransitionTimer();
+    this.clearAutoPlayTimer();
+    this.stopCurrentAudio();
   },
 
   startTest() {
@@ -167,12 +169,8 @@ Page({
   },
 
   speak(event) {
-    const word = flow.getWordById(event.currentTarget.dataset.wordId);
-    if (!word) return;
-    const audio = wx.createInnerAudioContext();
-    audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word.word)}&type=2`;
-    audio.obeyMuteSwitch = false;
-    audio.play();
+    this.clearAutoPlayTimer();
+    this.playWordAudio(event.currentTarget.dataset.wordId);
   },
 
   openDetail(event) {
@@ -195,6 +193,19 @@ Page({
     if (!this.mixedTransitionTimer) return;
     clearTimeout(this.mixedTransitionTimer);
     this.mixedTransitionTimer = null;
+  },
+
+  clearAutoPlayTimer() {
+    if (!this.autoPlayTimer) return;
+    clearTimeout(this.autoPlayTimer);
+    this.autoPlayTimer = null;
+  },
+
+  stopCurrentAudio() {
+    if (!this.currentAudio) return;
+    this.currentAudio.stop();
+    this.currentAudio.destroy();
+    this.currentAudio = null;
   },
 
   goHome() {
@@ -236,7 +247,9 @@ Page({
     if (view === VIEWS.AUDIO_MEANING) patch.audio = buildAudioData(state);
     if (view === VIEWS.WRONG_BOOK) patch.wrongBook = buildWrongBookData(state);
     if (view === VIEWS.DAILY_REPORT) patch.report = buildReportData(state);
-    this.setData(patch);
+    this.setData(patch, () => {
+      this.scheduleAutoPlay(view, patch.mixedTransition ? 1200 : 180);
+    });
     if (patch.mixedTransition) {
       this.clearMixedTransitionTimer();
       this.mixedTransitionTimer = setTimeout(() => {
@@ -244,6 +257,50 @@ Page({
         this.setData({ mixedTransition: false });
       }, 1100);
     }
+  },
+
+  scheduleAutoPlay(view, delay) {
+    this.clearAutoPlayTimer();
+    const wordId = this.getAutoPlayWordId(view);
+    if (!wordId) return;
+    const key = `${this.state.daily.startedAt}:${view}:${wordId}:${this.state.daily.audioIndex}:${this.state.daily.mixedIndex}`;
+    if (this.lastAutoPlayKey === key) return;
+    this.lastAutoPlayKey = key;
+    this.autoPlayTimer = setTimeout(() => {
+      this.autoPlayTimer = null;
+      this.playWordAudio(wordId);
+    }, delay);
+  },
+
+  getAutoPlayWordId(view) {
+    let question = null;
+    if (view === VIEWS.AUDIO_MEANING) {
+      question = flow.getCurrentAudioQuestion(this.state);
+    }
+    if (view === VIEWS.GROUP_REVIEW && this.state.daily.reviewPhase === "mixed") {
+      question = flow.getCurrentMixedReviewQuestion(this.state);
+    }
+    if (!question || question.answered) return "";
+    return question.wordId;
+  },
+
+  playWordAudio(wordId) {
+    const word = flow.getWordById(wordId);
+    if (!word) return;
+    this.stopCurrentAudio();
+    const audio = wx.createInnerAudioContext();
+    this.currentAudio = audio;
+    audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word.word)}&type=2`;
+    audio.obeyMuteSwitch = false;
+    audio.onEnded(() => {
+      if (this.currentAudio === audio) this.currentAudio = null;
+      audio.destroy();
+    });
+    audio.onError(() => {
+      if (this.currentAudio === audio) this.currentAudio = null;
+      audio.destroy();
+    });
+    audio.play();
   },
 
   openDetailById(wordId) {
