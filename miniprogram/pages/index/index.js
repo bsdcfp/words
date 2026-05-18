@@ -426,8 +426,9 @@ Page({
 
 function buildHomeData(state) {
   const result = state.assessment.result;
-  const weakCount = Object.values(state.userWordStates).filter((wordState) => wordState.wrongCount > 0).length;
-  const learnedCount = Object.values(state.userWordStates).filter((wordState) => wordState.familiarity > 0).length;
+  const wordStates = objectValues(state.userWordStates);
+  const weakCount = wordStates.filter((wordState) => wordState.wrongCount > 0).length;
+  const learnedCount = wordStates.filter((wordState) => wordState.familiarity > 0).length;
   const todayDone = state.daily.sessionCompletedWordIds.length;
   const planCount = 3;
   const reviewCount = state.daily.mixedReviewWordIds.length || 0;
@@ -453,8 +454,9 @@ function buildHomeData(state) {
 
 function buildProfileData(state) {
   const result = state.assessment.result;
-  const learnedCount = Object.values(state.userWordStates).filter((wordState) => wordState.familiarity > 0).length;
-  const weakCount = Object.values(state.userWordStates).filter((wordState) => wordState.wrongCount > 0).length;
+  const wordStates = objectValues(state.userWordStates);
+  const learnedCount = wordStates.filter((wordState) => wordState.familiarity > 0).length;
+  const weakCount = wordStates.filter((wordState) => wordState.wrongCount > 0).length;
   const todayDone = state.daily.sessionCompletedWordIds.length;
   const todayMinutes = todayDone ? Math.max(3, todayDone * 2) : 0;
   const week = ["一", "二", "三", "四", "五", "六", "日"].map((day, index) => ({
@@ -591,9 +593,9 @@ function buildAudioData(state) {
 }
 
 function buildWrongBookData(state) {
-  const words = Object.entries(state.userWordStates)
-    .filter(([, wordState]) => wordState.wrongCount > 0)
-    .map(([wordId, wordState]) => ({ word: flow.getWordById(wordId), wordState }))
+  const words = objectEntries(state.userWordStates)
+    .filter((entry) => entry[1].wrongCount > 0)
+    .map((entry) => ({ word: flow.getWordById(entry[0]), wordState: entry[1] }))
     .filter((item) => item.word)
     .sort((a, b) => b.wordState.wrongCount - a.wordState.wrongCount)
     .map((item) => Object.assign({}, decorateWord(item.word), { wrongCount: item.wordState.wrongCount }));
@@ -637,4 +639,12 @@ function decorateQuestion(question, word) {
 function getMeaningPos(meaning) {
   const matched = flow.getAllWords().find((item) => item.cn.join("，") === meaning);
   return matched ? matched.pos : "";
+}
+
+function objectValues(source) {
+  return Object.keys(source || {}).map((key) => source[key]);
+}
+
+function objectEntries(source) {
+  return Object.keys(source || {}).map((key) => [key, source[key]]);
 }
