@@ -15,7 +15,7 @@ const VIEWS = {
   WRONG_BOOK: "wrong-book",
   DAILY_REPORT: "daily-report"
 };
-const NOTICE_DURATION_MS = 2000;
+const NOTICE_DURATION_MS = 1500;
 const AUTO_PLAY_AFTER_NOTICE_MS = NOTICE_DURATION_MS + 120;
 const AUTO_PLAY_DELAY_MS = 180;
 
