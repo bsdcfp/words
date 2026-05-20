@@ -11,6 +11,7 @@ import {
   getCurrentAudioQuestion,
   getCurrentGroupReviewQuestion,
   getCurrentMixedReviewQuestion,
+  markPrecheck,
   moveToNextAudioQuestion,
   moveToNextGroupReviewQuestion,
   moveToNextMixedReviewQuestion,
@@ -52,6 +53,11 @@ assert.ok(mostlyUnknown.vocabulary < 900, "many unknown answers should stay in a
 
 const state = structuredClone(defaultState);
 startDailyLearning(state);
+const firstCandidateId = state.daily.candidateWordIds[0];
+markPrecheck(state, firstCandidateId, "known");
+assert.equal(state.daily.candidateWordIds.length, 9, "marking a word known should refill the precheck list to nine candidates");
+assert.ok(!state.daily.candidateWordIds.includes(firstCandidateId), "known words should be removed from the visible precheck candidates");
+
 completeGroup(state, ["absolutely", "accident", "account"]);
 assert.equal(state.daily.reviewPhase, "initial", "one group should continue to next selection without mixed review");
 

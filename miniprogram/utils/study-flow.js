@@ -60,6 +60,7 @@ function markPrecheck(state, wordId, status) {
   if (status === "known") {
     state.daily.precheck[wordId] = "known";
     state.daily.selectedWordIds = state.daily.selectedWordIds.filter((id) => id !== wordId);
+    refillPrecheckCandidateWordIds(state);
     return;
   }
   if (state.daily.precheck[wordId] === status) {
@@ -238,6 +239,32 @@ function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map((item) => item.id)
     .slice(0, 9);
+}
+
+function refillPrecheckCandidateWordIds(state) {
+  const visibleWordIds = state.daily.candidateWordIds.filter((wordId) => isVisiblePrecheckCandidate(state, wordId));
+  const excluded = uniqueIds([]
+    .concat(state.daily.completedWordIds || [])
+    .concat(state.daily.sessionCompletedWordIds || [])
+    .concat(state.daily.candidateWordIds)
+    .concat(Object.keys(state.daily.precheck || {}).filter((wordId) => state.daily.precheck[wordId] === "known")));
+
+  while (visibleWordIds.length < 9) {
+    const nextWordId = buildCandidateWordIds(state, excluded)[0];
+    if (!nextWordId) break;
+    visibleWordIds.push(nextWordId);
+    excluded.push(nextWordId);
+  }
+
+  state.daily.candidateWordIds = uniqueIds(visibleWordIds);
+}
+
+function isVisiblePrecheckCandidate(state, wordId) {
+  return Boolean(
+    wordId &&
+    !state.daily.completedWordIds.includes(wordId) &&
+    state.daily.precheck[wordId] !== "known"
+  );
 }
 
 function prepareMixedReview(state) {
