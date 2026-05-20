@@ -3,6 +3,9 @@ import { words } from "../data/words.js";
 import { buildAssessmentResult, buildDailyReport } from "./report.js";
 
 const REVIEW_INTERVAL_DAYS = [1, 2, 4, 7, 15];
+const PRECHECK_WINDOW_SIZE = 9;
+const MAX_REVIEW_CANDIDATES = 3;
+const CURRICULUM_STAGE_ORDER = [1, 2, 0];
 
 export function startAssessment(state) {
   state.assessment = {
@@ -427,19 +430,15 @@ function applyOverdueDowngrades(state) {
 }
 
 function prioritiseCurriculumWords(items) {
-  return [
-    ...items.filter((word) => word.starLevel === 1),
-    ...items.filter((word) => word.starLevel === 2),
-    ...items.filter((word) => word.starLevel === 0)
-  ];
+  return CURRICULUM_STAGE_ORDER.flatMap((stage) => items.filter((word) => word.starLevel === stage));
 }
 
 function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
   const userWordStates = stateOrWordStates.userWordStates || stateOrWordStates || {};
   const streakDays = stateOrWordStates.user?.streakDays || 0;
   const excluded = new Set(excludedWordIds);
-  return prioritiseCurriculumWords(words)
-    .filter((word) => !excluded.has(word.id))
+  const reviewWordIds = prioritiseCurriculumWords(words)
+    .filter((word) => !excluded.has(word.id) && isReviewCandidate(userWordStates[word.id]))
     .map((word, index) => ({
       id: word.id,
       index,
@@ -447,7 +446,29 @@ function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
     }))
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map((item) => item.id)
-    .slice(0, 9);
+    .slice(0, MAX_REVIEW_CANDIDATES);
+
+  reviewWordIds.forEach((wordId) => excluded.add(wordId));
+
+  return [
+    ...reviewWordIds,
+    ...buildCurrentStageNewWordIds(userWordStates, excluded, PRECHECK_WINDOW_SIZE - reviewWordIds.length)
+  ].slice(0, PRECHECK_WINDOW_SIZE);
+}
+
+function buildCurrentStageNewWordIds(userWordStates, excluded, count) {
+  const result = [];
+  for (const stage of CURRICULUM_STAGE_ORDER) {
+    const stageWords = words.filter((word) => word.starLevel === stage);
+    for (const word of stageWords) {
+      if (result.length >= count) return result;
+      if (excluded.has(word.id) || !isFreshWordCandidate(userWordStates[word.id])) continue;
+      result.push(word.id);
+      excluded.add(word.id);
+    }
+    if (result.length > 0 && result.length >= count) return result;
+  }
+  return result;
 }
 
 function refillPrecheckCandidateWordIds(state) {
@@ -455,18 +476,14 @@ function refillPrecheckCandidateWordIds(state) {
   const excluded = uniqueIds([
     ...(state.daily.completedWordIds || []),
     ...(state.daily.sessionCompletedWordIds || []),
-    ...state.daily.candidateWordIds,
+    ...visibleWordIds,
     ...Object.keys(state.daily.precheck || {}).filter((wordId) => state.daily.precheck[wordId] === "known")
   ]);
 
-  while (visibleWordIds.length < 9) {
-    const [nextWordId] = buildCandidateWordIds(state, excluded);
-    if (!nextWordId) break;
-    visibleWordIds.push(nextWordId);
-    excluded.push(nextWordId);
-  }
-
-  state.daily.candidateWordIds = uniqueIds(visibleWordIds);
+  state.daily.candidateWordIds = uniqueIds([
+    ...visibleWordIds,
+    ...buildCandidateWordIds(state, excluded)
+  ]).slice(0, PRECHECK_WINDOW_SIZE);
 }
 
 function isVisiblePrecheckCandidate(state, wordId) {
@@ -580,6 +597,25 @@ function scoreWordRisk(word, wordState, streakDays) {
     Math.max(0, 5 - (wordState.familiarity || 0)) * 80,
     recencyDays * 12
   ].reduce((sum, item) => sum + item, 0);
+}
+
+function isReviewCandidate(wordState) {
+  return Boolean(
+    wordState &&
+    (
+      isDueForReview(wordState) ||
+      wordState.reviewFailedThisRound ||
+      wordState.lastResult === "wrong" ||
+      (wordState.wrongCount || 0) > 0
+    )
+  );
+}
+
+function isFreshWordCandidate(wordState) {
+  if (!wordState) return true;
+  if (isReviewCandidate(wordState)) return false;
+  if (wordState.nextReviewAt || wordState.reviewStage) return false;
+  return !wordState.lastSeenAt;
 }
 
 function nextReviewPatch(current) {

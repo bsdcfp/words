@@ -53,6 +53,12 @@ assert.ok(mostlyUnknown.vocabulary < 900, "many unknown answers should stay in a
 
 const state = structuredClone(defaultState);
 startDailyLearning(state);
+assert.equal(state.daily.candidateWordIds.length, 9, "daily learning should open with a nine-word precheck window");
+assert.deepEqual(
+  [...new Set(state.daily.candidateWordIds.map((wordId) => words.find((word) => word.id === wordId)?.starLevel))],
+  [1],
+  "fresh precheck windows should start from one curriculum stage"
+);
 const firstCandidateId = state.daily.candidateWordIds[0];
 markPrecheck(state, firstCandidateId, "known");
 assert.equal(state.daily.candidateWordIds.length, 9, "marking a word known should refill the precheck list to nine candidates");
@@ -139,6 +145,33 @@ dueReviewState.userWordStates[account.id] = {
 };
 startDailyLearning(dueReviewState);
 assert.equal(dueReviewState.daily.candidateWordIds[0], account.id, "due review words should outrank fresh words");
+
+const reviewCapState = structuredClone(defaultState);
+const dueReviewWords = words.filter((word) => word.starLevel === 2).slice(0, 4);
+assert.equal(dueReviewWords.length, 4, "fixture should include enough stage-2 words for review cap testing");
+dueReviewWords.forEach((word) => {
+  reviewCapState.userWordStates[word.id] = {
+    familiarity: 3,
+    correctStreak: 1,
+    wrongCount: 1,
+    lastSeenAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    favorite: false,
+    reviewStage: 1,
+    nextReviewAt: new Date(Date.now() - 86400000).toISOString(),
+    lastReviewAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    lastResult: "wrong"
+  };
+});
+startDailyLearning(reviewCapState);
+const dueReviewWordIds = dueReviewWords.map((word) => word.id);
+const insertedReviewIds = reviewCapState.daily.candidateWordIds.filter((wordId) => dueReviewWordIds.includes(wordId));
+assert.equal(insertedReviewIds.length, 3, "a precheck window should insert at most three review or wrong words");
+assert.ok(
+  reviewCapState.daily.candidateWordIds
+    .filter((wordId) => !dueReviewWordIds.includes(wordId))
+    .every((wordId) => words.find((word) => word.id === wordId)?.starLevel === 1),
+  "review inserts should leave the remaining slots for current-stage fresh words"
+);
 
 const failedReviewState = structuredClone(defaultState);
 failedReviewState.userWordStates[account.id] = {

@@ -2,14 +2,7 @@ import { words, wordDatasetMeta } from "../data/words.js";
 import { testQuestions } from "../data/test-questions.js";
 import { writeFile } from "node:fs/promises";
 
-const TEST_SOURCE_IDS = new Set(testQuestions.map((question) => question.sourceWordId));
-const starterWords = words
-  .filter((word) => word.starLevel === 1 || word.starLevel === 2)
-  .slice(0, 160);
-const selected = dedupeById([
-  ...starterWords,
-  ...words.filter((word) => TEST_SOURCE_IDS.has(word.id))
-]).map(compactWord);
+const selected = words.map(compactWord);
 
 const compactMeta = {
   groupId: wordDatasetMeta.groupId,
@@ -42,25 +35,15 @@ function compactWord(word) {
     cn: word.cn,
     memoryImage: {
       meaning: word.memoryImage?.meaning || word.cn.join("，"),
-      pos: word.memoryImage?.pos || word.pos,
-      scene: word.memoryImage?.scene || ""
+      pos: word.memoryImage?.pos || word.pos
     },
-    example_en: word.example_en || "",
-    example_cn: word.example_cn || "",
-    collocations: word.collocations || [],
+    example_en: "",
+    example_cn: "",
+    collocations: [],
     level: word.level,
     curriculumStage: word.curriculumStage,
     starLevel: word.starLevel,
     sourceIndex: word.sourceIndex,
-    tags: word.tags || []
+    tags: []
   };
-}
-
-function dedupeById(items) {
-  const seen = new Set();
-  return items.filter((item) => {
-    if (!item || seen.has(item.id)) return false;
-    seen.add(item.id);
-    return true;
-  });
 }

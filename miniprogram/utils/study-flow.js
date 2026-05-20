@@ -3,6 +3,9 @@ const { words } = require("../data/words");
 const { buildAssessmentResult, buildDailyReport } = require("./report");
 
 const REVIEW_INTERVAL_DAYS = [1, 2, 4, 7, 15];
+const PRECHECK_WINDOW_SIZE = 9;
+const MAX_REVIEW_CANDIDATES = 3;
+const CURRICULUM_STAGE_ORDER = [1, 2, 0];
 
 function startAssessment(state) {
   state.assessment = { completed: false, currentIndex: 0, answers: [], result: null };
@@ -229,8 +232,8 @@ function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
   const streakDays = stateOrWordStates.user && stateOrWordStates.user.streakDays ? stateOrWordStates.user.streakDays : 0;
   const excluded = {};
   excludedWordIds.forEach((id) => { excluded[id] = true; });
-  return prioritiseCurriculumWords(words)
-    .filter((word) => !excluded[word.id])
+  const reviewWordIds = prioritiseCurriculumWords(words)
+    .filter((word) => !excluded[word.id] && isReviewCandidate(userWordStates[word.id]))
     .map((word, index) => ({
       id: word.id,
       index,
@@ -238,7 +241,30 @@ function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
     }))
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map((item) => item.id)
-    .slice(0, 9);
+    .slice(0, MAX_REVIEW_CANDIDATES);
+
+  reviewWordIds.forEach((wordId) => { excluded[wordId] = true; });
+
+  return reviewWordIds
+    .concat(buildCurrentStageNewWordIds(userWordStates, excluded, PRECHECK_WINDOW_SIZE - reviewWordIds.length))
+    .slice(0, PRECHECK_WINDOW_SIZE);
+}
+
+function buildCurrentStageNewWordIds(userWordStates, excluded, count) {
+  const result = [];
+  for (let stageIndex = 0; stageIndex < CURRICULUM_STAGE_ORDER.length; stageIndex += 1) {
+    const stage = CURRICULUM_STAGE_ORDER[stageIndex];
+    const stageWords = words.filter((word) => word.starLevel === stage);
+    for (let index = 0; index < stageWords.length; index += 1) {
+      const word = stageWords[index];
+      if (result.length >= count) return result;
+      if (excluded[word.id] || !isFreshWordCandidate(userWordStates[word.id])) continue;
+      result.push(word.id);
+      excluded[word.id] = true;
+    }
+    if (result.length > 0 && result.length >= count) return result;
+  }
+  return result;
 }
 
 function refillPrecheckCandidateWordIds(state) {
@@ -246,17 +272,10 @@ function refillPrecheckCandidateWordIds(state) {
   const excluded = uniqueIds([]
     .concat(state.daily.completedWordIds || [])
     .concat(state.daily.sessionCompletedWordIds || [])
-    .concat(state.daily.candidateWordIds)
+    .concat(visibleWordIds)
     .concat(Object.keys(state.daily.precheck || {}).filter((wordId) => state.daily.precheck[wordId] === "known")));
 
-  while (visibleWordIds.length < 9) {
-    const nextWordId = buildCandidateWordIds(state, excluded)[0];
-    if (!nextWordId) break;
-    visibleWordIds.push(nextWordId);
-    excluded.push(nextWordId);
-  }
-
-  state.daily.candidateWordIds = uniqueIds(visibleWordIds);
+  state.daily.candidateWordIds = uniqueIds(visibleWordIds.concat(buildCandidateWordIds(state, excluded))).slice(0, PRECHECK_WINDOW_SIZE);
 }
 
 function isVisiblePrecheckCandidate(state, wordId) {
@@ -445,9 +464,7 @@ function currentGroupWordIds(state) {
 }
 
 function prioritiseCurriculumWords(items) {
-  return items.filter((word) => word.starLevel === 1)
-    .concat(items.filter((word) => word.starLevel === 2))
-    .concat(items.filter((word) => word.starLevel === 0));
+  return CURRICULUM_STAGE_ORDER.reduce((result, stage) => result.concat(items.filter((word) => word.starLevel === stage)), []);
 }
 
 function defaultWordState() {
@@ -487,6 +504,25 @@ function scoreWordRisk(word, wordState, streakDays) {
     Math.max(0, 5 - (wordState.familiarity || 0)) * 80,
     recencyDays * 12
   ].reduce((sum, item) => sum + item, 0);
+}
+
+function isReviewCandidate(wordState) {
+  return Boolean(
+    wordState &&
+    (
+      isDueForReview(wordState) ||
+      wordState.reviewFailedThisRound ||
+      wordState.lastResult === "wrong" ||
+      (wordState.wrongCount || 0) > 0
+    )
+  );
+}
+
+function isFreshWordCandidate(wordState) {
+  if (!wordState) return true;
+  if (isReviewCandidate(wordState)) return false;
+  if (wordState.nextReviewAt || wordState.reviewStage) return false;
+  return !wordState.lastSeenAt;
 }
 
 function nextReviewPatch(current) {
