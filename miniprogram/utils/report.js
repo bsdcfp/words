@@ -1,15 +1,34 @@
+const ASSESSMENT_LAYERS = [
+  { id: "foundation", label: "义务教育基础词", starLevel: 0, wordCount: 1500, passRate: 80 },
+  { id: "required", label: "高中必修词", starLevel: 1, wordCount: 499, passRate: 70 },
+  { id: "selective", label: "选择性必修词", starLevel: 2, wordCount: 1001, passRate: 60 }
+];
+
 function buildAssessmentResult(assessment) {
   const answered = assessment.answers.length;
   const correct = assessment.answers.filter((answer) => answer.isCorrect).length;
   const unknown = assessment.answers.filter((answer) => answer.selected === "不认识").length;
   const accuracy = answered ? Math.round((correct / answered) * 100) : 0;
-  const vocabulary = estimateVocabulary(correct, unknown, answered);
-  const stage = vocabulary >= 2600 ? "高中进阶" : vocabulary >= 1600 ? "初中高阶" : "初中基础";
-  const advice = vocabulary >= 2600
-    ? "适合进入高频核心词和语境复习。"
-    : "建议先补基础词义，再增加听音辨义训练。";
+  const layerStats = buildLayerStats(assessment.answers);
+  const startLevel = decideStartLevel(layerStats);
+  const vocabularyRange = estimateVocabularyRange(layerStats);
+  const stage = (ASSESSMENT_LAYERS.find((layer) => layer.id === startLevel) || ASSESSMENT_LAYERS[1]).label;
+  const advice = `建议从${stage}开始。学习 3 天后会结合真实表现自动校准。`;
 
-  return { answered, correct, unknown, accuracy, vocabulary, stage, advice };
+  return {
+    answered,
+    correct,
+    unknown,
+    wrongChoice: answered - correct - unknown,
+    accuracy,
+    vocabulary: `${vocabularyRange.lower}-${vocabularyRange.upper}`,
+    vocabularyRange,
+    startLevel,
+    startLevelLabel: stage,
+    layerStats,
+    stage,
+    advice
+  };
 }
 
 function buildDailyReport(state, words) {
@@ -44,23 +63,52 @@ function getRewardStreakText(state) {
   return current > 0 ? `连续打卡 ${current} 天` : `最长连续打卡 ${longest} 天`;
 }
 
-function estimateVocabulary(correct, unknown, answered) {
-  if (!answered) return 600;
-  const scaledCorrect = (correct / answered) * 50;
-  const breakpoints = [[0, 600], [10, 900], [20, 1500], [30, 2300], [40, 3100], [50, 3800]];
-  let base = breakpoints[0][1];
-  for (let index = 1; index < breakpoints.length; index += 1) {
-    const [rightScore, rightVocab] = breakpoints[index];
-    const [leftScore, leftVocab] = breakpoints[index - 1];
-    if (scaledCorrect <= rightScore) {
-      const ratio = (scaledCorrect - leftScore) / Math.max(1, rightScore - leftScore);
-      base = leftVocab + ratio * (rightVocab - leftVocab);
-      break;
-    }
-    base = rightVocab;
-  }
-  const unknownPenalty = Math.min(420, Math.round((unknown / Math.max(1, answered)) * 520));
-  return Math.max(600, Math.round(base - unknownPenalty));
+function buildLayerStats(answers) {
+  return ASSESSMENT_LAYERS.reduce((stats, layer) => {
+    const layerAnswers = answers.filter((answer) => answer.layer === layer.id);
+    const total = layerAnswers.length;
+    const correct = layerAnswers.filter((answer) => answer.isCorrect).length;
+    const unknown = layerAnswers.filter((answer) => answer.selected === "不认识").length;
+    const wrongChoice = total - correct - unknown;
+    const accuracy = total ? Math.round((correct / total) * 100) : 0;
+    stats[layer.id] = {
+      total,
+      correct,
+      unknown,
+      wrongChoice,
+      accuracy,
+      unknownRate: total ? Math.round((unknown / total) * 100) : 0,
+      wrongChoiceRate: total ? Math.round((wrongChoice / total) * 100) : 0,
+      passed: accuracy >= layer.passRate,
+      passRate: layer.passRate,
+      wordCount: layer.wordCount,
+      label: layer.label
+    };
+    return stats;
+  }, {});
+}
+
+function decideStartLevel(layerStats) {
+  const firstFailed = ASSESSMENT_LAYERS.find((layer) => !layerStats[layer.id] || !layerStats[layer.id].passed);
+  return firstFailed ? firstFailed.id : "selective";
+}
+
+function estimateVocabularyRange(layerStats) {
+  const range = ASSESSMENT_LAYERS.reduce((sum, layer) => {
+    const stats = layerStats[layer.id];
+    const rate = Math.min(1, Math.max(0, ((stats && stats.accuracy) || 0) / 100));
+    const upperContribution = stats && stats.passed ? layer.wordCount : layer.wordCount * rate;
+    const lowerContribution = stats && stats.passed ? layer.wordCount : layer.wordCount * rate * 0.5;
+    return {
+      lower: sum.lower + lowerContribution,
+      upper: sum.upper + upperContribution
+    };
+  }, { lower: 0, upper: 0 });
+
+  return {
+    lower: Math.round(range.lower),
+    upper: Math.max(Math.round(range.upper), Math.round(range.lower))
+  };
 }
 
 function getReviewLabel(hasWeakWords) {

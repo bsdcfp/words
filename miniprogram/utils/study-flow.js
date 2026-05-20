@@ -6,13 +6,28 @@ const REVIEW_INTERVAL_DAYS = [1, 2, 4, 7, 15];
 const PRECHECK_WINDOW_SIZE = 9;
 const MAX_REVIEW_CANDIDATES = 3;
 const CURRICULUM_STAGE_ORDER = [1, 2, 0];
+const ASSESSMENT_LAYER_ORDER = ["foundation", "required", "selective"];
+const ASSESSMENT_LAYERS = {
+  foundation: { starLevel: 0, label: "义务教育基础词" },
+  required: { starLevel: 1, label: "高中必修词" },
+  selective: { starLevel: 2, label: "选择性必修词" }
+};
+const ASSESSMENT_TOTAL_QUESTIONS = 36;
+const ASSESSMENT_INITIAL_PER_LAYER = 6;
 
 function startAssessment(state) {
-  state.assessment = { completed: false, currentIndex: 0, answers: [], result: null };
+  state.assessment = {
+    completed: false,
+    currentIndex: 0,
+    questions: buildInitialAssessmentQuestions(),
+    answers: [],
+    result: null
+  };
 }
 
 function getCurrentTestQuestion(state) {
-  return testQuestions[state.assessment.currentIndex];
+  const questions = state.assessment.questions && state.assessment.questions.length ? state.assessment.questions : testQuestions;
+  return questions[state.assessment.currentIndex];
 }
 
 function answerAssessmentQuestion(state, selected) {
@@ -21,15 +36,28 @@ function answerAssessmentQuestion(state, selected) {
   state.assessment.answers.push({
     questionId: question.id,
     word: question.word,
+    sourceWordId: question.sourceWordId,
+    layer: question.layer,
     selected,
     answer: question.answer,
     isCorrect,
     durationMs: 0
   });
   state.assessment.currentIndex += 1;
-  if (state.assessment.currentIndex >= testQuestions.length) {
+  if (state.assessment.answers.length === 18 && state.assessment.questions.length < ASSESSMENT_TOTAL_QUESTIONS) {
+    state.assessment.questions = state.assessment.questions.concat(buildAdaptiveAssessmentQuestions(state.assessment.answers, state.assessment.questions));
+  }
+  if (state.assessment.currentIndex >= ASSESSMENT_TOTAL_QUESTIONS) {
     state.assessment.completed = true;
     state.assessment.result = buildAssessmentResult(state.assessment);
+    state.user.vocabularyAssessment = {
+      completedAt: new Date().toISOString(),
+      startLevel: state.assessment.result.startLevel,
+      vocabularyRange: state.assessment.result.vocabularyRange,
+      layerStats: state.assessment.result.layerStats
+    };
+    state.user.learningStartLevel = state.assessment.result.startLevel;
+    state.user.learningStartLevelLabel = state.assessment.result.startLevelLabel;
   }
 }
 
@@ -232,7 +260,8 @@ function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
   const streakDays = stateOrWordStates.user && stateOrWordStates.user.streakDays ? stateOrWordStates.user.streakDays : 0;
   const excluded = {};
   excludedWordIds.forEach((id) => { excluded[id] = true; });
-  const reviewWordIds = prioritiseCurriculumWords(words)
+  const stageOrder = curriculumStageOrderFor(stateOrWordStates);
+  const reviewWordIds = orderWordsByStages(words, stageOrder)
     .filter((word) => !excluded[word.id] && isReviewCandidate(userWordStates[word.id]))
     .map((word, index) => ({
       id: word.id,
@@ -246,14 +275,15 @@ function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
   reviewWordIds.forEach((wordId) => { excluded[wordId] = true; });
 
   return reviewWordIds
-    .concat(buildCurrentStageNewWordIds(userWordStates, excluded, PRECHECK_WINDOW_SIZE - reviewWordIds.length))
+    .concat(buildCurrentStageNewWordIds(userWordStates, excluded, PRECHECK_WINDOW_SIZE - reviewWordIds.length, stageOrder))
     .slice(0, PRECHECK_WINDOW_SIZE);
 }
 
-function buildCurrentStageNewWordIds(userWordStates, excluded, count) {
+function buildCurrentStageNewWordIds(userWordStates, excluded, count, stageOrder) {
   const result = [];
-  for (let stageIndex = 0; stageIndex < CURRICULUM_STAGE_ORDER.length; stageIndex += 1) {
-    const stage = CURRICULUM_STAGE_ORDER[stageIndex];
+  const stages = stageOrder || CURRICULUM_STAGE_ORDER;
+  for (let stageIndex = 0; stageIndex < stages.length; stageIndex += 1) {
+    const stage = stages[stageIndex];
     const stageWords = words.filter((word) => word.starLevel === stage);
     for (let index = 0; index < stageWords.length; index += 1) {
       const word = stageWords[index];
@@ -465,6 +495,81 @@ function currentGroupWordIds(state) {
 
 function prioritiseCurriculumWords(items) {
   return CURRICULUM_STAGE_ORDER.reduce((result, stage) => result.concat(items.filter((word) => word.starLevel === stage)), []);
+}
+
+function curriculumStageOrderFor(stateOrWordStates) {
+  const user = stateOrWordStates.user || {};
+  const startLevel = user.learningStartLevel || (user.vocabularyAssessment && user.vocabularyAssessment.startLevel);
+  if (startLevel === "foundation") return [0, 1, 2];
+  if (startLevel === "selective") return [2, 1, 0];
+  return CURRICULUM_STAGE_ORDER;
+}
+
+function orderWordsByStages(items, stageOrder) {
+  return stageOrder.reduce((result, stage) => result.concat(items.filter((word) => word.starLevel === stage)), []);
+}
+
+function buildInitialAssessmentQuestions() {
+  return ASSESSMENT_LAYER_ORDER.reduce((result, layer) => result.concat(buildAssessmentQuestionsForLayer(layer, ASSESSMENT_INITIAL_PER_LAYER, {})), []);
+}
+
+function buildAdaptiveAssessmentQuestions(answers, existingQuestions) {
+  const usedWordIds = {};
+  existingQuestions.forEach((question) => { usedWordIds[question.sourceWordId] = true; });
+  const layerCorrect = ASSESSMENT_LAYER_ORDER.map((layer) => ({
+    layer,
+    correct: answers.filter((answer) => answer.layer === layer && answer.isCorrect).length
+  }));
+  const criticalLayers = layerCorrect.filter((item) => item.correct === 3 || item.correct === 4).map((item) => item.layer);
+  if (criticalLayers.length === 1) {
+    return buildAssessmentQuestionsForLayer(criticalLayers[0], 18, usedWordIds);
+  }
+  if (criticalLayers.length > 1) {
+    return buildAssessmentQuestionsForLayer(criticalLayers[0], 12, usedWordIds)
+      .concat(buildAssessmentQuestionsForLayer(criticalLayers[1], 6, usedWordIds));
+  }
+
+  const foundation = layerCorrect.find((item) => item.layer === "foundation");
+  if ((foundation && foundation.correct ? foundation.correct : 0) <= 2) {
+    return buildAssessmentQuestionsForLayer("foundation", 18, usedWordIds);
+  }
+
+  let highestPassedIndex = -1;
+  for (let index = 0; index < layerCorrect.length; index += 1) {
+    if (layerCorrect[index].correct >= 5) highestPassedIndex = index;
+  }
+  if (highestPassedIndex >= 0 && highestPassedIndex < ASSESSMENT_LAYER_ORDER.length - 1) {
+    return buildAssessmentQuestionsForLayer(ASSESSMENT_LAYER_ORDER[highestPassedIndex], 12, usedWordIds)
+      .concat(buildAssessmentQuestionsForLayer(ASSESSMENT_LAYER_ORDER[highestPassedIndex + 1], 6, usedWordIds));
+  }
+
+  return buildAssessmentQuestionsForLayer("selective", 18, usedWordIds);
+}
+
+function buildAssessmentQuestionsForLayer(layer, count, usedWordIds) {
+  const layerConfig = ASSESSMENT_LAYERS[layer];
+  const layerWords = words.filter((word) => word.starLevel === layerConfig.starLevel && !usedWordIds[word.id]);
+  return layerWords.slice(0, count).map((word, index) => {
+    usedWordIds[word.id] = true;
+    return createAssessmentQuestion(word, layer, index);
+  });
+}
+
+function createAssessmentQuestion(word, layer, index) {
+  const correct = word.cn.join("，");
+  const allDistractors = words
+    .filter((item) => item.id !== word.id && item.cn.join("，") !== correct)
+    .map((item) => item.cn.join("，"));
+  const start = (word.sourceIndex + index) % Math.max(1, allDistractors.length - 2);
+  const distractors = allDistractors.slice(start, start + 2);
+  return {
+    id: `vocab_${layer}_${word.id}`,
+    word: word.word,
+    sourceWordId: word.id,
+    layer,
+    options: shuffle([correct].concat(distractors).concat("不认识")),
+    answer: correct
+  };
 }
 
 function defaultWordState() {

@@ -1,5 +1,4 @@
 const { wordDatasetMeta } = require("../../data/words");
-const { testQuestions } = require("../../data/test-questions");
 const { buildDailyReport, getRewardStreakText } = require("../../utils/report");
 const { loadState, resetState, saveState } = require("../../utils/storage");
 const flow = require("../../utils/study-flow");
@@ -20,7 +19,16 @@ const VIEWS = {
 const NOTICE_DURATION_MS = 1500;
 const AUTO_PLAY_DELAY_MS = 0;
 const AUDIO_PLAY_RETRY_MS = 80;
+const WORD_LEVEL_OPTIONS = [
+  { id: "start_foundation", label: "义务教育基础词", startLevel: "foundation" },
+  { id: "start_required", label: "高中必修词", startLevel: "required" },
+  { id: "start_selective", label: "选择性必修词", startLevel: "selective" }
+];
 const LEVEL_GROUPS = [
+  {
+    title: "单词起点",
+    options: WORD_LEVEL_OPTIONS
+  },
   {
     title: "小学",
     options: [
@@ -134,7 +142,14 @@ Page({
   },
 
   selectLevel(event) {
-    const { levelId, levelLabel } = event.currentTarget.dataset;
+    const { levelId, levelLabel, startLevel } = event.currentTarget.dataset;
+    if (startLevel) {
+      this.state.user.learningStartLevel = startLevel;
+      this.state.user.learningStartLevelLabel = levelLabel;
+      this.state.user.manualStartLevel = startLevel;
+      this.saveAndRender(VIEWS.PROFILE);
+      return;
+    }
     this.state.user.levelId = levelId;
     this.state.user.levelLabel = levelLabel;
     this.state.user.level = levelLabel;
@@ -395,7 +410,7 @@ Page({
     if (view === VIEWS.PROFILE) patch.profile = buildProfileData(state);
     if (view === VIEWS.LEVEL_SELECT) patch.levelSelect = buildLevelSelectData(state);
     if (view === VIEWS.TEST) patch.test = buildTestData(state);
-    if (view === VIEWS.TEST_RESULT) patch.testResult = state.assessment.result || {};
+    if (view === VIEWS.TEST_RESULT) patch.testResult = buildTestResultData(state);
     if (view === VIEWS.PRECHECK) {
       patch.precheck = buildPrecheckData(state);
       const precheckNotice = buildPrecheckNoticeData(state);
@@ -551,6 +566,7 @@ function buildHomeData(state) {
   return {
     userName: state.user.name,
     levelLabel: state.user.levelLabel || state.user.level || "未选择",
+    startLevelLabel: state.user.learningStartLevelLabel || result?.startLevelLabel || "高中必修词",
     vocabulary: result ? result.vocabulary : "未测",
     testLabel: result ? `${result.stage} · ${result.accuracy}%` : "独立诊断入口",
     learnedCount,
@@ -584,7 +600,9 @@ function buildProfileData(state) {
   return {
     userName: state.user.name,
     vocabulary: result ? result.vocabulary : "未测",
+    vocabularyRange: result?.vocabularyRange || null,
     levelLabel: state.user.levelLabel || state.user.level || "未选择",
+    startLevelLabel: state.user.learningStartLevelLabel || result?.startLevelLabel || "高中必修词",
     activeGroup: state.user.activeGroup || wordDatasetMeta.groupName,
     total: wordDatasetMeta.total,
     miniProgramTotal: wordDatasetMeta.miniProgramTotal,
@@ -601,7 +619,7 @@ function buildProfileData(state) {
 
 function buildLevelSelectData(state) {
   return {
-    currentLevel: state.user.levelLabel || state.user.level || "未选择",
+    currentLevel: state.user.learningStartLevelLabel || "高中必修词",
     groups: LEVEL_GROUPS
   };
 }
@@ -610,14 +628,33 @@ function buildTestData(state) {
   const question = flow.getCurrentTestQuestion(state);
   const answered = state.assessment.answers.length;
   const correct = state.assessment.answers.filter((answer) => answer.isCorrect).length;
+  const total = state.assessment.questions && state.assessment.questions.length ? state.assessment.questions.length : 36;
   return {
     question,
-    progress: `${answered + 1}/${testQuestions.length}`,
+    progress: `${Math.min(answered + 1, total)}/${total}`,
     correct,
     wrong: answered - correct,
-    remain: testQuestions.length - answered,
+    remain: total - answered,
     options: question ? question.options.filter((option) => option !== "不认识") : []
   };
+}
+
+function buildTestResultData(state) {
+  const result = state.assessment.result || {};
+  const range = result.vocabularyRange || {};
+  const layerStats = result.layerStats || {};
+  return Object.assign({}, result, {
+    vocabulary: result.vocabulary || (range.lower ? `${range.lower}-${range.upper}` : "未测"),
+    calibrationText: "初测估计，学习 3 天后会自动校准",
+    layerSummary: ["foundation", "required", "selective"]
+      .map((layer) => {
+        const stats = layerStats[layer];
+        if (!stats) return "";
+        return `${stats.label} ${stats.accuracy}%`;
+      })
+      .filter(Boolean)
+      .join(" · ")
+  });
 }
 
 function buildPrecheckData(state) {

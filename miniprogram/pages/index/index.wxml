@@ -62,7 +62,7 @@
       </view>
     </view>
     <view class="profile-list">
-      <view class="list-button" bindtap="openLevelSelect"><text>选择单词水平</text><text>{{profile.levelLabel}}</text></view>
+      <view class="list-button" bindtap="openLevelSelect"><text>选择单词水平</text><text>{{profile.startLevelLabel}}</text></view>
       <view class="list-button" bindtap="startTest"><text>词汇量测试</text><text>当前 {{profile.vocabulary}}</text></view>
       <view class="list-button" bindtap="openWrongBook"><text>错词本</text><text>{{profile.weakCount}} 个待巩固</text></view>
     </view>
@@ -79,7 +79,7 @@
       <view wx:for="{{levelSelect.groups}}" wx:key="title" wx:for-item="group" class="level-group">
         <text class="level-title">{{group.title}}</text>
         <view class="level-options">
-          <view wx:for="{{group.options}}" wx:key="id" wx:for-item="option" class="level-option" data-level-id="{{option.id}}" data-level-label="{{option.label}}" bindtap="selectLevel">{{option.label}}</view>
+          <view wx:for="{{group.options}}" wx:key="id" wx:for-item="option" class="level-option" data-level-id="{{option.id}}" data-level-label="{{option.label}}" data-start-level="{{option.startLevel}}" bindtap="selectLevel">{{option.label}}</view>
         </view>
       </view>
       <view class="secondary-button" bindtap="skipLevelSelect">先跳过</view>
@@ -105,7 +105,8 @@
     <view class="result-panel">
       <text class="section-label">现实掌握词汇</text>
       <text class="vocab-number">{{testResult.vocabulary}}</text>
-      <view class="copy-card"><text class="card-title">{{testResult.stage}}</text><text>正确率 {{testResult.accuracy}}%，不认识 {{testResult.unknown}} 个。{{testResult.advice}}</text></view>
+      <view class="copy-card"><text class="card-title">{{testResult.stage}}</text><text>{{testResult.calibrationText}}</text><text>正确率 {{testResult.accuracy}}%，不认识 {{testResult.unknown}} 个，误选 {{testResult.wrongChoice}} 个。{{testResult.advice}}</text></view>
+      <view class="copy-card"><text class="card-title">分层表现</text><text>{{testResult.layerSummary}}</text></view>
       <view class="primary-button" bindtap="goHome">返回首页</view>
     </view>
   </view>

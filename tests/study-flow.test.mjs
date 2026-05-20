@@ -4,11 +4,13 @@ import { buildAssessmentResult } from "../src/report.js";
 import { defaultState } from "../src/storage.js";
 import {
   answerAudioQuestion,
+  answerAssessmentQuestion,
   answerGroupReviewQuestion,
   answerMixedReviewQuestion,
   completeMixedReview,
   confirmPrecheck,
   getCurrentAudioQuestion,
+  getCurrentTestQuestion,
   getCurrentGroupReviewQuestion,
   getCurrentMixedReviewQuestion,
   markPrecheck,
@@ -17,6 +19,7 @@ import {
   moveToNextMixedReviewQuestion,
   prepareAudioQuestions,
   prepareGroupReviewQuestions,
+  startAssessment,
   startDailyLearning
 } from "../src/study-flow.js";
 
@@ -34,22 +37,46 @@ for (let index = 0; index < 24; index += 1) {
 assert.ok(optionOrders.size > 1, "audio options should be shuffled randomly across attempts");
 
 const fullScore = buildAssessmentResult({
-  answers: Array.from({ length: 50 }, (_, index) => ({
+  answers: ["foundation", "required", "selective"].flatMap((layer) => Array.from({ length: 12 }, (_, index) => ({
     questionId: `q_${index}`,
+    layer,
     selected: "正确",
     isCorrect: true
-  }))
+  })))
 });
-assert.ok(fullScore.vocabulary <= 3900, "50-question full score should not inflate above a high-school vocabulary range");
+assert.equal(fullScore.startLevel, "selective", "full score should start from the highest V1 layer");
+assert.equal(fullScore.vocabularyRange.upper, 3000, "full score should cover the 3000-word base list");
 
 const mostlyUnknown = buildAssessmentResult({
-  answers: Array.from({ length: 50 }, (_, index) => ({
+  answers: ["foundation", "required", "selective"].flatMap((layer) => Array.from({ length: 12 }, (_, index) => ({
     questionId: `q_${index}`,
+    layer,
     selected: index < 38 ? "不认识" : "错误",
     isCorrect: false
-  }))
+  })))
 });
-assert.ok(mostlyUnknown.vocabulary < 900, "many unknown answers should stay in a remedial range");
+assert.equal(mostlyUnknown.startLevel, "foundation", "mostly unknown answers should start from foundation words");
+assert.ok(mostlyUnknown.vocabularyRange.upper < 900, "many unknown answers should stay in a remedial range");
+
+const assessmentState = structuredClone(defaultState);
+startAssessment(assessmentState);
+assert.equal(assessmentState.assessment.questions.length, 18, "assessment should start with an 18-question first phase");
+assert.deepEqual(
+  ["foundation", "required", "selective"].map((layer) => assessmentState.assessment.questions.filter((question) => question.layer === layer).length),
+  [6, 6, 6],
+  "first assessment phase should sample six questions from each layer"
+);
+for (let index = 0; index < 18; index += 1) {
+  const question = getCurrentTestQuestion(assessmentState);
+  const shouldPassRequiredBoundary = question.layer === "foundation" || (question.layer === "required" && assessmentState.assessment.answers.filter((answer) => answer.layer === "required" && answer.isCorrect).length < 4);
+  answerAssessmentQuestion(assessmentState, shouldPassRequiredBoundary ? question.answer : "不认识");
+}
+assert.equal(assessmentState.assessment.questions.length, 36, "assessment should append an 18-question adaptive phase");
+assert.equal(
+  assessmentState.assessment.questions.slice(18).filter((question) => question.layer === "required").length,
+  18,
+  "a single critical layer should receive all adaptive questions"
+);
 
 const state = structuredClone(defaultState);
 startDailyLearning(state);
@@ -58,6 +85,14 @@ assert.deepEqual(
   [...new Set(state.daily.candidateWordIds.map((wordId) => words.find((word) => word.id === wordId)?.starLevel))],
   [1],
   "fresh precheck windows should start from one curriculum stage"
+);
+const foundationStartState = structuredClone(defaultState);
+foundationStartState.user.learningStartLevel = "foundation";
+startDailyLearning(foundationStartState);
+assert.deepEqual(
+  [...new Set(foundationStartState.daily.candidateWordIds.map((wordId) => words.find((word) => word.id === wordId)?.starLevel))],
+  [0],
+  "assessment start level should move fresh candidates to foundation words"
 );
 const firstCandidateId = state.daily.candidateWordIds[0];
 markPrecheck(state, firstCandidateId, "known");

@@ -71,11 +71,11 @@ try {
 
   await page.getByRole("button", { name: "词汇量测试" }).click();
   await page.waitForSelector('[data-view="test"].active');
-  assert.equal(await page.locator("#view-test .option-card").count(), 4);
+  assert.equal(await page.locator("#view-test .option-card").count(), 3);
   assert.match(await page.locator("#view-test").innerText(), /我不认识/);
   await page.waitForTimeout(70);
   assert.match(await page.locator("#view-test").innerText(), /停留太久可以选不认识/);
-  for (let index = 0; index < 50; index += 1) {
+  for (let index = 0; index < 36; index += 1) {
     await page.locator('[data-action="answer-test"]').first().click();
   }
   await page.waitForSelector('[data-view="test-result"].active');
@@ -85,6 +85,11 @@ try {
   await page.getByRole("button", { name: "开始今日学习" }).click();
   await page.waitForSelector('[data-view="precheck"].active');
   assert.match(await page.locator("#view-precheck").innerText(), /训前检测/);
+  assert.match(await page.locator("#view-precheck").innerText(), /ability/, "vocabulary assessment should move the first precheck window to foundation words");
+  await page.getByRole("button", { name: "返回首页" }).click();
+  await page.getByRole("button", { name: "重置体验数据" }).click();
+  await page.getByRole("button", { name: "开始今日学习" }).click();
+  await page.waitForSelector('[data-view="precheck"].active');
   assert.match(await page.locator("#view-precheck").innerText(), /absolutely/);
   const precheckFooter = page.locator('#view-precheck .bottom-actions');
   const initialCards = page.locator('#view-precheck .precheck-row');

@@ -7,14 +7,18 @@ const defaultState = {
     level: "高二",
     levelId: "senior_2",
     levelLabel: "高二",
+    learningStartLevel: "required",
+    learningStartLevelLabel: "高中必修词",
     activeGroup: "高考课标词",
     streakDays: 0,
     longestStreak: 0,
-    badges: []
+    badges: [],
+    vocabularyAssessment: null
   },
   assessment: {
     completed: false,
     currentIndex: 0,
+    questions: [],
     answers: [],
     result: null
   },
@@ -89,7 +93,7 @@ function normaliseState(state) {
   if (!state.userWordStates || typeof state.userWordStates !== "object") state.userWordStates = {};
   if (!Array.isArray(state.answerRecords)) state.answerRecords = [];
   if (!Array.isArray(state.user.badges)) state.user.badges = [];
-  ensureArrayFields(state.assessment, ["answers"]);
+  ensureArrayFields(state.assessment, ["answers", "questions"]);
   ensureArrayFields(state.daily, [
     "selectedWordIds",
     "groupQueue",

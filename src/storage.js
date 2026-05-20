@@ -5,14 +5,18 @@ export const defaultState = {
     id: "demo_student",
     name: "体验学生",
     level: "高二",
+    learningStartLevel: "required",
+    learningStartLevelLabel: "高中必修词",
     activeGroup: "高考课标词",
     streakDays: 0,
     longestStreak: 0,
-    badges: []
+    badges: [],
+    vocabularyAssessment: null
   },
   assessment: {
     completed: false,
     currentIndex: 0,
+    questions: [],
     answers: [],
     result: null
   },

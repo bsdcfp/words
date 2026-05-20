@@ -1,5 +1,4 @@
 import { words, getWordById, wordDatasetMeta } from "../data/words.js";
-import { testQuestions } from "../data/test-questions.js";
 import { speakWord } from "./audio.js";
 import { VIEWS, showView, getCurrentView } from "./router.js";
 import { buildDailyReport, getRewardStreakText } from "./report.js";
@@ -193,10 +192,11 @@ function renderTest() {
   const answered = state.assessment.answers.length;
   const correct = state.assessment.answers.filter((answer) => answer.isCorrect).length;
   const wrong = answered - correct;
+  const total = state.assessment.questions?.length || 36;
   view.innerHTML = `
     <header class="topbar compact">
       <button class="icon-button" type="button" aria-label="返回首页" data-action="go-home">‹</button>
-      <div class="progress-label">${answered + 1}/${testQuestions.length}</div>
+      <div class="progress-label">${Math.min(answered + 1, total)}/${total}</div>
     </header>
     <section class="question-panel">
       <p class="section-label">词汇量测试</p>
@@ -215,7 +215,7 @@ function renderTest() {
     <footer class="counter-bar">
       <span class="pill green">${correct}</span>
       <span class="pill red">${wrong}</span>
-      <span class="pill blue">${testQuestions.length - answered}</span>
+      <span class="pill blue">${total - answered}</span>
     </footer>
   `;
   scheduleTestPrompt(question.id);
@@ -228,6 +228,12 @@ function renderTestResult() {
     view.innerHTML = "";
     return;
   }
+  const range = result.vocabularyRange || { lower: 0, upper: 0 };
+  const layerSummary = ["foundation", "required", "selective"]
+    .map((layer) => result.layerStats?.[layer])
+    .filter(Boolean)
+    .map((stats) => `${stats.label} ${stats.accuracy}%`)
+    .join(" · ");
   view.innerHTML = `
     <header class="topbar compact">
       <button class="icon-button" type="button" aria-label="返回首页" data-action="go-home">‹</button>
@@ -238,11 +244,13 @@ function renderTestResult() {
       <strong class="vocab-number">${result.vocabulary}</strong>
       <div class="bar-chart" aria-label="词汇量对比图">
         <div class="bar target"><span>高中目标</span></div>
-        <div class="bar current" style="height:${Math.min(92, Math.max(18, result.vocabulary / 40))}%"><span>当前</span></div>
+        <div class="bar current" style="height:${Math.min(92, Math.max(18, (range.upper || 0) / 40))}%"><span>当前</span></div>
       </div>
       <article class="copy-card">
         <h2>${result.stage}</h2>
-        <p>正确率 ${result.accuracy}%，不认识 ${result.unknown} 个。${result.advice}</p>
+        <p>初测估计，学习 3 天后会自动校准。</p>
+        <p>正确率 ${result.accuracy}%，不认识 ${result.unknown} 个，误选 ${result.wrongChoice} 个。${result.advice}</p>
+        <p>${layerSummary}</p>
       </article>
       <button class="primary-button" type="button" data-action="go-home">返回首页</button>
     </section>
