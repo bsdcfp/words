@@ -91,6 +91,7 @@ Page({
     mixedTransition: false,
     mixedTransitionTitle: "",
     mixedTransitionHint: "",
+    audioCompletionNotice: "",
     precheckNotice: ""
   },
 
@@ -112,6 +113,7 @@ Page({
   onUnload() {
     this.clearStudyTransitionTimer();
     this.clearMixedTransitionTimer();
+    this.clearAudioCompletionTimer();
     this.clearPrecheckNoticeTimer();
     this.clearAutoPlayTimer();
     this.stopCurrentAudio();
@@ -241,7 +243,7 @@ Page({
     const result = flow.answerAudioQuestion(this.state, event.currentTarget.dataset.value);
     if (result.isCorrect) {
       const phase = flow.moveToNextAudioQuestion(this.state);
-      this.saveAndRender(phase === "next-selection" ? VIEWS.PRECHECK : phase === "mixed-review" ? VIEWS.GROUP_REVIEW : VIEWS.AUDIO_MEANING);
+      this.advanceAfterAudioPhase(phase);
       return;
     }
     this.saveAndRender(VIEWS.AUDIO_MEANING);
@@ -249,7 +251,37 @@ Page({
 
   nextAudio() {
     const phase = flow.moveToNextAudioQuestion(this.state);
-    this.saveAndRender(phase === "next-selection" ? VIEWS.PRECHECK : phase === "mixed-review" ? VIEWS.GROUP_REVIEW : VIEWS.AUDIO_MEANING);
+    this.advanceAfterAudioPhase(phase);
+  },
+
+  advanceAfterAudioPhase(phase) {
+    if (phase === "next-selection") {
+      this.showAudioCompletionThenRender(VIEWS.PRECHECK);
+      return;
+    }
+    if (phase === "mixed-review") {
+      this.showAudioCompletionThenRender(VIEWS.GROUP_REVIEW);
+      return;
+    }
+    this.saveAndRender(VIEWS.AUDIO_MEANING);
+  },
+
+  showAudioCompletionThenRender(nextView) {
+    const notice = this.state.daily.groupFeedback || "本组完成，重新选下一组";
+    const precheckNotice = buildPrecheckNoticeData(this.state);
+    const mixedNotice = buildMixedTransitionData(this.state);
+    if (precheckNotice) this.lastPrecheckNoticeKey = precheckNotice.key;
+    if (mixedNotice) this.lastMixedTransitionKey = mixedNotice.key;
+    saveState(this.state);
+    this.clearAutoPlayTimer();
+    this.stopCurrentAudio();
+    this.clearAudioCompletionTimer();
+    this.setData({ audioCompletionNotice: notice });
+    this.audioCompletionTimer = setTimeout(() => {
+      this.audioCompletionTimer = null;
+      this.setData({ audioCompletionNotice: "" });
+      this.saveAndRender(nextView);
+    }, NOTICE_DURATION_MS);
   },
 
   answerMixed(event) {
@@ -313,6 +345,12 @@ Page({
     if (!this.mixedTransitionTimer) return;
     clearTimeout(this.mixedTransitionTimer);
     this.mixedTransitionTimer = null;
+  },
+
+  clearAudioCompletionTimer() {
+    if (!this.audioCompletionTimer) return;
+    clearTimeout(this.audioCompletionTimer);
+    this.audioCompletionTimer = null;
   },
 
   clearPrecheckNoticeTimer() {
