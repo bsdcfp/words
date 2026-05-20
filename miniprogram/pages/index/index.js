@@ -328,6 +328,10 @@ Page({
   },
 
   stopCurrentAudio() {
+    if (this.currentAudioCleanup) {
+      this.currentAudioCleanup(true);
+      return;
+    }
     if (!this.currentAudio) return;
     this.currentAudio.stop();
     this.currentAudio.destroy();
@@ -417,6 +421,13 @@ Page({
 
   getAutoPlayWordId(view) {
     let question = null;
+    if (view === VIEWS.WORD_STUDY) {
+      const word = flow.getCurrentStudyWord(this.state);
+      return word ? word.id : "";
+    }
+    if (view === VIEWS.GROUP_REVIEW && this.state.daily.reviewPhase !== "mixed") {
+      question = flow.getCurrentGroupReviewQuestion(this.state);
+    }
     if (view === VIEWS.AUDIO_MEANING) {
       question = flow.getCurrentAudioQuestion(this.state);
     }
@@ -430,37 +441,71 @@ Page({
   playWordAudio(wordId) {
     const word = flow.getWordById(wordId);
     if (!word) return;
-    this.configureAudioPlayback();
+    this.configureAudioPlayback(() => this.startInnerAudio(word));
+  },
+
+  startInnerAudio(word) {
     this.stopCurrentAudio();
     const audio = wx.createInnerAudioContext();
     this.currentAudio = audio;
+    let playStarted = false;
+    let cleaned = false;
+    let retryTimer = null;
+    const clearRetry = () => {
+      if (!retryTimer) return;
+      clearTimeout(retryTimer);
+      retryTimer = null;
+    };
+    const safePlay = () => {
+      if (playStarted) return;
+      playStarted = true;
+      audio.play();
+    };
+    const cleanup = (shouldStop = false) => {
+      if (cleaned) return;
+      cleaned = true;
+      clearRetry();
+      if (this.currentAudio === audio) this.currentAudio = null;
+      if (this.currentAudioCleanup === cleanup) this.currentAudioCleanup = null;
+      if (shouldStop) audio.stop();
+      audio.destroy();
+    };
+    this.currentAudioCleanup = cleanup;
+    audio.autoplay = true;
     audio.obeyMuteSwitch = false;
     audio.volume = 1;
+    audio.onCanplay(safePlay);
+    audio.onPlay(() => {
+      playStarted = true;
+      clearRetry();
+    });
+    audio.onEnded(cleanup);
+    audio.onError((error) => {
+      console.warn("word audio play failed", word.word, error);
+      cleanup();
+    });
     audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word.word)}&type=2`;
-    audio.onEnded(() => {
-      if (this.currentAudio === audio) this.currentAudio = null;
-      audio.destroy();
-    });
-    audio.onError(() => {
-      if (this.currentAudio === audio) this.currentAudio = null;
-      audio.destroy();
-    });
-    audio.play();
+    retryTimer = setTimeout(safePlay, 260);
   },
 
-  configureAudioPlayback() {
+  configureAudioPlayback(done) {
+    const finish = typeof done === "function" ? done : null;
     const app = typeof getApp === "function" ? getApp() : null;
     if (app && typeof app.configureAudioPlayback === "function") {
-      app.configureAudioPlayback();
+      app.configureAudioPlayback(finish);
       return;
     }
     if (typeof wx !== "undefined" && typeof wx.setInnerAudioOption === "function") {
       wx.setInnerAudioOption({
         mixWithOther: true,
         obeyMuteSwitch: false,
-        speakerOn: true
+        speakerOn: true,
+        success: finish || undefined,
+        fail: finish || undefined
       });
+      return;
     }
+    if (finish) finish();
   },
 
   openDetailById(wordId) {

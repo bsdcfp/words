@@ -1,9 +1,15 @@
-function configureAudioPlayback() {
-  if (typeof wx === "undefined" || typeof wx.setInnerAudioOption !== "function") return;
+function configureAudioPlayback(done) {
+  const finish = typeof done === "function" ? done : null;
+  if (typeof wx === "undefined" || typeof wx.setInnerAudioOption !== "function") {
+    if (finish) finish();
+    return;
+  }
   wx.setInnerAudioOption({
     mixWithOther: true,
     obeyMuteSwitch: false,
-    speakerOn: true
+    speakerOn: true,
+    success: finish || undefined,
+    fail: finish || undefined
   });
 }
 

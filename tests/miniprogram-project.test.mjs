@@ -17,5 +17,13 @@ assert.match(pageJs, /Page\(/);
 assert.match(pageJs, /startDailyLearning/);
 assert.match(pageJs, /scheduleAutoPlay/);
 assert.match(pageJs, /playWordAudio/);
+assert.match(pageJs, /view === VIEWS\.WORD_STUDY/, "word study pages should auto-play pronunciation");
+assert.match(pageJs, /getCurrentGroupReviewQuestion/, "group visual review should auto-play pronunciation");
+assert.match(pageJs, /onCanplay\(safePlay\)/, "audio should wait for canplay before auto-playing");
+assert.match(pageJs, /retryTimer = setTimeout\(safePlay/, "audio autoplay should retry after the source is assigned");
+
+const appJs = await readFile("miniprogram/app.js", "utf8");
+assert.match(appJs, /obeyMuteSwitch: false/);
+assert.match(appJs, /success: finish/, "audio option setup should call back before playback starts");
 
 console.log("miniprogram project checks passed");
