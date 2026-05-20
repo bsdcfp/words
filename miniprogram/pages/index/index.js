@@ -18,7 +18,6 @@ const VIEWS = {
   DAILY_REPORT: "daily-report"
 };
 const NOTICE_DURATION_MS = 1500;
-const AUTO_PLAY_AFTER_NOTICE_MS = NOTICE_DURATION_MS + 120;
 const AUTO_PLAY_DELAY_MS = 180;
 const LEVEL_GROUPS = [
   {
@@ -88,10 +87,8 @@ Page({
     bootError: "",
     studyImageMode: false,
     studyTransition: false,
-    mixedTransition: false,
-    mixedTransitionTitle: "",
-    mixedTransitionHint: "",
     audioCompletionNotice: "",
+    audioCompletionHint: "",
     precheckNotice: ""
   },
 
@@ -112,7 +109,6 @@ Page({
 
   onUnload() {
     this.clearStudyTransitionTimer();
-    this.clearMixedTransitionTimer();
     this.clearAudioCompletionTimer();
     this.clearPrecheckNoticeTimer();
     this.clearAutoPlayTimer();
@@ -267,19 +263,21 @@ Page({
   },
 
   showAudioCompletionThenRender(nextView) {
-    const notice = this.state.daily.groupFeedback || "本组完成，重新选下一组";
-    const precheckNotice = buildPrecheckNoticeData(this.state);
     const mixedNotice = buildMixedTransitionData(this.state);
+    const notice = nextView === VIEWS.GROUP_REVIEW && mixedNotice
+      ? mixedNotice.title
+      : this.state.daily.groupFeedback || "本组完成，重新选下一组";
+    const hint = nextView === VIEWS.GROUP_REVIEW && mixedNotice ? mixedNotice.hint : "";
+    const precheckNotice = buildPrecheckNoticeData(this.state);
     if (precheckNotice) this.lastPrecheckNoticeKey = precheckNotice.key;
-    if (mixedNotice) this.lastMixedTransitionKey = mixedNotice.key;
     saveState(this.state);
     this.clearAutoPlayTimer();
     this.stopCurrentAudio();
     this.clearAudioCompletionTimer();
-    this.setData({ audioCompletionNotice: notice });
+    this.setData({ audioCompletionNotice: notice, audioCompletionHint: hint });
     this.audioCompletionTimer = setTimeout(() => {
       this.audioCompletionTimer = null;
-      this.setData({ audioCompletionNotice: "" });
+      this.setData({ audioCompletionNotice: "", audioCompletionHint: "" });
       this.saveAndRender(nextView);
     }, NOTICE_DURATION_MS);
   },
@@ -341,12 +339,6 @@ Page({
     this.studyTransitionTimer = null;
   },
 
-  clearMixedTransitionTimer() {
-    if (!this.mixedTransitionTimer) return;
-    clearTimeout(this.mixedTransitionTimer);
-    this.mixedTransitionTimer = null;
-  },
-
   clearAudioCompletionTimer() {
     if (!this.audioCompletionTimer) return;
     clearTimeout(this.audioCompletionTimer);
@@ -397,7 +389,7 @@ Page({
 
   render(view) {
     const state = this.state;
-    const patch = { view, state, studyTransition: false, mixedTransition: false };
+    const patch = { view, state, studyTransition: false };
     if (view === VIEWS.HOME) patch.home = buildHomeData(state);
     if (view === VIEWS.PROFILE) patch.profile = buildProfileData(state);
     if (view === VIEWS.LEVEL_SELECT) patch.levelSelect = buildLevelSelectData(state);
@@ -414,27 +406,13 @@ Page({
     if (view === VIEWS.WORD_STUDY) patch.study = buildStudyData(state);
     if (view === VIEWS.GROUP_REVIEW) {
       patch.review = buildReviewData(state);
-      const mixedNotice = buildMixedTransitionData(state);
-      if (mixedNotice && this.lastMixedTransitionKey !== mixedNotice.key) {
-        this.lastMixedTransitionKey = mixedNotice.key;
-        patch.mixedTransition = true;
-        patch.mixedTransitionTitle = mixedNotice.title;
-        patch.mixedTransitionHint = mixedNotice.hint;
-      }
     }
     if (view === VIEWS.AUDIO_MEANING) patch.audio = buildAudioData(state);
     if (view === VIEWS.WRONG_BOOK) patch.wrongBook = buildWrongBookData(state);
     if (view === VIEWS.DAILY_REPORT) patch.report = buildReportData(state);
     this.setData(patch, () => {
-      this.scheduleAutoPlay(view, patch.mixedTransition ? AUTO_PLAY_AFTER_NOTICE_MS : AUTO_PLAY_DELAY_MS);
+      this.scheduleAutoPlay(view, AUTO_PLAY_DELAY_MS);
     });
-    if (patch.mixedTransition) {
-      this.clearMixedTransitionTimer();
-      this.mixedTransitionTimer = setTimeout(() => {
-        this.mixedTransitionTimer = null;
-        this.setData({ mixedTransition: false });
-      }, NOTICE_DURATION_MS);
-    }
     if (patch.precheckNotice) {
       this.clearPrecheckNoticeTimer();
       this.precheckNoticeTimer = setTimeout(() => {

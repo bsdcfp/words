@@ -183,9 +183,6 @@
       <view class="audio-tools"><view data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{review.word.id}}" bindtap="speak">重播</view></view>
       <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : (review.question.mode == 'audio' ? '混组听音辨义' : '混组看词辨义')}}<text class="goal-hint">{{review.goalText}}</text></text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
     </view>
-    <view wx:if="{{mixedTransition}}" class="transition-mask">
-      <view class="transition-card"><text>{{mixedTransitionTitle}}</text><text>{{mixedTransitionHint}}</text></view>
-    </view>
   </view>
 
   <view wx:elif="{{view == 'audio-meaning'}}" class="view audio-view">
@@ -199,7 +196,7 @@
     </view>
     <view class="bottom-actions status-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}<text class="goal-hint">{{audio.goalText}}</text></text><view wx:if="{{audio.question.answered}}" class="primary-button small" bindtap="nextAudio">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
     <view wx:if="{{audioCompletionNotice}}" class="transition-mask">
-      <view class="transition-card"><text>{{audioCompletionNotice}}</text></view>
+      <view class="transition-card"><text>{{audioCompletionNotice}}</text><text wx:if="{{audioCompletionHint}}">{{audioCompletionHint}}</text></view>
     </view>
   </view>
 

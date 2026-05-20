@@ -23,11 +23,12 @@ assert.match(pageJs, /onCanplay\(safePlay\)/, "audio should wait for canplay bef
 assert.match(pageJs, /retryTimer = setTimeout\(safePlay/, "audio autoplay should retry after the source is assigned");
 assert.match(pageJs, /showAudioCompletionThenRender/, "audio completion should show notice before switching views");
 assert.match(pageJs, /audioCompletionNotice/, "audio completion notice should stay on the audio page");
+assert.match(pageJs, /audioCompletionHint/, "mixed-review hints should be shown before the mixed card appears");
 assert.match(pageJs, /lastPrecheckNoticeKey = precheckNotice\.key/, "audio completion should suppress duplicate precheck notices");
-assert.match(pageJs, /lastMixedTransitionKey = mixedNotice\.key/, "audio completion should suppress duplicate mixed-review notices");
 
 const pageWxml = await readFile("miniprogram/pages/index/index.wxml", "utf8");
 assert.match(pageWxml, /wx:if="{{audioCompletionNotice}}"/, "audio page should render the completion notice");
+assert.doesNotMatch(pageWxml, /wx:if="{{mixedTransition}}"/, "mixed-review notice should not render on top of the mixed card");
 
 const appJs = await readFile("miniprogram/app.js", "utf8");
 assert.match(appJs, /obeyMuteSwitch: false/);
