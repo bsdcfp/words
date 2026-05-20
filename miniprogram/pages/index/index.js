@@ -668,8 +668,7 @@ function buildStudyData(state) {
   const current = Math.min(state.daily.studyIndex + 1, total);
   return {
     word: word ? decorateWord(word) : null,
-    progress: `${current}/${total}`,
-    goalText: buildGoalText(state)
+    progress: `${current}/${total}`
   };
 }
 
@@ -683,8 +682,7 @@ function buildReviewData(state) {
       question: decorateQuestion(question, word),
       word: word ? decorateWord(word) : null,
       count: state.daily.mixedReviewWordIds.length,
-      progress: question ? `${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}` : "",
-      goalText: buildGoalText(state)
+      progress: question ? `${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}` : ""
     };
   }
   const question = flow.getCurrentGroupReviewQuestion(state);
@@ -694,8 +692,7 @@ function buildReviewData(state) {
     question: decorateQuestion(question, word),
     word: word ? decorateWord(word) : null,
     count: state.daily.selectedWordIds.length,
-    progress: question ? `${state.daily.groupIndex + 1}/${state.daily.groupQuestions.length}` : "",
-    goalText: buildGoalText(state)
+    progress: question ? `${state.daily.groupIndex + 1}/${state.daily.groupQuestions.length}` : ""
   };
 }
 
@@ -716,14 +713,8 @@ function buildAudioData(state) {
   return {
     question: decorateQuestion(question, word),
     word: word ? decorateWord(word) : null,
-    progress: question ? `${state.daily.audioIndex + 1}/${state.daily.audioQuestions.length}` : "",
-    goalText: buildGoalText(state)
+    progress: question ? `${state.daily.audioIndex + 1}/${state.daily.audioQuestions.length}` : ""
   };
-}
-
-function buildGoalText(state) {
-  const completedGroups = Math.floor(((state.daily && state.daily.sessionCompletedWordIds) || []).length / 3);
-  return completedGroups >= 1 ? "今日最低目标已达成，可随时结束" : "完成 1 组达成今日目标";
 }
 
 function buildWrongBookData(state) {

@@ -115,7 +115,7 @@ function renderHome() {
     <section class="hero-panel">
       <p class="section-label">今日任务</p>
       <h2>今日至少完成 1 组</h2>
-      <p>${todayGroups >= 1 ? "已达成今日最低目标，可随时结束，也可以继续下一组。" : "每组 3 个词，完成后自动进入下一组。"}</p>
+      <p>${todayGroups >= 1 ? `今日已完成 ${todayGroups} 组，继续按计划学习。` : "每组 3 个词，完成后自动进入下一组。"}</p>
       <button class="primary-button" type="button" data-action="start-daily">开始今日学习</button>
     </section>
     <section class="coach-strip" aria-label="学习流程">

@@ -15,7 +15,7 @@
     <view class="plan-panel">
       <text class="section-label">按记忆曲线安排</text>
       <text class="hero-title">今日至少完成 1 组</text>
-      <text class="plan-copy">{{home.dailyGoalMet ? '已达成今日最低目标，可随时结束，也可以继续下一组。' : '每组 3 个词，完成后自动进入下一组。错过复习的词会回到识记。'}}</text>
+      <text class="plan-copy">{{home.todayGroups > 0 ? '今日已完成 ' + home.todayGroups + ' 组，继续按计划学习。' : '每组 3 个词，完成后自动进入下一组。错过复习的词会回到识记。'}}</text>
       <view class="primary-button" bindtap="startDailyLearning">开始今日学习</view>
     </view>
     <view class="plan-grid">
@@ -170,7 +170,7 @@
           <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerGroupReview"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
         </view>
         <view class="audio-tools"><view data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{review.word.id}}" bindtap="speak">播放</view></view>
-        <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '回答正确' : '已加入本轮错词') : '本组看词辨义'}}<text class="goal-hint">{{review.goalText}}</text></text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextGroupReview">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
+        <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '回答正确' : '已加入本轮错词') : '本组看词辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextGroupReview">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
       </view>
     </view>
     <view wx:else class="audio-panel audio-minimal">
@@ -180,7 +180,7 @@
         <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerMixed"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
       </view>
       <view class="audio-tools"><view data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{review.word.id}}" bindtap="speak">重播</view></view>
-      <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组看词辨义'}}<text class="goal-hint">{{review.goalText}}</text></text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
+      <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组看词辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
     </view>
   </view>
 
@@ -193,7 +193,7 @@
       </view>
       <view class="audio-tools"><view data-word-id="{{audio.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{audio.word.id}}" bindtap="speak">重播</view></view>
     </view>
-    <view class="bottom-actions status-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}<text class="goal-hint">{{audio.goalText}}</text></text><view wx:if="{{audio.question.answered}}" class="primary-button small" bindtap="nextAudio">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
+    <view class="bottom-actions status-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}</text><view wx:if="{{audio.question.answered}}" class="primary-button small" bindtap="nextAudio">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
     <view wx:if="{{audioCompletionNotice}}" class="transition-mask">
       <view class="transition-card"><text>{{audioCompletionNotice}}</text><text wx:if="{{audioCompletionHint}}">{{audioCompletionHint}}</text></view>
     </view>
