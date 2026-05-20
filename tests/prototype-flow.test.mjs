@@ -218,9 +218,9 @@ async function answerMixedReview(page, headwords) {
   await page.waitForSelector('[data-view="group-review"].active');
   assert.match(await page.locator("#view-group-review").innerText(), /混组/);
   assert.match(await page.locator("#view-group-review").innerText(), new RegExp(`${headwords.length} 个词`));
-  assert.match(await page.locator("#view-group-review").innerText(), new RegExp(`1/${headwords.length * 2}`));
+  assert.match(await page.locator("#view-group-review").innerText(), new RegExp(`1/${headwords.length}`));
   assert.equal(await page.locator('#view-group-review [data-action="answer-mixed"]').count(), 4);
-  const questionHeadwords = headwords.flatMap((headword) => [headword, headword]);
+  const questionHeadwords = headwords;
   for (let index = 0; index < questionHeadwords.length; index += 1) {
     await clickAnswer(page, "answer-mixed", meaningFor(questionHeadwords[index]));
     if (index < questionHeadwords.length - 1) {

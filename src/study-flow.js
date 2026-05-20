@@ -357,7 +357,6 @@ function masteryFlagFor(type, mode) {
   if (type === "group-word-meaning") return "groupVisualPassed";
   if (type === "audio-meaning") return "groupAudioPassed";
   if (type === "mixed-review" && mode === "visual") return "mixedVisualPassed";
-  if (type === "mixed-review" && mode === "audio") return "mixedAudioPassed";
   return null;
 }
 
@@ -373,8 +372,7 @@ function isRoundMastered(wordState) {
   return Boolean(
     wordState.groupVisualPassed &&
     wordState.groupAudioPassed &&
-    wordState.mixedVisualPassed &&
-    wordState.mixedAudioPassed
+    wordState.mixedVisualPassed
   );
 }
 
@@ -454,10 +452,7 @@ function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
 function prepareMixedReview(state) {
   state.daily.reviewPhase = "mixed";
   state.daily.mixedReviewWordIds = buildSecondLevelReviewWordIds(state);
-  state.daily.mixedQuestions = state.daily.mixedReviewWordIds.flatMap((wordId) => [
-    createChoiceQuestion(wordId, "mixed-review", "visual"),
-    createChoiceQuestion(wordId, "mixed-review", "audio")
-  ]);
+  state.daily.mixedQuestions = state.daily.mixedReviewWordIds.map((wordId) => createChoiceQuestion(wordId, "mixed-review", "visual"));
   state.daily.mixedIndex = 0;
 }
 

@@ -97,7 +97,7 @@ const mixedModeState = structuredClone(defaultState);
 startDailyLearning(mixedModeState);
 completeGroup(mixedModeState, ["absolutely", "accident", "account"]);
 completeGroup(mixedModeState, ["ache", "achievement", "acquire"]);
-assert.equal(mixedModeState.daily.mixedQuestions.length, 12, "six-word mixed review should include visual and audio questions");
+assert.equal(mixedModeState.daily.mixedQuestions.length, 6, "six-word mixed review should include visual questions only");
 assert.equal(
   mixedModeState.daily.mixedQuestions.filter((question) => question.mode === "visual").length,
   6,
@@ -105,8 +105,8 @@ assert.equal(
 );
 assert.equal(
   mixedModeState.daily.mixedQuestions.filter((question) => question.mode === "audio").length,
-  6,
-  "six-word mixed review should include six audio questions"
+  0,
+  "six-word mixed review should not include audio questions"
 );
 
 answerAllMixedQuestions(mixedModeState);
@@ -115,7 +115,6 @@ const masteredWordState = mixedModeState.userWordStates[absolutely.id];
 assert.equal(masteredWordState.groupVisualPassed, true, "a mastered word should pass the group visual check");
 assert.equal(masteredWordState.groupAudioPassed, true, "a mastered word should pass the group audio check");
 assert.equal(masteredWordState.mixedVisualPassed, true, "a mastered word should pass the mixed visual check");
-assert.equal(masteredWordState.mixedAudioPassed, true, "a mastered word should pass the mixed audio check");
 assert.equal(masteredWordState.reviewStage, 1, "a word should enter the first review node only after full round mastery");
 assert.ok(masteredWordState.nextReviewAt, "a mastered word should receive the next review time");
 

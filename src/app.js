@@ -390,34 +390,31 @@ function renderMixedReview(view) {
     return;
   }
   const word = getWordById(question.wordId);
-  const isAudioMode = question.mode === "audio";
-  if (isAudioMode) scheduleAutoSpeak(word, `mixed:${state.daily.startedAt}:${state.daily.mixedIndex}:${word.id}`);
+  scheduleAutoSpeak(word, `mixed:${state.daily.startedAt}:${state.daily.mixedIndex}:${word.id}`);
   view.innerHTML = `
     <header class="topbar compact">
       <button class="icon-button" type="button" aria-label="返回首页" data-action="go-home">‹</button>
       <div>
         <p class="eyebrow">${state.daily.mixedReviewWordIds.length} 个混组记忆</p>
-        <h1>${isAudioMode ? "混组听音辨义" : "混组看词辨义"}</h1>
+        <h1>混组看词辨义</h1>
       </div>
       <div class="progress-label">${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}</div>
     </header>
     <section class="review-summary">
       <strong>${state.daily.mixedReviewWordIds.length} 个词</strong>
-      <span>逐词听音、辨义，完成后继续下一段学习</span>
+      <span>打乱前面学过的词，只看英文选中文释义</span>
     </section>
     <section class="audio-panel">
-      ${isAudioMode
-        ? `<button class="speaker-tile" type="button" data-action="speak" data-word-id="${word.id}" aria-label="播放 ${word.word} 发音">播放</button>`
-        : `<h1 class="test-word">${word.word}</h1>`}
+      <h1 class="test-word">${word.word}</h1>
       <p class="ipa"><span>英</span>${word.ipa}</p>
-      <p class="hint">${isAudioMode ? "混组抽查：先听，再选中文释义" : "混组抽查：看到英文，选择中文释义"}</p>
+      <p class="hint">混组抽查：看到英文，选择中文释义</p>
       <div class="option-stack">
         ${renderQuestionOptions(question, word, "answer-mixed")}
       </div>
       <button class="text-link centered" type="button" data-action="open-detail" data-word-id="${word.id}">看词卡</button>
     </section>
     <footer class="bottom-actions">
-      <span>${question.answered ? (question.isCorrect ? "混组回答正确" : "混组已加入错词") : (isAudioMode ? "混组听音辨义" : "混组看词辨义")}</span>
+      <span>${question.answered ? (question.isCorrect ? "混组回答正确" : "混组已加入错词") : "混组看词辨义"}</span>
       <button class="primary-button small" type="button" ${question.answered ? "" : "disabled"} data-action="next-mixed">${state.daily.mixedIndex + 1 >= state.daily.mixedQuestions.length ? "完成复习" : "继续"}</button>
     </footer>
   `;
