@@ -18,7 +18,8 @@ const VIEWS = {
   DAILY_REPORT: "daily-report"
 };
 const NOTICE_DURATION_MS = 1500;
-const AUTO_PLAY_DELAY_MS = 180;
+const AUTO_PLAY_DELAY_MS = 0;
+const AUDIO_PLAY_RETRY_MS = 80;
 const LEVEL_GROUPS = [
   {
     title: "小学",
@@ -457,7 +458,8 @@ Page({
   playWordAudio(wordId) {
     const word = flow.getWordById(wordId);
     if (!word) return;
-    this.configureAudioPlayback(() => this.startInnerAudio(word));
+    this.configureAudioPlayback();
+    this.startInnerAudio(word);
   },
 
   startInnerAudio(word) {
@@ -501,7 +503,7 @@ Page({
       cleanup();
     });
     audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word.word)}&type=2`;
-    retryTimer = setTimeout(safePlay, 260);
+    retryTimer = setTimeout(safePlay, AUDIO_PLAY_RETRY_MS);
   },
 
   configureAudioPlayback(done) {

@@ -21,6 +21,9 @@ assert.match(pageJs, /view === VIEWS\.WORD_STUDY/, "word study pages should auto
 assert.match(pageJs, /getCurrentGroupReviewQuestion/, "group visual review should auto-play pronunciation");
 assert.match(pageJs, /onCanplay\(safePlay\)/, "audio should wait for canplay before auto-playing");
 assert.match(pageJs, /retryTimer = setTimeout\(safePlay/, "audio autoplay should retry after the source is assigned");
+assert.match(pageJs, /const AUTO_PLAY_DELAY_MS = 0/, "card pronunciation should start immediately after render");
+assert.match(pageJs, /const AUDIO_PLAY_RETRY_MS = 80/, "audio retry fallback should not add visible delay");
+assert.match(pageJs, /this\.configureAudioPlayback\(\);\n    this\.startInnerAudio\(word\);/, "playback should not wait for audio-option callback on every card");
 assert.match(pageJs, /showAudioCompletionThenRender/, "audio completion should show notice before switching views");
 assert.match(pageJs, /audioCompletionNotice/, "audio completion notice should stay on the audio page");
 assert.match(pageJs, /audioCompletionHint/, "mixed-review hints should be shown before the mixed card appears");
