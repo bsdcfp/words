@@ -14,13 +14,13 @@
     </view>
     <view class="plan-panel">
       <text class="section-label">按记忆曲线安排</text>
-      <text class="hero-title">先选 3 个不熟词</text>
-      <text class="plan-copy">如果错过复习，词会重新进入识记，从头把记忆补回来。</text>
+      <text class="hero-title">今日至少完成 1 组</text>
+      <text class="plan-copy">{{home.dailyGoalMet ? '已达成今日最低目标，可随时结束，也可以继续下一组。' : '每组 3 个词，完成后自动进入下一组。错过复习的词会回到识记。'}}</text>
       <view class="primary-button" bindtap="startDailyLearning">开始今日学习</view>
     </view>
     <view class="plan-grid">
-      <view><text>{{home.planCount}}</text><text>今日一组</text></view>
-      <view><text>{{home.todayDone}}</text><text>今日已学</text></view>
+      <view><text>{{home.planCount}}</text><text>最低组数</text></view>
+      <view><text>{{home.todayGroups}}</text><text>今日已完成组</text></view>
       <view><text>{{home.weakCount}}</text><text>待巩固</text></view>
     </view>
     <view class="today-card">
@@ -163,16 +163,25 @@
   <view wx:elif="{{view == 'group-review'}}" class="view">
     <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">{{review.isMixed ? '混组复习' : '本组复习'}}</text><text class="progress-label">{{review.progress}}</text></view>
     <view wx:if="{{!review.isMixed}}" class="review-stack">
-      <view wx:for="{{review.words}}" wx:key="id" class="review-card"><view class="review-copy"><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text></view><view class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</view></view>
-      <view class="primary-button" bindtap="finishReview">进入发音辨义</view>
+      <view wx:if="{{review.word}}" class="audio-panel audio-minimal visual-question">
+        <text class="test-word">{{review.word.word}}</text>
+        <text class="ipa">{{review.word.ipa}}</text>
+        <view class="option-stack">
+          <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerGroupReview"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
+        </view>
+        <view class="audio-tools"><view data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{review.word.id}}" bindtap="speak">播放</view></view>
+        <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '回答正确' : '已加入本轮错词') : '本组看词辨义'}}<text class="goal-hint">{{review.goalText}}</text></text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextGroupReview">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
+      </view>
     </view>
     <view wx:else class="audio-panel audio-minimal">
-      <view class="speaker-tile" data-word-id="{{review.word.id}}" bindtap="speak">播放</view>
+      <view wx:if="{{review.question.mode == 'audio'}}" class="speaker-tile" data-word-id="{{review.word.id}}" bindtap="speak">播放</view>
+      <text wx:else class="test-word">{{review.word.word}}</text>
+      <text class="ipa">{{review.word.ipa}}</text>
       <view class="option-stack">
         <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerMixed"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
       </view>
       <view class="audio-tools"><view data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{review.word.id}}" bindtap="speak">重播</view></view>
-      <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组听音辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
+      <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : (review.question.mode == 'audio' ? '混组听音辨义' : '混组看词辨义')}}<text class="goal-hint">{{review.goalText}}</text></text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
     </view>
     <view wx:if="{{mixedTransition}}" class="transition-mask">
       <view class="transition-card"><text>{{mixedTransitionTitle}}</text><text>{{mixedTransitionHint}}</text></view>
@@ -188,7 +197,7 @@
       </view>
       <view class="audio-tools"><view data-word-id="{{audio.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{audio.word.id}}" bindtap="speak">重播</view></view>
     </view>
-    <view class="bottom-actions status-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}</text><view wx:if="{{audio.question.answered}}" class="primary-button small" bindtap="nextAudio">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
+    <view class="bottom-actions status-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}<text class="goal-hint">{{audio.goalText}}</text></text><view wx:if="{{audio.question.answered}}" class="primary-button small" bindtap="nextAudio">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
   </view>
 
   <view wx:elif="{{view == 'wrong-book'}}" class="view">

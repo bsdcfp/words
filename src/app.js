@@ -7,11 +7,13 @@ import { loadState, resetState, saveState } from "./storage.js";
 import {
   answerAssessmentQuestion,
   answerAudioQuestion,
+  answerGroupReviewQuestion,
   answerMixedReviewQuestion,
   autoSelectPrecheckWords,
   completeMixedReview,
   confirmPrecheck,
   getCurrentAudioQuestion,
+  getCurrentGroupReviewQuestion,
   getCurrentMixedReviewQuestion,
   getCurrentStudyWord,
   getCurrentTestQuestion,
@@ -19,7 +21,9 @@ import {
   markStudyWord,
   moveToNextMixedReviewQuestion,
   moveToNextAudioQuestion,
+  moveToNextGroupReviewQuestion,
   prepareAudioQuestions,
+  prepareGroupReviewQuestions,
   startAssessment,
   startDailyLearning,
   togglePrecheckWord
@@ -62,6 +66,8 @@ function bindGlobalActions() {
     if (action === "start-review") showView(VIEWS.GROUP_REVIEW);
     if (action === "finish-review") handleFinishReview();
     if (action === "finish-mixed-review") handleFinishMixedReview();
+    if (action === "answer-group-review") handleAnswerGroupReview(value);
+    if (action === "next-group-review") handleNextGroupReview();
     if (action === "answer-audio") handleAnswerAudio(value);
     if (action === "next-audio") handleNextAudio();
     if (action === "answer-mixed") handleAnswerMixed(value);
@@ -94,6 +100,7 @@ function renderHome() {
   const result = state.assessment.result;
   const weakCount = Object.values(state.userWordStates).filter((wordState) => wordState.wrongCount > 0).length;
   const learnedCount = Object.values(state.userWordStates).filter((wordState) => wordState.familiarity > 0).length;
+  const todayGroups = Math.floor((state.daily.sessionCompletedWordIds || []).length / 3);
   const badges = state.user.badges.length ? state.user.badges.join("、") : "今日完成后获得起步徽章";
   const streakText = getRewardStreakText(state);
   const view = document.querySelector("#view-home");
@@ -107,7 +114,8 @@ function renderHome() {
     </header>
     <section class="hero-panel">
       <p class="section-label">今日任务</p>
-      <h2>先选 3 个不熟词</h2>
+      <h2>今日至少完成 1 组</h2>
+      <p>${todayGroups >= 1 ? "已达成今日最低目标，可随时结束，也可以继续下一组。" : "每组 3 个词，完成后自动进入下一组。"}</p>
       <button class="primary-button" type="button" data-action="start-daily">开始今日学习</button>
     </section>
     <section class="coach-strip" aria-label="学习流程">
@@ -126,8 +134,8 @@ function renderHome() {
         <small>现实词汇量</small>
       </article>
       <article class="metric">
-        <span>${learnedCount}</span>
-        <small>已练单词</small>
+        <span>${todayGroups}</span>
+        <small>今日已完成组</small>
       </article>
       <article class="metric">
         <span>${state.user.streakDays}</span>
@@ -325,35 +333,43 @@ function renderGroupReview() {
     renderMixedReview(view);
     return;
   }
-  const reviewIds = isMixed ? state.daily.mixedReviewWordIds : state.daily.selectedWordIds;
-  const selected = reviewIds.map(getWordById).filter(Boolean);
+  const question = getCurrentGroupReviewQuestion(state);
+  if (!question) {
+    view.innerHTML = `
+      <header class="topbar compact">
+        <button class="icon-button" type="button" aria-label="返回首页" data-action="go-home">‹</button>
+        <h1>本组复习</h1>
+      </header>
+      <section class="empty-state">
+        <p>本组看词辨义已完成</p>
+        <button class="primary-button" type="button" data-action="finish-review">进入听音辨义</button>
+      </section>
+    `;
+    return;
+  }
+  const word = getWordById(question.wordId);
+  const total = state.daily.groupQuestions.length || 1;
   view.innerHTML = `
     <header class="topbar compact">
       <button class="icon-button" type="button" aria-label="返回识记" data-action="go-home">‹</button>
       <div>
-        <p class="eyebrow">${isMixed ? `${selected.length} 个混组记忆` : "3 个一组即时复习"}</p>
-        <h1>${isMixed ? "混组复习" : "本组复习"}</h1>
+        <p class="eyebrow">3 个一组即时复习</p>
+        <h1>看词辨义</h1>
       </div>
+      <div class="progress-label">${state.daily.groupIndex + 1}/${total}</div>
     </header>
-    <section class="review-summary">
-      <strong>${selected.length} 个词</strong>
-      <span>${isMixed ? `本轮已完成词混合为 ${selected.length} 个词` : "先把刚选出的 3 个词过一遍"}</span>
-    </section>
-    <section class="review-stack">
-      ${selected.map((word) => `
-        <article class="review-card">
-          <button class="sound-mini" type="button" data-action="speak" data-word-id="${word.id}" aria-label="播放 ${word.word}">播放</button>
-          <div>
-            <h2>${word.word}</h2>
-            <p>${word.ipa}</p>
-            <small>${word.cn.join("，")}</small>
-          </div>
-        </article>
-      `).join("")}
+    <section class="audio-panel">
+      <h1 class="test-word">${word.word}</h1>
+      <p class="ipa"><span>英</span>${word.ipa}</p>
+      <p class="hint">看到英文，选择正确中文释义</p>
+      <div class="option-stack">
+        ${renderQuestionOptions(question, word, "answer-group-review")}
+      </div>
+      <button class="text-link centered" type="button" data-action="open-detail" data-word-id="${word.id}">看词卡</button>
     </section>
     <footer class="bottom-actions">
-      <span>${isMixed ? "完成后继续下一段学习" : "复习后进入听音辨义"}</span>
-      <button class="primary-button small" type="button" data-action="${isMixed ? "finish-mixed-review" : "finish-review"}">${isMixed ? "完成复习" : "进入发音辨义"}</button>
+      <span>${question.answered ? (question.isCorrect ? "回答正确" : "已加入本轮错词") : "本组看词辨义"}</span>
+      <button class="primary-button small" type="button" ${question.answered ? "" : "disabled"} data-action="next-group-review">继续</button>
     </footer>
   `;
 }
@@ -374,13 +390,14 @@ function renderMixedReview(view) {
     return;
   }
   const word = getWordById(question.wordId);
-  scheduleAutoSpeak(word, `mixed:${state.daily.startedAt}:${state.daily.mixedIndex}:${word.id}`);
+  const isAudioMode = question.mode === "audio";
+  if (isAudioMode) scheduleAutoSpeak(word, `mixed:${state.daily.startedAt}:${state.daily.mixedIndex}:${word.id}`);
   view.innerHTML = `
     <header class="topbar compact">
       <button class="icon-button" type="button" aria-label="返回首页" data-action="go-home">‹</button>
       <div>
         <p class="eyebrow">${state.daily.mixedReviewWordIds.length} 个混组记忆</p>
-        <h1>混组复习</h1>
+        <h1>${isAudioMode ? "混组听音辨义" : "混组看词辨义"}</h1>
       </div>
       <div class="progress-label">${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}</div>
     </header>
@@ -389,23 +406,18 @@ function renderMixedReview(view) {
       <span>逐词听音、辨义，完成后继续下一段学习</span>
     </section>
     <section class="audio-panel">
-      <button class="speaker-tile" type="button" data-action="speak" data-word-id="${word.id}" aria-label="播放 ${word.word} 发音">播放</button>
+      ${isAudioMode
+        ? `<button class="speaker-tile" type="button" data-action="speak" data-word-id="${word.id}" aria-label="播放 ${word.word} 发音">播放</button>`
+        : `<h1 class="test-word">${word.word}</h1>`}
       <p class="ipa"><span>英</span>${word.ipa}</p>
-      <p class="hint">混组抽查：先听，再选中文释义</p>
+      <p class="hint">${isAudioMode ? "混组抽查：先听，再选中文释义" : "混组抽查：看到英文，选择中文释义"}</p>
       <div class="option-stack">
-        ${question.options.map((option) => {
-          const isAnswer = option === word.cn.join("，");
-          const isSelected = question.selected === option;
-          const className = question.answered
-            ? isAnswer ? "option-card correct" : isSelected ? "option-card wrong" : "option-card muted-card"
-            : "option-card";
-          return `<button class="${className}" type="button" ${question.answered ? "disabled" : ""} data-action="answer-mixed" data-value="${escapeAttr(option)}">${formatMeaning(option)}</button>`;
-        }).join("")}
+        ${renderQuestionOptions(question, word, "answer-mixed")}
       </div>
       <button class="text-link centered" type="button" data-action="open-detail" data-word-id="${word.id}">看词卡</button>
     </section>
     <footer class="bottom-actions">
-      <span>${question.answered ? (question.isCorrect ? "混组回答正确" : "混组已加入错词") : "混组听音辨义"}</span>
+      <span>${question.answered ? (question.isCorrect ? "混组回答正确" : "混组已加入错词") : (isAudioMode ? "混组听音辨义" : "混组看词辨义")}</span>
       <button class="primary-button small" type="button" ${question.answered ? "" : "disabled"} data-action="next-mixed">${state.daily.mixedIndex + 1 >= state.daily.mixedQuestions.length ? "完成复习" : "继续"}</button>
     </footer>
   `;
@@ -431,14 +443,7 @@ function renderAudioMeaning() {
       <p class="ipa"><span>英</span>${word.ipa}</p>
       <p class="hint">先回想词义再选择，想不起来看答案</p>
       <div class="option-stack">
-        ${question.options.map((option) => {
-          const isAnswer = option === word.cn.join("，");
-          const isSelected = question.selected === option;
-          const className = question.answered
-            ? isAnswer ? "option-card correct" : isSelected ? "option-card wrong" : "option-card muted-card"
-            : "option-card";
-          return `<button class="${className}" type="button" ${question.answered ? "disabled" : ""} data-action="answer-audio" data-value="${escapeAttr(option)}">${formatMeaning(option)}</button>`;
-        }).join("")}
+        ${renderQuestionOptions(question, word, "answer-audio")}
       </div>
       <button class="text-link centered" type="button" data-action="open-detail" data-word-id="${word.id}">看答案</button>
     </section>
@@ -590,7 +595,8 @@ function handleMarkStudy(familiarity) {
   if (nextWord) {
     renderWordStudy();
   } else {
-    showView(VIEWS.WORD_STUDY);
+    prepareGroupReviewQuestions(state);
+    saveAndRender(VIEWS.GROUP_REVIEW);
   }
 }
 
@@ -601,6 +607,29 @@ function handleFinishReview() {
   saveAndRender(VIEWS.AUDIO_MEANING);
 }
 
+function handleAnswerGroupReview(selected) {
+  const result = answerGroupReviewQuestion(state, selected);
+  if (result.isCorrect) {
+    advanceGroupReviewQuestion();
+    return;
+  }
+  saveState(state);
+  renderGroupReview();
+}
+
+function handleNextGroupReview() {
+  advanceGroupReviewQuestion();
+}
+
+function advanceGroupReviewQuestion() {
+  const phase = moveToNextGroupReviewQuestion(state);
+  if (phase === "audio-meaning") {
+    handleFinishReview();
+    return;
+  }
+  saveAndRender(VIEWS.GROUP_REVIEW);
+}
+
 function handleAnswerAudio(selected) {
   const result = answerAudioQuestion(state, selected);
   if (result.isCorrect) {
@@ -609,7 +638,6 @@ function handleAnswerAudio(selected) {
   }
   saveState(state);
   renderAudioMeaning();
-  openDetail(result.word.id, "audio");
 }
 
 function handleNextAudio() {
@@ -764,6 +792,17 @@ function escapeAttr(value) {
 function formatMeaning(option) {
   const [first, ...rest] = option.split("，");
   return `<span>${first}</span>${rest.length ? `<small>${rest.join("，")}</small>` : ""}`;
+}
+
+function renderQuestionOptions(question, word, action) {
+  return question.options.map((option) => {
+    const isAnswer = option === word.cn.join("，");
+    const isSelected = question.selected === option;
+    const className = question.answered
+      ? isAnswer ? "option-card correct" : isSelected ? "option-card wrong" : "option-card muted-card"
+      : "option-card";
+    return `<button class="${className}" type="button" ${question.answered ? "disabled" : ""} data-action="${action}" data-value="${escapeAttr(option)}">${formatMeaning(option)}</button>`;
+  }).join("");
 }
 
 function renderDetailTabContent(word) {

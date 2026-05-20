@@ -31,6 +31,8 @@ const defaultState = {
     precheck: {},
     studyIndex: 0,
     reviewPhase: "initial",
+    groupQuestions: [],
+    groupIndex: 0,
     audioQuestions: [],
     audioIndex: 0,
     mixedQuestions: [],
@@ -96,6 +98,7 @@ function normaliseState(state) {
     "sessionCompletedWordIds",
     "mixedReviewWordIds",
     "candidateWordIds",
+    "groupQuestions",
     "audioQuestions",
     "mixedQuestions"
   ]);

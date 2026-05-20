@@ -191,7 +191,8 @@ Page({
       this.studyTransitionTimer = setTimeout(() => {
         this.studyTransitionTimer = null;
         this.setData({ studyTransition: false });
-        this.render(VIEWS.GROUP_REVIEW);
+        flow.prepareGroupReviewQuestions(this.state);
+        this.saveAndRender(VIEWS.GROUP_REVIEW);
       }, NOTICE_DURATION_MS);
       return;
     }
@@ -201,12 +202,37 @@ Page({
   startReview() {
     this.clearStudyTransitionTimer();
     this.setData({ studyTransition: false });
+    flow.prepareGroupReviewQuestions(this.state);
     this.saveAndRender(VIEWS.GROUP_REVIEW);
   },
 
   finishReview() {
     flow.prepareAudioQuestions(this.state);
     this.saveAndRender(VIEWS.AUDIO_MEANING);
+  },
+
+  answerGroupReview(event) {
+    const question = flow.getCurrentGroupReviewQuestion(this.state);
+    if (!question || question.answered) return;
+    const result = flow.answerGroupReviewQuestion(this.state, event.currentTarget.dataset.value);
+    if (result.isCorrect) {
+      this.advanceGroupReview();
+      return;
+    }
+    this.saveAndRender(VIEWS.GROUP_REVIEW);
+  },
+
+  nextGroupReview() {
+    this.advanceGroupReview();
+  },
+
+  advanceGroupReview() {
+    const phase = flow.moveToNextGroupReviewQuestion(this.state);
+    if (phase === "audio-meaning") {
+      this.finishReview();
+      return;
+    }
+    this.saveAndRender(VIEWS.GROUP_REVIEW);
   },
 
   answerAudio(event) {
@@ -217,9 +243,6 @@ Page({
       const phase = flow.moveToNextAudioQuestion(this.state);
       this.saveAndRender(phase === "next-selection" ? VIEWS.PRECHECK : phase === "mixed-review" ? VIEWS.GROUP_REVIEW : VIEWS.AUDIO_MEANING);
       return;
-    }
-    if (!result.isCorrect) {
-      this.openDetailById(result.word.id);
     }
     this.saveAndRender(VIEWS.AUDIO_MEANING);
   },
@@ -459,7 +482,8 @@ function buildHomeData(state) {
   const weakCount = wordStates.filter((wordState) => wordState.wrongCount > 0).length;
   const learnedCount = wordStates.filter((wordState) => wordState.familiarity > 0).length;
   const todayDone = state.daily.sessionCompletedWordIds.length;
-  const planCount = 3;
+  const todayGroups = Math.floor(todayDone / 3);
+  const planCount = 1;
   const reviewCount = state.daily.mixedReviewWordIds.length || 0;
   return {
     userName: state.user.name,
@@ -469,6 +493,8 @@ function buildHomeData(state) {
     learnedCount,
     weakCount,
     todayDone,
+    todayGroups,
+    dailyGoalMet: todayGroups >= 1,
     planCount,
     reviewCount,
     streakDays: state.user.streakDays,
@@ -579,7 +605,8 @@ function buildStudyData(state) {
   const current = Math.min(state.daily.studyIndex + 1, total);
   return {
     word: word ? decorateWord(word) : null,
-    progress: `${current}/${total}`
+    progress: `${current}/${total}`,
+    goalText: buildGoalText(state)
   };
 }
 
@@ -593,11 +620,20 @@ function buildReviewData(state) {
       question: decorateQuestion(question, word),
       word: word ? decorateWord(word) : null,
       count: state.daily.mixedReviewWordIds.length,
-      progress: question ? `${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}` : ""
+      progress: question ? `${state.daily.mixedIndex + 1}/${state.daily.mixedQuestions.length}` : "",
+      goalText: buildGoalText(state)
     };
   }
-  const words = state.daily.selectedWordIds.map(flow.getWordById).filter(Boolean).map(decorateWord);
-  return { isMixed: false, words, count: words.length };
+  const question = flow.getCurrentGroupReviewQuestion(state);
+  const word = question ? flow.getWordById(question.wordId) : null;
+  return {
+    isMixed: false,
+    question: decorateQuestion(question, word),
+    word: word ? decorateWord(word) : null,
+    count: state.daily.selectedWordIds.length,
+    progress: question ? `${state.daily.groupIndex + 1}/${state.daily.groupQuestions.length}` : "",
+    goalText: buildGoalText(state)
+  };
 }
 
 function buildMixedTransitionData(state) {
@@ -617,8 +653,14 @@ function buildAudioData(state) {
   return {
     question: decorateQuestion(question, word),
     word: word ? decorateWord(word) : null,
-    progress: question ? `${state.daily.audioIndex + 1}/${state.daily.audioQuestions.length}` : ""
+    progress: question ? `${state.daily.audioIndex + 1}/${state.daily.audioQuestions.length}` : "",
+    goalText: buildGoalText(state)
   };
+}
+
+function buildGoalText(state) {
+  const completedGroups = Math.floor(((state.daily && state.daily.sessionCompletedWordIds) || []).length / 3);
+  return completedGroups >= 1 ? "今日最低目标已达成，可随时结束" : "完成 1 组达成今日目标";
 }
 
 function buildWrongBookData(state) {
@@ -653,6 +695,7 @@ function decorateQuestion(question, word) {
   if (!question || !word) return null;
   const answer = word.cn.join("，");
   return Object.assign({}, question, {
+    mode: question.mode || "visual",
     options: question.options.map((option) => ({
       value: option,
       pos: getMeaningPos(option),

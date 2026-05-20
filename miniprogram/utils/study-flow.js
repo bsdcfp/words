@@ -2,6 +2,8 @@ const { testQuestions } = require("../data/test-questions");
 const { words } = require("../data/words");
 const { buildAssessmentResult, buildDailyReport } = require("./report");
 
+const REVIEW_INTERVAL_DAYS = [1, 2, 4, 7, 15];
+
 function startAssessment(state) {
   state.assessment = { completed: false, currentIndex: 0, answers: [], result: null };
 }
@@ -29,6 +31,7 @@ function answerAssessmentQuestion(state, selected) {
 }
 
 function startDailyLearning(state) {
+  applyOverdueDowngrades(state);
   state.daily = {
     startedAt: new Date().toISOString(),
     selectedWordIds: [],
@@ -38,10 +41,12 @@ function startDailyLearning(state) {
     completedWordIds: [],
     sessionCompletedWordIds: [],
     mixedReviewWordIds: [],
-    candidateWordIds: buildCandidateWordIds(state.userWordStates),
+    candidateWordIds: buildCandidateWordIds(state),
     precheck: {},
     studyIndex: 0,
     reviewPhase: "initial",
+    groupQuestions: [],
+    groupIndex: 0,
     audioQuestions: [],
     audioIndex: 0,
     mixedQuestions: [],
@@ -89,10 +94,13 @@ function confirmPrecheck(state) {
   const firstGroup = state.daily.selectedWordIds.slice(0, 3);
   state.daily.studyIndex = 0;
   state.daily.groupQueue = [firstGroup];
+  resetRoundMasteryForWords(state, firstGroup);
   state.daily.batchWordIds = uniqueIds(state.daily.batchWordIds.concat(firstGroup));
   state.daily.selectedWordIds = firstGroup;
   state.daily.reviewPhase = "initial";
   state.daily.mixedReviewWordIds = [];
+  state.daily.groupQuestions = [];
+  state.daily.groupIndex = 0;
   state.daily.audioQuestions = [];
   state.daily.audioIndex = 0;
   state.daily.mixedQuestions = [];
@@ -116,8 +124,31 @@ function markStudyWord(state, familiarity) {
   state.daily.studyIndex += 1;
 }
 
+function prepareGroupReviewQuestions(state) {
+  state.daily.groupQuestions = currentGroupWordIds(state).map((wordId) => createChoiceQuestion(wordId, "group-word-meaning", "visual"));
+  state.daily.groupIndex = 0;
+}
+
+function getCurrentGroupReviewQuestion(state) {
+  return state.daily.groupQuestions[state.daily.groupIndex];
+}
+
+function answerGroupReviewQuestion(state, selectedCn) {
+  return answerChoiceQuestion(state, getCurrentGroupReviewQuestion(state), selectedCn, "group-word-meaning");
+}
+
+function moveToNextGroupReviewQuestion(state) {
+  state.daily.groupIndex += 1;
+  if (state.daily.groupIndex >= state.daily.groupQuestions.length) {
+    state.daily.groupQuestions = [];
+    state.daily.groupIndex = 0;
+    return "audio-meaning";
+  }
+  return "group-review";
+}
+
 function prepareAudioQuestions(state) {
-  state.daily.audioQuestions = state.daily.selectedWordIds.map((wordId) => createChoiceQuestion(wordId, "audio-meaning"));
+  state.daily.audioQuestions = currentGroupWordIds(state).map((wordId) => createChoiceQuestion(wordId, "audio-meaning", "audio"));
   state.daily.audioIndex = 0;
 }
 
@@ -177,8 +208,11 @@ function completeMixedReview(state) {
   state.user.streakDays = Math.max(1, state.user.streakDays + 1);
   state.user.longestStreak = Math.max(state.user.longestStreak || 0, state.user.streakDays);
   if (!state.user.badges.includes("起步徽章")) state.user.badges.push("起步徽章");
+  if (state.user.streakDays >= 3 && !state.user.badges.includes("三日连学")) {
+    state.user.badges.push("三日连学");
+  }
   state.lastReport = buildDailyReport(state, words);
-  return "daily-report";
+  return startNextRound(state) ? "next-round" : "daily-report";
 }
 
 function getWordById(id) {
@@ -189,25 +223,63 @@ function getAllWords() {
   return words;
 }
 
-function buildCandidateWordIds(userWordStates, excludedWordIds = []) {
+function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
+  const userWordStates = stateOrWordStates.userWordStates || stateOrWordStates || {};
+  const streakDays = stateOrWordStates.user && stateOrWordStates.user.streakDays ? stateOrWordStates.user.streakDays : 0;
   const excluded = {};
   excludedWordIds.forEach((id) => { excluded[id] = true; });
-  const weakIds = Object.keys(userWordStates || {}).filter((wordId) => {
-    const wordState = userWordStates[wordId];
-    return wordState.wrongCount > 0 || wordState.familiarity < 2;
-  });
-  const freshIds = prioritiseCurriculumWords(words).map((word) => word.id).filter((id) => !weakIds.includes(id));
-  return uniqueIds(weakIds.concat(freshIds)).filter((id) => !excluded[id]).slice(0, 9);
+  return prioritiseCurriculumWords(words)
+    .filter((word) => !excluded[word.id])
+    .map((word, index) => ({
+      id: word.id,
+      index,
+      score: scoreWordRisk(word, userWordStates[word.id], streakDays)
+    }))
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .map((item) => item.id)
+    .slice(0, 9);
 }
 
 function prepareMixedReview(state) {
   state.daily.reviewPhase = "mixed";
   state.daily.mixedReviewWordIds = uniqueIds(state.daily.batchWordIds);
-  state.daily.mixedQuestions = state.daily.mixedReviewWordIds.map((wordId) => createChoiceQuestion(wordId, "mixed-review"));
+  state.daily.mixedQuestions = state.daily.mixedReviewWordIds.reduce((questions, wordId) => questions.concat([
+    createChoiceQuestion(wordId, "mixed-review", "visual"),
+    createChoiceQuestion(wordId, "mixed-review", "audio")
+  ]), []);
   state.daily.mixedIndex = 0;
 }
 
-function createChoiceQuestion(wordId, type) {
+function startNextRound(state) {
+  let nextCandidateWordIds = buildCandidateWordIds(state, state.daily.sessionCompletedWordIds || []);
+  if (!nextCandidateWordIds.length) {
+    state.daily.sessionCompletedWordIds = [];
+    nextCandidateWordIds = buildCandidateWordIds(state);
+  }
+  if (!nextCandidateWordIds.length) return false;
+
+  state.daily.roundIndex = Number(state.daily.roundIndex || 1) + 1;
+  state.daily.selectedWordIds = [];
+  state.daily.groupQueue = [];
+  state.daily.batchWordIds = [];
+  state.daily.completedWordIds = [];
+  state.daily.mixedReviewWordIds = [];
+  state.daily.candidateWordIds = nextCandidateWordIds;
+  state.daily.precheck = {};
+  state.daily.studyIndex = 0;
+  state.daily.reviewPhase = "initial";
+  state.daily.groupQuestions = [];
+  state.daily.groupIndex = 0;
+  state.daily.audioQuestions = [];
+  state.daily.audioIndex = 0;
+  state.daily.mixedQuestions = [];
+  state.daily.mixedIndex = 0;
+  state.daily.groupFeedback = `上一轮完成，开始第 ${state.daily.roundIndex} 轮选词`;
+  state.daily.completed = false;
+  return true;
+}
+
+function createChoiceQuestion(wordId, type, mode) {
   const word = getWordById(wordId);
   const correct = word.cn.join("，");
   const allDistractors = uniqueIds(words
@@ -216,19 +288,21 @@ function createChoiceQuestion(wordId, type) {
     .filter((meaning) => meaning !== correct));
   const offset = word.sourceIndex % Math.max(1, allDistractors.length - 3);
   const distractors = allDistractors.slice(offset, offset + 3);
-  return { wordId, type, options: shuffle([correct].concat(distractors)), answered: false, selected: null, isCorrect: null };
+  return { wordId, type, mode: mode || "visual", options: shuffle([correct].concat(distractors)), answered: false, selected: null, isCorrect: null };
 }
 
 function answerChoiceQuestion(state, question, selectedCn, type) {
   const word = getWordById(question.wordId);
   const isCorrect = word.cn.join("，") === selectedCn;
   const current = state.userWordStates[word.id] || defaultWordState();
-  state.userWordStates[word.id] = Object.assign({}, current, {
+  const answeredState = Object.assign({}, current, {
     familiarity: isCorrect ? Math.min(current.familiarity + 1, 5) : Math.max(current.familiarity - 1, 0),
     correctStreak: isCorrect ? current.correctStreak + 1 : 0,
     wrongCount: isCorrect ? current.wrongCount : current.wrongCount + 1,
-    lastSeenAt: new Date().toISOString()
-  });
+    lastSeenAt: new Date().toISOString(),
+    lastResult: isCorrect ? "correct" : "wrong"
+  }, masteryPatch(current, type, question.mode, isCorrect));
+  state.userWordStates[word.id] = Object.assign({}, answeredState, roundMasterySchedulePatch(answeredState));
   state.answerRecords.push({
     id: `answer_${Date.now()}_${state.answerRecords.length}`,
     sessionId: state.daily.startedAt,
@@ -242,7 +316,110 @@ function answerChoiceQuestion(state, question, selectedCn, type) {
   question.answered = true;
   question.selected = selectedCn;
   question.isCorrect = isCorrect;
+  if (!isCorrect) appendRetryQuestion(state, question, type);
   return { isCorrect, word };
+}
+
+function appendRetryQuestion(state, question, type) {
+  const retry = createChoiceQuestion(question.wordId, type, question.mode);
+  if (type === "group-word-meaning") {
+    state.daily.groupQuestions.push(retry);
+    return;
+  }
+  if (type === "audio-meaning") {
+    state.daily.audioQuestions.push(retry);
+    return;
+  }
+  if (type === "mixed-review") {
+    state.daily.mixedQuestions.push(retry);
+  }
+}
+
+function masteryPatch(current, type, mode, isCorrect) {
+  if (!isCorrect) {
+    return {
+      reviewFailedThisRound: isDueForReview(current) ? true : current.reviewFailedThisRound
+    };
+  }
+  const flag = masteryFlagFor(type, mode);
+  if (!flag) return {};
+  const patch = {};
+  patch[flag] = true;
+  return patch;
+}
+
+function masteryFlagFor(type, mode) {
+  if (type === "group-word-meaning") return "groupVisualPassed";
+  if (type === "audio-meaning") return "groupAudioPassed";
+  if (type === "mixed-review" && mode === "visual") return "mixedVisualPassed";
+  if (type === "mixed-review" && mode === "audio") return "mixedAudioPassed";
+  return null;
+}
+
+function roundMasterySchedulePatch(wordState) {
+  if (!isRoundMastered(wordState)) return {};
+  if (wordState.nextReviewAt && !isDueForReview(wordState)) {
+    return { roundMasteredAt: wordState.roundMasteredAt || new Date().toISOString() };
+  }
+  return nextReviewPatch(wordState);
+}
+
+function isRoundMastered(wordState) {
+  return Boolean(
+    wordState.groupVisualPassed &&
+    wordState.groupAudioPassed &&
+    wordState.mixedVisualPassed &&
+    wordState.mixedAudioPassed
+  );
+}
+
+function resetRoundMasteryForWords(state, wordIds) {
+  wordIds.forEach((wordId) => {
+    const current = state.userWordStates[wordId] || defaultWordState();
+    state.userWordStates[wordId] = Object.assign({}, current, {
+      groupVisualPassed: false,
+      groupAudioPassed: false,
+      mixedVisualPassed: false,
+      mixedAudioPassed: false,
+      reviewFailedThisRound: false,
+      roundMasteredAt: null
+    });
+  });
+}
+
+function applyOverdueDowngrades(state) {
+  Object.keys(state.userWordStates || {}).forEach((wordId) => {
+    const current = state.userWordStates[wordId];
+    if (!current || !current.nextReviewAt || !current.reviewStage) return;
+    const overdueDays = daysPast(current.nextReviewAt);
+    if (overdueDays < 3) return;
+
+    const patch = {
+      lastResult: "wrong",
+      groupVisualPassed: false,
+      groupAudioPassed: false,
+      mixedVisualPassed: false,
+      mixedAudioPassed: false,
+      reviewFailedThisRound: false,
+      roundMasteredAt: null
+    };
+
+    if (overdueDays >= 15) {
+      patch.reviewStage = 0;
+      patch.nextReviewAt = null;
+      patch.familiarity = Math.min(current.familiarity || 0, 1);
+    } else if (overdueDays >= 7) {
+      patch.reviewStage = 1;
+    } else {
+      patch.reviewStage = Math.max(1, (current.reviewStage || 1) - 1);
+    }
+
+    state.userWordStates[wordId] = Object.assign({}, current, patch);
+  });
+}
+
+function currentGroupWordIds(state) {
+  return state.daily.selectedWordIds;
 }
 
 function prioritiseCurriculumWords(items) {
@@ -252,7 +429,76 @@ function prioritiseCurriculumWords(items) {
 }
 
 function defaultWordState() {
-  return { familiarity: 0, correctStreak: 0, wrongCount: 0, lastSeenAt: null, favorite: false };
+  return {
+    familiarity: 0,
+    correctStreak: 0,
+    wrongCount: 0,
+    lastSeenAt: null,
+    favorite: false,
+    reviewStage: 0,
+    nextReviewAt: null,
+    lastReviewAt: null,
+    lastResult: null,
+    groupVisualPassed: false,
+    groupAudioPassed: false,
+    mixedVisualPassed: false,
+    mixedAudioPassed: false,
+    reviewFailedThisRound: false,
+    roundMasteredAt: null
+  };
+}
+
+function scoreWordRisk(word, wordState, streakDays) {
+  if (!wordState) {
+    return 100 + Math.min(streakDays, 7) * 6 + (word.starLevel === 1 ? 8 : word.starLevel === 2 ? 4 : 0);
+  }
+  const now = Date.now();
+  const dueAt = wordState.nextReviewAt ? Date.parse(wordState.nextReviewAt) : null;
+  const isDue = dueAt && dueAt <= now;
+  const overdueDays = isDue ? Math.floor((now - dueAt) / 86400000) : 0;
+  const recencyDays = wordState.lastSeenAt ? Math.floor((now - Date.parse(wordState.lastSeenAt)) / 86400000) : 0;
+  return [
+    isDue ? 10000 : 0,
+    overdueDays * 240,
+    (wordState.wrongCount || 0) * 180,
+    wordState.lastResult === "wrong" ? 600 : 0,
+    Math.max(0, 5 - (wordState.familiarity || 0)) * 80,
+    recencyDays * 12
+  ].reduce((sum, item) => sum + item, 0);
+}
+
+function nextReviewPatch(current) {
+  const stage = nextReviewStage(current);
+  const intervalDays = REVIEW_INTERVAL_DAYS[stage - 1] || REVIEW_INTERVAL_DAYS[REVIEW_INTERVAL_DAYS.length - 1];
+  const now = new Date();
+  return {
+    reviewStage: stage,
+    lastReviewAt: now.toISOString(),
+    nextReviewAt: new Date(now.getTime() + intervalDays * 86400000).toISOString(),
+    reviewFailedThisRound: false,
+    roundMasteredAt: now.toISOString(),
+    lastResult: "correct"
+  };
+}
+
+function nextReviewStage(current) {
+  const currentStage = current.reviewStage || 0;
+  if (currentStage <= 0 || !current.nextReviewAt) return 1;
+  if (isDueForReview(current) && current.reviewFailedThisRound) return currentStage;
+  if (isDueForReview(current)) return Math.min(currentStage + 1, REVIEW_INTERVAL_DAYS.length);
+  return currentStage;
+}
+
+function isDueForReview(wordState) {
+  if (!wordState || !wordState.nextReviewAt || !wordState.reviewStage) return false;
+  const dueAt = Date.parse(wordState.nextReviewAt);
+  return Number.isFinite(dueAt) && dueAt <= Date.now();
+}
+
+function daysPast(isoDate) {
+  const dueAt = Date.parse(isoDate);
+  if (!Number.isFinite(dueAt)) return 0;
+  return Math.floor((Date.now() - dueAt) / 86400000);
 }
 
 function uniqueIds(ids) {
@@ -278,11 +524,13 @@ function shuffle(items) {
 module.exports = {
   answerAssessmentQuestion,
   answerAudioQuestion,
+  answerGroupReviewQuestion,
   answerMixedReviewQuestion,
   autoSelectPrecheckWords,
   completeMixedReview,
   confirmPrecheck,
   getCurrentAudioQuestion,
+  getCurrentGroupReviewQuestion,
   getCurrentMixedReviewQuestion,
   getCurrentStudyWord,
   getCurrentTestQuestion,
@@ -291,7 +539,9 @@ module.exports = {
   markPrecheck,
   markStudyWord,
   moveToNextAudioQuestion,
+  moveToNextGroupReviewQuestion,
   moveToNextMixedReviewQuestion,
+  prepareGroupReviewQuestions,
   prepareAudioQuestions,
   startAssessment,
   startDailyLearning,

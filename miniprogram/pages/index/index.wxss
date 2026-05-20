@@ -423,6 +423,13 @@ button::after {
   word-break: break-word;
 }
 
+.status-actions .goal-hint {
+  margin-top: 4rpx;
+  color: #0d8f7a;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
 .bottom-actions .primary-button,
 .bottom-actions .secondary-button {
   width: 100%;

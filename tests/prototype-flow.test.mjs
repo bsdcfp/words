@@ -112,30 +112,34 @@ try {
         await waitForSpoken(page, selectedGroups[groupIndex][index + 1]);
       }
     }
-    await page.getByRole("button", { name: "进入本组复习" }).click();
     await page.waitForSelector('[data-view="group-review"].active');
-    assert.match(await page.locator("#view-group-review").innerText(), /本组复习/);
-    assert.equal(await page.locator("#view-group-review .review-card").count(), 3);
-    await page.getByRole("button", { name: "进入发音辨义" }).click();
+    assert.match(await page.locator("#view-group-review").innerText(), /看词辨义/);
+    assert.equal(await page.locator('#view-group-review [data-action="answer-group-review"]').count(), 4);
+    for (let index = 0; index < 3; index += 1) {
+      await clickAnswer(page, "answer-group-review", meaningFor(selectedGroups[groupIndex][index]));
+      if (index < 2) {
+        await waitForText(page, "#view-group-review.active", `${index + 2}/3`);
+      }
+    }
 
     await page.waitForSelector('[data-view="audio-meaning"].active');
     assert.match(await page.locator("#view-audio-meaning").innerText(), /1\/3/);
     await page.waitForFunction(() => window.__spokenWords.length > 0);
-    for (let index = 0; index < 3; index += 1) {
-      const headword = selectedGroups[groupIndex][index];
-      if (groupIndex === 0 && index === 0) {
-        await page.locator('[data-action="answer-audio"]').filter({ hasNotText: "完全地" }).first().click();
-        await page.getByRole("button", { name: "派生" }).click();
-        assert.match(await page.locator("#detail-content").innerText(), /派生/);
-        await page.getByRole("button", { name: "近义" }).click();
-        assert.match(await page.locator("#detail-content").innerText(), /近义/);
-        await page.getByRole("button", { name: "关闭词卡" }).click();
-        await page.locator('[data-action="next-audio"]:not([disabled])').click();
-      } else {
-        await clickAnswer(page, "answer-audio", meaningFor(headword));
-      }
-      if (index < 2) {
-        await waitForText(page, "#view-audio-meaning.active", `${index + 2}/3`);
+    if (groupIndex === 0) {
+      await page.locator('[data-action="answer-audio"]').filter({ hasNotText: "完全地" }).first().click();
+      await page.locator('[data-action="next-audio"]:not([disabled])').click();
+      await waitForText(page, "#view-audio-meaning.active", "2/4");
+      await clickAnswer(page, "answer-audio", meaningFor("accident"));
+      await waitForText(page, "#view-audio-meaning.active", "3/4");
+      await clickAnswer(page, "answer-audio", meaningFor("account"));
+      await waitForText(page, "#view-audio-meaning.active", "4/4");
+      await clickAnswer(page, "answer-audio", meaningFor("absolutely"));
+    } else {
+      for (let index = 0; index < 3; index += 1) {
+        await clickAnswer(page, "answer-audio", meaningFor(selectedGroups[groupIndex][index]));
+        if (index < 2) {
+          await waitForText(page, "#view-audio-meaning.active", `${index + 2}/3`);
+        }
       }
     }
     if (groupIndex === 0) {
@@ -212,14 +216,15 @@ async function clickAnswer(page, action, meaning) {
 
 async function answerMixedReview(page, headwords) {
   await page.waitForSelector('[data-view="group-review"].active');
-  assert.match(await page.locator("#view-group-review").innerText(), /混组复习/);
+  assert.match(await page.locator("#view-group-review").innerText(), /混组/);
   assert.match(await page.locator("#view-group-review").innerText(), new RegExp(`${headwords.length} 个词`));
-  assert.match(await page.locator("#view-group-review").innerText(), new RegExp(`1/${headwords.length}`));
+  assert.match(await page.locator("#view-group-review").innerText(), new RegExp(`1/${headwords.length * 2}`));
   assert.equal(await page.locator('#view-group-review [data-action="answer-mixed"]').count(), 4);
-  for (let index = 0; index < headwords.length; index += 1) {
-    await clickAnswer(page, "answer-mixed", meaningFor(headwords[index]));
-    if (index < headwords.length - 1) {
-      await waitForText(page, "#view-group-review.active", `${index + 2}/${headwords.length}`);
+  const questionHeadwords = headwords.flatMap((headword) => [headword, headword]);
+  for (let index = 0; index < questionHeadwords.length; index += 1) {
+    await clickAnswer(page, "answer-mixed", meaningFor(questionHeadwords[index]));
+    if (index < questionHeadwords.length - 1) {
+      await waitForText(page, "#view-group-review.active", `${index + 2}/${questionHeadwords.length}`);
     }
   }
 }

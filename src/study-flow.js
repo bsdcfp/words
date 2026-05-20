@@ -2,6 +2,8 @@ import { testQuestions } from "../data/test-questions.js";
 import { words } from "../data/words.js";
 import { buildAssessmentResult, buildDailyReport } from "./report.js";
 
+const REVIEW_INTERVAL_DAYS = [1, 2, 4, 7, 15];
+
 export function startAssessment(state) {
   state.assessment = {
     completed: false,
@@ -35,7 +37,8 @@ export function answerAssessmentQuestion(state, selected) {
 }
 
 export function startDailyLearning(state) {
-  const candidateWordIds = buildCandidateWordIds(state.userWordStates);
+  applyOverdueDowngrades(state);
+  const candidateWordIds = buildCandidateWordIds(state);
   state.daily = {
     startedAt: new Date().toISOString(),
     selectedWordIds: [],
@@ -51,6 +54,8 @@ export function startDailyLearning(state) {
     studyIndex: 0,
     reviewPhase: "initial",
     reviewed: false,
+    groupQuestions: [],
+    groupIndex: 0,
     mixedReviewed: false,
     audioQuestions: [],
     audioIndex: 0,
@@ -104,6 +109,7 @@ export function confirmPrecheck(state) {
   state.daily.studyIndex = 0;
   state.daily.currentGroupIndex = 0;
   state.daily.groupQueue = [firstGroup];
+  resetRoundMasteryForWords(state, firstGroup);
   state.daily.batchWordIds = uniqueIds([
     ...state.daily.batchWordIds,
     ...firstGroup
@@ -111,6 +117,8 @@ export function confirmPrecheck(state) {
   state.daily.selectedWordIds = firstGroup;
   state.daily.reviewPhase = "initial";
   state.daily.reviewed = false;
+  state.daily.groupQuestions = [];
+  state.daily.groupIndex = 0;
   state.daily.mixedReviewed = false;
   state.daily.mixedReviewWordIds = [];
   state.daily.audioQuestions = [];
@@ -138,9 +146,34 @@ export function markStudyWord(state, familiarity) {
   state.daily.studyIndex += 1;
 }
 
+export function prepareGroupReviewQuestions(state) {
+  state.daily.groupQuestions = currentGroupWordIds(state).map((wordId) => createChoiceQuestion(wordId, "group-word-meaning", "visual"));
+  state.daily.groupIndex = 0;
+  state.daily.reviewed = false;
+}
+
+export function getCurrentGroupReviewQuestion(state) {
+  return state.daily.groupQuestions[state.daily.groupIndex];
+}
+
+export function answerGroupReviewQuestion(state, selectedCn) {
+  const question = getCurrentGroupReviewQuestion(state);
+  return answerChoiceQuestion(state, question, selectedCn, "group-word-meaning");
+}
+
+export function moveToNextGroupReviewQuestion(state) {
+  state.daily.groupIndex += 1;
+  if (state.daily.groupIndex >= state.daily.groupQuestions.length) {
+    state.daily.reviewed = true;
+    state.daily.groupQuestions = [];
+    state.daily.groupIndex = 0;
+    return "audio-meaning";
+  }
+  return "group-review";
+}
+
 export function prepareAudioQuestions(state) {
-  const questionIds = currentGroupWordIds(state);
-  state.daily.audioQuestions = questionIds.map((wordId) => createAudioQuestion(wordId));
+  state.daily.audioQuestions = currentGroupWordIds(state).map((wordId) => createAudioQuestion(wordId));
   state.daily.audioIndex = 0;
   state.daily.audioCompleted = false;
 }
@@ -151,30 +184,7 @@ export function getCurrentAudioQuestion(state) {
 
 export function answerAudioQuestion(state, selectedCn) {
   const question = getCurrentAudioQuestion(state);
-  const word = words.find((item) => item.id === question.wordId);
-  const isCorrect = word.cn.join("，") === selectedCn;
-  const current = state.userWordStates[word.id] || defaultWordState();
-  state.userWordStates[word.id] = {
-    ...current,
-    familiarity: isCorrect ? Math.min(current.familiarity + 1, 5) : Math.max(current.familiarity - 1, 0),
-    correctStreak: isCorrect ? current.correctStreak + 1 : 0,
-    wrongCount: isCorrect ? current.wrongCount : current.wrongCount + 1,
-    lastSeenAt: new Date().toISOString()
-  };
-  state.answerRecords.push({
-    id: `answer_${Date.now()}_${state.answerRecords.length}`,
-    sessionId: state.daily.startedAt,
-    type: "audio-meaning",
-    wordId: word.id,
-    selected: selectedCn,
-    answer: word.cn.join("，"),
-    isCorrect,
-    createdAt: new Date().toISOString()
-  });
-  question.answered = true;
-  question.selected = selectedCn;
-  question.isCorrect = isCorrect;
-  return { isCorrect, word };
+  return answerChoiceQuestion(state, question, selectedCn, "audio-meaning");
 }
 
 export function moveToNextAudioQuestion(state) {
@@ -257,10 +267,10 @@ export function completeMixedReview(state) {
 }
 
 function createAudioQuestion(wordId) {
-  return createChoiceQuestion(wordId, "audio-meaning");
+  return createChoiceQuestion(wordId, "audio-meaning", "audio");
 }
 
-function createChoiceQuestion(wordId, type) {
+function createChoiceQuestion(wordId, type, mode = "visual") {
   const word = words.find((item) => item.id === wordId);
   const correct = word.cn.join("，");
   const allDistractors = Array.from(new Set(words
@@ -274,6 +284,7 @@ function createChoiceQuestion(wordId, type) {
   return {
     wordId,
     type,
+    mode,
     options,
     answered: false,
     selected: null,
@@ -285,12 +296,18 @@ function answerChoiceQuestion(state, question, selectedCn, type) {
   const word = words.find((item) => item.id === question.wordId);
   const isCorrect = word.cn.join("，") === selectedCn;
   const current = state.userWordStates[word.id] || defaultWordState();
-  state.userWordStates[word.id] = {
+  const answeredState = {
     ...current,
     familiarity: isCorrect ? Math.min(current.familiarity + 1, 5) : Math.max(current.familiarity - 1, 0),
     correctStreak: isCorrect ? current.correctStreak + 1 : 0,
     wrongCount: isCorrect ? current.wrongCount : current.wrongCount + 1,
-    lastSeenAt: new Date().toISOString()
+    lastSeenAt: new Date().toISOString(),
+    lastResult: isCorrect ? "correct" : "wrong",
+    ...masteryPatch(current, type, question.mode, isCorrect)
+  };
+  state.userWordStates[word.id] = {
+    ...answeredState,
+    ...roundMasterySchedulePatch(answeredState)
   };
   state.answerRecords.push({
     id: `answer_${Date.now()}_${state.answerRecords.length}`,
@@ -305,7 +322,109 @@ function answerChoiceQuestion(state, question, selectedCn, type) {
   question.answered = true;
   question.selected = selectedCn;
   question.isCorrect = isCorrect;
+  if (!isCorrect) {
+    appendRetryQuestion(state, question, type);
+  }
   return { isCorrect, word };
+}
+
+function appendRetryQuestion(state, question, type) {
+  const retry = createChoiceQuestion(question.wordId, type, question.mode);
+  if (type === "group-word-meaning") {
+    state.daily.groupQuestions.push(retry);
+    return;
+  }
+  if (type === "audio-meaning") {
+    state.daily.audioQuestions.push(retry);
+    return;
+  }
+  if (type === "mixed-review") {
+    state.daily.mixedQuestions.push(retry);
+  }
+}
+
+function masteryPatch(current, type, mode, isCorrect) {
+  if (!isCorrect) {
+    return {
+      reviewFailedThisRound: isDueForReview(current) ? true : current.reviewFailedThisRound
+    };
+  }
+  const flag = masteryFlagFor(type, mode);
+  return flag ? { [flag]: true } : {};
+}
+
+function masteryFlagFor(type, mode) {
+  if (type === "group-word-meaning") return "groupVisualPassed";
+  if (type === "audio-meaning") return "groupAudioPassed";
+  if (type === "mixed-review" && mode === "visual") return "mixedVisualPassed";
+  if (type === "mixed-review" && mode === "audio") return "mixedAudioPassed";
+  return null;
+}
+
+function roundMasterySchedulePatch(wordState) {
+  if (!isRoundMastered(wordState)) return {};
+  if (wordState.nextReviewAt && !isDueForReview(wordState)) return {
+    roundMasteredAt: wordState.roundMasteredAt || new Date().toISOString()
+  };
+  return nextReviewPatch(wordState);
+}
+
+function isRoundMastered(wordState) {
+  return Boolean(
+    wordState.groupVisualPassed &&
+    wordState.groupAudioPassed &&
+    wordState.mixedVisualPassed &&
+    wordState.mixedAudioPassed
+  );
+}
+
+function resetRoundMasteryForWords(state, wordIds) {
+  wordIds.forEach((wordId) => {
+    const current = state.userWordStates[wordId] || defaultWordState();
+    state.userWordStates[wordId] = {
+      ...current,
+      groupVisualPassed: false,
+      groupAudioPassed: false,
+      mixedVisualPassed: false,
+      mixedAudioPassed: false,
+      reviewFailedThisRound: false,
+      roundMasteredAt: null
+    };
+  });
+}
+
+function applyOverdueDowngrades(state) {
+  const entries = Object.entries(state.userWordStates || {});
+  entries.forEach(([wordId, current]) => {
+    if (!current?.nextReviewAt || !current.reviewStage) return;
+    const overdueDays = daysPast(current.nextReviewAt);
+    if (overdueDays < 3) return;
+
+    const patch = {
+      lastResult: "wrong",
+      groupVisualPassed: false,
+      groupAudioPassed: false,
+      mixedVisualPassed: false,
+      mixedAudioPassed: false,
+      reviewFailedThisRound: false,
+      roundMasteredAt: null
+    };
+
+    if (overdueDays >= 15) {
+      patch.reviewStage = 0;
+      patch.nextReviewAt = null;
+      patch.familiarity = Math.min(current.familiarity || 0, 1);
+    } else if (overdueDays >= 7) {
+      patch.reviewStage = 1;
+    } else {
+      patch.reviewStage = Math.max(1, (current.reviewStage || 1) - 1);
+    }
+
+    state.userWordStates[wordId] = {
+      ...current,
+      ...patch
+    };
+  });
 }
 
 function prioritiseCurriculumWords(items) {
@@ -316,33 +435,40 @@ function prioritiseCurriculumWords(items) {
   ];
 }
 
-function buildCandidateWordIds(userWordStates, excludedWordIds = []) {
+function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
+  const userWordStates = stateOrWordStates.userWordStates || stateOrWordStates || {};
+  const streakDays = stateOrWordStates.user?.streakDays || 0;
   const excluded = new Set(excludedWordIds);
-  const weakIds = Object.entries(userWordStates || {})
-    .filter(([, wordState]) => wordState.wrongCount > 0 || wordState.familiarity < 2)
-    .map(([wordId]) => wordId);
-  const learningPool = prioritiseCurriculumWords(words);
-  const freshIds = learningPool.map((word) => word.id).filter((id) => !weakIds.includes(id));
-  return uniqueIds([...weakIds, ...freshIds])
-    .filter((id) => !excluded.has(id))
+  return prioritiseCurriculumWords(words)
+    .filter((word) => !excluded.has(word.id))
+    .map((word, index) => ({
+      id: word.id,
+      index,
+      score: scoreWordRisk(word, userWordStates[word.id], streakDays)
+    }))
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .map((item) => item.id)
     .slice(0, 9);
 }
 
 function prepareMixedReview(state) {
   state.daily.reviewPhase = "mixed";
   state.daily.mixedReviewWordIds = buildSecondLevelReviewWordIds(state);
-  state.daily.mixedQuestions = state.daily.mixedReviewWordIds.map((wordId) => createChoiceQuestion(wordId, "mixed-review"));
+  state.daily.mixedQuestions = state.daily.mixedReviewWordIds.flatMap((wordId) => [
+    createChoiceQuestion(wordId, "mixed-review", "visual"),
+    createChoiceQuestion(wordId, "mixed-review", "audio")
+  ]);
   state.daily.mixedIndex = 0;
 }
 
 function startNextRound(state) {
   let nextCandidateWordIds = buildCandidateWordIds(
-    state.userWordStates,
+    state,
     state.daily.sessionCompletedWordIds || []
   );
   if (!nextCandidateWordIds.length) {
     state.daily.sessionCompletedWordIds = [];
-    nextCandidateWordIds = buildCandidateWordIds(state.userWordStates);
+    nextCandidateWordIds = buildCandidateWordIds(state);
   }
   if (!nextCandidateWordIds.length) return false;
 
@@ -400,8 +526,76 @@ function defaultWordState() {
     correctStreak: 0,
     wrongCount: 0,
     lastSeenAt: null,
-    favorite: false
+    favorite: false,
+    reviewStage: 0,
+    nextReviewAt: null,
+    lastReviewAt: null,
+    lastResult: null,
+    groupVisualPassed: false,
+    groupAudioPassed: false,
+    mixedVisualPassed: false,
+    mixedAudioPassed: false,
+    reviewFailedThisRound: false,
+    roundMasteredAt: null
   };
+}
+
+function scoreWordRisk(word, wordState, streakDays) {
+  if (!wordState) {
+    return 100 + Math.min(streakDays, 7) * 6 + (word.starLevel === 1 ? 8 : word.starLevel === 2 ? 4 : 0);
+  }
+  const now = Date.now();
+  const dueAt = wordState.nextReviewAt ? Date.parse(wordState.nextReviewAt) : null;
+  const isDue = dueAt && dueAt <= now;
+  const overdueDays = isDue ? Math.floor((now - dueAt) / 86400000) : 0;
+  const recencyDays = wordState.lastSeenAt ? Math.floor((now - Date.parse(wordState.lastSeenAt)) / 86400000) : 0;
+  return [
+    isDue ? 10000 : 0,
+    overdueDays * 240,
+    (wordState.wrongCount || 0) * 180,
+    wordState.lastResult === "wrong" ? 600 : 0,
+    Math.max(0, 5 - (wordState.familiarity || 0)) * 80,
+    recencyDays * 12
+  ].reduce((sum, item) => sum + item, 0);
+}
+
+function nextReviewPatch(current) {
+  const now = new Date();
+  const currentStage = current.reviewStage || 0;
+  const stage = nextReviewStage(current);
+  const intervalDays = REVIEW_INTERVAL_DAYS[stage - 1] || REVIEW_INTERVAL_DAYS.at(-1);
+  const nextReviewAt = new Date(now.getTime() + intervalDays * 86400000).toISOString();
+  return {
+    reviewStage: stage,
+    lastReviewAt: now.toISOString(),
+    nextReviewAt,
+    reviewFailedThisRound: false,
+    roundMasteredAt: now.toISOString(),
+    lastResult: "correct",
+    correctStreak: current.reviewFailedThisRound && currentStage > 0
+      ? Math.max(1, current.correctStreak || 0)
+      : current.correctStreak
+  };
+}
+
+function nextReviewStage(current) {
+  const currentStage = current.reviewStage || 0;
+  if (currentStage <= 0 || !current.nextReviewAt) return 1;
+  if (isDueForReview(current) && current.reviewFailedThisRound) return currentStage;
+  if (isDueForReview(current)) return Math.min(currentStage + 1, REVIEW_INTERVAL_DAYS.length);
+  return currentStage;
+}
+
+function isDueForReview(wordState) {
+  if (!wordState?.nextReviewAt || !wordState.reviewStage) return false;
+  const dueAt = Date.parse(wordState.nextReviewAt);
+  return Number.isFinite(dueAt) && dueAt <= Date.now();
+}
+
+function daysPast(isoDate) {
+  const dueAt = Date.parse(isoDate);
+  if (!Number.isFinite(dueAt)) return 0;
+  return Math.floor((Date.now() - dueAt) / 86400000);
 }
 
 function shuffle(items) {

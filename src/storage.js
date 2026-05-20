@@ -31,6 +31,8 @@ export const defaultState = {
     studyIndex: 0,
     reviewPhase: "initial",
     reviewed: false,
+    groupQuestions: [],
+    groupIndex: 0,
     mixedReviewed: false,
     audioQuestions: [],
     audioIndex: 0,
