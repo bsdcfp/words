@@ -71,7 +71,7 @@ try {
 
   await page.getByRole("button", { name: "词汇量测试" }).click();
   await page.waitForSelector('[data-view="test"].active');
-  assert.equal(await page.locator("#view-test .option-card").count(), 3);
+  assert.equal(await page.locator("#view-test .option-card").count(), 4);
   assert.match(await page.locator("#view-test").innerText(), /我不认识/);
   await page.waitForTimeout(70);
   assert.match(await page.locator("#view-test").innerText(), /停留太久可以选不认识/);

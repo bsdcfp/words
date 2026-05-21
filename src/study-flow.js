@@ -526,8 +526,8 @@ function createAssessmentQuestion(word, layer, index) {
   const allDistractors = words
     .filter((item) => item.id !== word.id && item.cn.join("，") !== correct)
     .map((item) => item.cn.join("，"));
-  const start = (word.sourceIndex + index) % Math.max(1, allDistractors.length - 2);
-  const distractors = allDistractors.slice(start, start + 2);
+  const start = (word.sourceIndex + index) % Math.max(1, allDistractors.length - 3);
+  const distractors = allDistractors.slice(start, start + 3);
   return {
     id: `vocab_${layer}_${word.id}`,
     word: word.word,
