@@ -93,7 +93,7 @@
       <text class="test-word">{{test.question.word}}</text>
       <text class="muted">下面只选释义，不确定时点“不认识”</text>
       <view class="option-stack">
-        <view wx:for="{{test.options}}" wx:key="*this" class="option-card" data-value="{{item}}" bindtap="answerTest">{{item}}</view>
+        <view wx:for="{{test.options}}" wx:key="*this" class="option-card test-option" hover-class="test-option-pressed" data-value="{{item}}" bindtap="answerTest">{{item}}</view>
       </view>
       <view class="secondary-button unknown-button" data-value="不认识" bindtap="answerTest">我不认识</view>
     </view>

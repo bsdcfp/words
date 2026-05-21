@@ -313,6 +313,18 @@ button {
   border: 1px solid transparent;
 }
 
+.question-panel .option-card {
+  display: flex;
+  align-items: center;
+  min-height: 78px;
+  border: 1px solid rgba(120, 140, 93, 0.28);
+  border-left: 5px solid var(--brand);
+  background:
+    linear-gradient(135deg, rgba(120, 140, 93, 0.16), rgba(232, 230, 220, 0.86));
+  box-shadow: 0 7px 15px rgba(20, 20, 19, 0.08);
+  font-weight: 900;
+}
+
 .option-card small,
 .option-card span {
   display: block;
