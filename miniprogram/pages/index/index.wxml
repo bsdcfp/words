@@ -72,7 +72,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view == 'level-select'}}" class="view level-view">
+  <view wx:elif="{{view == 'level-select'}}" class="view level-view sticky-view">
     <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">你现在是</text></view>
     <view class="level-panel">
       <text class="section-label">当前：{{levelSelect.currentLevel}}</text>
@@ -86,7 +86,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view == 'test'}}" class="view">
+  <view wx:elif="{{view == 'test'}}" class="view sticky-view">
     <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="progress-label">{{test.progress}}</text></view>
     <view class="question-panel">
       <text class="section-label">词汇量测试</text>
@@ -100,7 +100,7 @@
     <view class="counter-bar"><text class="pill green">{{test.correct}}</text><text class="pill red">{{test.wrong}}</text><text class="pill blue">{{test.remain}}</text></view>
   </view>
 
-  <view wx:elif="{{view == 'test-result'}}" class="view">
+  <view wx:elif="{{view == 'test-result'}}" class="view sticky-view">
     <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">测评结果</text></view>
     <view class="result-panel">
       <text class="section-label">现实掌握词汇</text>
@@ -200,7 +200,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view == 'wrong-book'}}" class="view">
+  <view wx:elif="{{view == 'wrong-book'}}" class="view sticky-view">
     <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">错词本</text></view>
     <view class="review-summary"><text>{{wrongBook.count}} 个词</text><text>优先复盘听音辨义和混组复习里的错词</text></view>
     <view class="review-stack">
@@ -209,7 +209,7 @@
     </view>
   </view>
 
-  <view wx:elif="{{view == 'daily-report'}}" class="view">
+  <view wx:elif="{{view == 'daily-report'}}" class="view sticky-view">
     <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">学习报告</text></view>
     <view class="report-panel">
       <text class="report-ring">{{report.accuracy}}%</text>

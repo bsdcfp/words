@@ -26,6 +26,27 @@
   justify-content: flex-start;
 }
 
+.sticky-view {
+  padding-top: calc(env(safe-area-inset-top) + 144rpx);
+}
+
+.sticky-view .topbar {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  z-index: 8;
+  width: 100%;
+  max-width: 720px;
+  min-height: calc(env(safe-area-inset-top) + 112rpx);
+  margin: 0;
+  padding: calc(env(safe-area-inset-top) + 16rpx) 28rpx 16rpx;
+  transform: translateX(-50%);
+  background:
+    linear-gradient(180deg, rgba(250, 249, 245, 0.98) 0%, rgba(250, 249, 245, 0.9) 72%, rgba(250, 249, 245, 0) 100%);
+  box-sizing: border-box;
+  backdrop-filter: blur(12rpx);
+}
+
 .page-title,
 .hero-title,
 .test-word,
@@ -1254,6 +1275,11 @@ button::after {
 
 @media (min-width: 520px) {
   .view {
+    padding-left: 40rpx;
+    padding-right: 40rpx;
+  }
+
+  .sticky-view .topbar {
     padding-left: 40rpx;
     padding-right: 40rpx;
   }
