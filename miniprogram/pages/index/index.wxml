@@ -144,15 +144,15 @@
     <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="progress-label">{{study.progress}}</text></view>
     <view wx:if="{{study.word}}" class="study-focus-card">
       <text class="section-label">单词识记</text>
-      <view wx:if="{{studyImageMode}}" class="memory-image"><text class="memory-mark">记忆图</text><text class="strong">{{study.word.memoryMeaning}}</text><text>{{study.word.scene}}</text></view>
       <text class="study-word">{{study.word.syllables}}</text>
       <text class="ipa">{{study.word.ipa}}</text>
       <text class="meaning"><text>{{study.word.pos}}</text>{{study.word.meaningText}}</text>
       <view class="study-tool-row">
-        <view class="tool-button {{studyImageMode ? 'active' : ''}}" bindtap="toggleStudyImageMode">图片</view>
+        <view class="tool-button {{studyImageMode ? 'active' : ''}}" bindtap="toggleStudyImageMode">{{studyImageMode ? '收起图片' : '图片'}}</view>
         <view class="tool-button" data-word-id="{{study.word.id}}" bindtap="openDetail">搭配</view>
         <view class="tool-button primary" data-word-id="{{study.word.id}}" bindtap="speak">播放</view>
       </view>
+      <view wx:if="{{studyImageMode}}" class="memory-image study-memory-image"><text class="memory-mark">记忆图</text><text class="strong">{{study.word.memoryMeaning}}</text><text>{{study.word.scene}}</text></view>
     </view>
     <view wx:if="{{study.word}}" class="bottom-actions two"><view class="secondary-button" data-value="1" bindtap="markStudy">还不熟</view><view class="primary-button small" data-value="3" bindtap="markStudy">已记住</view></view>
     <view wx:if="{{studyTransition}}" class="transition-mask">

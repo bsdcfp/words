@@ -798,6 +798,13 @@ button::after {
   font-weight: 900;
 }
 
+.study-memory-image {
+  margin: 4rpx 0 0;
+  border: 2rpx solid rgba(120, 140, 93, 0.18);
+  background:
+    linear-gradient(135deg, rgba(120, 140, 93, 0.12), rgba(217, 119, 87, 0.14));
+}
+
 .speaker-tile {
   display: flex;
   align-items: center;
