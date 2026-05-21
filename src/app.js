@@ -277,9 +277,10 @@ function renderPrecheck() {
         return `
           <article class="precheck-row ${state.daily.selectedWordIds.includes(word.id) ? "picked" : ""}">
             <span class="index">${index + 1}</span>
-            <button class="word-link" type="button" data-action="open-detail" data-word-id="${word.id}">${word.word}</button>
-            <span class="meaning-inline precheck-meaning"><span>${word.pos}</span>${word.cn.join("，")}</span>
-            <button class="select-toggle ${state.daily.selectedWordIds.includes(word.id) ? "on" : ""}" type="button" data-action="toggle-precheck-word" data-word-id="${word.id}" aria-label="${state.daily.selectedWordIds.includes(word.id) ? `取消选择 ${word.word}` : `选择 ${word.word}`}">${state.daily.selectedWordIds.includes(word.id) ? "✓" : "+"}</button>
+            <div class="precheck-main">
+              <button class="word-link" type="button" data-action="open-detail" data-word-id="${word.id}">${word.word}</button>
+              <span class="meaning-inline precheck-meaning"><span>${word.pos}</span>${word.cn.join("，")}</span>
+            </div>
             <div class="segmented">
               <button class="known ${status === "known" ? "selected" : ""}" type="button" data-action="mark-precheck" data-word-id="${word.id}" data-value="known">认识</button>
               <button class="unfamiliar ${status === "unfamiliar" ? "selected danger" : ""}" type="button" data-action="mark-precheck" data-word-id="${word.id}" data-value="unfamiliar">不熟</button>

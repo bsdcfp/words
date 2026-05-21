@@ -118,9 +118,10 @@
         <view wx:for="{{precheck.candidates}}" wx:key="id" class="precheck-row {{item.selected ? 'picked' : ''}}">
           <view class="precheck-head">
             <text class="index">{{item.index}}</text>
-            <view class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</view>
-            <text class="meaning-inline precheck-meaning"><text>{{item.pos}}</text>{{item.meaningText}}</text>
-            <view class="select-toggle {{item.selected ? 'on' : ''}}" data-word-id="{{item.id}}" bindtap="togglePrecheckWord">{{item.selected ? '✓' : '+'}}</view>
+            <view class="precheck-main">
+              <view class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</view>
+              <text class="meaning-inline precheck-meaning"><text>{{item.pos}}</text>{{item.meaningText}}</text>
+            </view>
           </view>
           <view class="segmented">
             <view class="segmented-button known {{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</view>

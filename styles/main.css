@@ -562,7 +562,7 @@ button {
 
 .precheck-row {
   display: grid;
-  grid-template-columns: 24px minmax(0, 0.95fr) minmax(0, 1.2fr) 38px;
+  grid-template-columns: 24px minmax(0, 1fr);
   gap: 10px;
   align-items: center;
   min-height: 70px;
@@ -579,6 +579,14 @@ button {
 
 .index {
   color: var(--muted);
+}
+
+.precheck-main {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .select-toggle {
@@ -598,11 +606,13 @@ button {
 }
 
 .word-link {
+  flex: 0 1 auto;
+  min-width: 0;
   border: 0;
   border-radius: 999px;
   background: rgba(250, 249, 245, 0.96);
   color: var(--text);
-  font-size: 25px;
+  font-size: 24px;
   font-weight: 900;
   text-align: left;
   overflow: hidden;
@@ -611,10 +621,12 @@ button {
 }
 
 .precheck-meaning {
+  flex: 1 1 auto;
   min-width: 0;
   color: var(--brand-strong);
   font-size: 17px;
   font-weight: 900;
+  text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -633,16 +645,19 @@ button {
 
 .precheck-row .segmented {
   grid-column: 2 / -1;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .segmented button {
-  min-height: 39px;
+  width: auto;
+  min-width: 56px;
+  min-height: 34px;
   border: 1px solid transparent;
-  border-radius: 8px;
-  padding: 0 9px;
-  font-size: 15px;
+  border-radius: 10px;
+  padding: 0 12px;
+  font-size: 14px;
   font-weight: 900;
 }
 
@@ -933,7 +948,7 @@ button {
   }
 
   .precheck-row {
-    grid-template-columns: 22px minmax(0, 0.9fr) minmax(0, 1.15fr) 34px;
+    grid-template-columns: 22px minmax(0, 1fr);
   }
 
   .segmented {
