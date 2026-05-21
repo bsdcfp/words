@@ -76,7 +76,7 @@ try {
   await page.waitForTimeout(70);
   assert.match(await page.locator("#view-test").innerText(), /停留太久可以选不认识/);
   for (let index = 0; index < 36; index += 1) {
-    await page.locator('[data-action="answer-test"]').first().click();
+    await page.locator('[data-action="answer-test"][data-value="不认识"]').click();
   }
   await page.waitForSelector('[data-view="test-result"].active');
   assert.match(await page.locator("#view-test-result").innerText(), /现实掌握词汇/);

@@ -15,11 +15,12 @@ const ASSESSMENT_LAYERS = {
 const ASSESSMENT_TOTAL_QUESTIONS = 36;
 const ASSESSMENT_INITIAL_PER_LAYER = 6;
 
-export function startAssessment(state) {
+export function startAssessment(state, seed = createAssessmentSeed()) {
   state.assessment = {
     completed: false,
     currentIndex: 0,
-    questions: buildInitialAssessmentQuestions(),
+    seed,
+    questions: buildInitialAssessmentQuestions(seed),
     answers: [],
     result: null
   };
@@ -48,7 +49,7 @@ export function answerAssessmentQuestion(state, selected) {
   if (state.assessment.answers.length === 18 && state.assessment.questions.length < ASSESSMENT_TOTAL_QUESTIONS) {
     state.assessment.questions = [
       ...state.assessment.questions,
-      ...buildAdaptiveAssessmentQuestions(state.assessment.answers, state.assessment.questions)
+      ...buildAdaptiveAssessmentQuestions(state.assessment.answers, state.assessment.questions, state.assessment.seed)
     ];
   }
 
@@ -471,11 +472,16 @@ function orderWordsByStages(items, stageOrder) {
   return stageOrder.flatMap((stage) => orderLearnableWordsForStage(items, stage));
 }
 
-function buildInitialAssessmentQuestions() {
-  return ASSESSMENT_LAYER_ORDER.flatMap((layer) => buildAssessmentQuestionsForLayer(layer, ASSESSMENT_INITIAL_PER_LAYER, new Set()));
+function createAssessmentSeed() {
+  return `${Date.now()}:${Math.random().toString(36).slice(2)}`;
 }
 
-function buildAdaptiveAssessmentQuestions(answers, existingQuestions) {
+function buildInitialAssessmentQuestions(seed) {
+  const usedWordIds = new Set();
+  return ASSESSMENT_LAYER_ORDER.flatMap((layer) => buildAssessmentQuestionsForLayer(layer, ASSESSMENT_INITIAL_PER_LAYER, usedWordIds, seed));
+}
+
+function buildAdaptiveAssessmentQuestions(answers, existingQuestions, seed) {
   const usedWordIds = new Set(existingQuestions.map((question) => question.sourceWordId));
   const layerCorrect = ASSESSMENT_LAYER_ORDER.map((layer) => ({
     layer,
@@ -483,18 +489,18 @@ function buildAdaptiveAssessmentQuestions(answers, existingQuestions) {
   }));
   const criticalLayers = layerCorrect.filter((item) => item.correct === 3 || item.correct === 4).map((item) => item.layer);
   if (criticalLayers.length === 1) {
-    return buildAssessmentQuestionsForLayer(criticalLayers[0], 18, usedWordIds);
+    return buildAssessmentQuestionsForLayer(criticalLayers[0], 18, usedWordIds, seed);
   }
   if (criticalLayers.length > 1) {
     return [
-      ...buildAssessmentQuestionsForLayer(criticalLayers[0], 12, usedWordIds),
-      ...buildAssessmentQuestionsForLayer(criticalLayers[1], 6, usedWordIds)
+      ...buildAssessmentQuestionsForLayer(criticalLayers[0], 12, usedWordIds, seed),
+      ...buildAssessmentQuestionsForLayer(criticalLayers[1], 6, usedWordIds, seed)
     ];
   }
 
   const foundation = layerCorrect.find((item) => item.layer === "foundation");
   if ((foundation?.correct || 0) <= 2) {
-    return buildAssessmentQuestionsForLayer("foundation", 18, usedWordIds);
+    return buildAssessmentQuestionsForLayer("foundation", 18, usedWordIds, seed);
   }
 
   let highestPassedIndex = -1;
@@ -503,17 +509,17 @@ function buildAdaptiveAssessmentQuestions(answers, existingQuestions) {
   }
   if (highestPassedIndex >= 0 && highestPassedIndex < ASSESSMENT_LAYER_ORDER.length - 1) {
     return [
-      ...buildAssessmentQuestionsForLayer(ASSESSMENT_LAYER_ORDER[highestPassedIndex], 12, usedWordIds),
-      ...buildAssessmentQuestionsForLayer(ASSESSMENT_LAYER_ORDER[highestPassedIndex + 1], 6, usedWordIds)
+      ...buildAssessmentQuestionsForLayer(ASSESSMENT_LAYER_ORDER[highestPassedIndex], 12, usedWordIds, seed),
+      ...buildAssessmentQuestionsForLayer(ASSESSMENT_LAYER_ORDER[highestPassedIndex + 1], 6, usedWordIds, seed)
     ];
   }
 
-  return buildAssessmentQuestionsForLayer("selective", 18, usedWordIds);
+  return buildAssessmentQuestionsForLayer("selective", 18, usedWordIds, seed);
 }
 
-function buildAssessmentQuestionsForLayer(layer, count, usedWordIds) {
+function buildAssessmentQuestionsForLayer(layer, count, usedWordIds, seed) {
   const layerConfig = ASSESSMENT_LAYERS[layer];
-  const layerWords = orderLearnableWordsForStage(words, layerConfig.starLevel)
+  const layerWords = orderAssessmentWordsForStage(words, layerConfig.starLevel, `${seed}:${layer}`)
     .filter((word) => !usedWordIds.has(word.id));
   return layerWords.slice(0, count).map((word, index) => {
     usedWordIds.add(word.id);
@@ -581,7 +587,15 @@ function buildCurrentStageNewWordIds(userWordStates, excluded, count, stageOrder
 function orderLearnableWordsForStage(items, stage) {
   return items
     .filter((word) => word.starLevel === stage && isLearnableNewWord(word))
-    .map((word) => ({ word, rank: stableWordRank(word, stage) }))
+    .map((word) => ({ word, rank: hashText(`${stage}:${word.id}:${word.sourceIndex}`) }))
+    .sort((a, b) => a.rank - b.rank || a.word.sourceIndex - b.word.sourceIndex)
+    .map((item) => item.word);
+}
+
+function orderAssessmentWordsForStage(items, stage, seed) {
+  return items
+    .filter((word) => word.starLevel === stage && isLearnableNewWord(word))
+    .map((word) => ({ word, rank: hashText(`${seed}:${word.id}:${word.sourceIndex}`) }))
     .sort((a, b) => a.rank - b.rank || a.word.sourceIndex - b.word.sourceIndex)
     .map((item) => item.word);
 }
@@ -592,8 +606,7 @@ function isLearnableNewWord(word) {
   return true;
 }
 
-function stableWordRank(word, stage) {
-  const text = `${stage}:${word.id}:${word.sourceIndex}`;
+function hashText(text) {
   let hash = 2166136261;
   for (let index = 0; index < text.length; index += 1) {
     hash ^= text.charCodeAt(index);

@@ -59,12 +59,28 @@ assert.equal(mostlyUnknown.startLevel, "foundation", "mostly unknown answers sho
 assert.ok(mostlyUnknown.vocabularyRange.upper < 900, "many unknown answers should stay in a remedial range");
 
 const assessmentState = structuredClone(defaultState);
-startAssessment(assessmentState);
+startAssessment(assessmentState, "assessment-critical-required");
 assert.equal(assessmentState.assessment.questions.length, 18, "assessment should start with an 18-question first phase");
 assert.deepEqual(
   ["foundation", "required", "selective"].map((layer) => assessmentState.assessment.questions.filter((question) => question.layer === layer).length),
   [6, 6, 6],
   "first assessment phase should sample six questions from each layer"
+);
+const seededAssessmentA = structuredClone(defaultState);
+const seededAssessmentB = structuredClone(defaultState);
+const seededAssessmentC = structuredClone(defaultState);
+startAssessment(seededAssessmentA, "assessment-seed-a");
+startAssessment(seededAssessmentB, "assessment-seed-a");
+startAssessment(seededAssessmentC, "assessment-seed-c");
+assert.deepEqual(
+  seededAssessmentA.assessment.questions.map((question) => question.sourceWordId),
+  seededAssessmentB.assessment.questions.map((question) => question.sourceWordId),
+  "the same assessment seed should keep one test session stable"
+);
+assert.notDeepEqual(
+  seededAssessmentA.assessment.questions.map((question) => question.sourceWordId),
+  seededAssessmentC.assessment.questions.map((question) => question.sourceWordId),
+  "different assessment seeds should sample different vocabulary questions"
 );
 for (let index = 0; index < 18; index += 1) {
   const question = getCurrentTestQuestion(assessmentState);
