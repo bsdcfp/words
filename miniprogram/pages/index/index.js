@@ -642,10 +642,9 @@ function buildProfileData(state) {
   const weakCount = wordStates.filter((wordState) => wordState.wrongCount > 0).length;
   const todayDone = state.daily.sessionCompletedWordIds.length;
   const todayMinutes = todayDone ? Math.max(3, todayDone * 2) : 0;
-  const week = ["一", "二", "三", "四", "五", "六", "日"].map((day, index) => ({
-    day,
-    active: index < Math.min(state.user.streakDays, 7)
-  }));
+  const checkins = state.user.checkins || {};
+  const week = buildCalendarWeek(checkins);
+  const checkinDays = Object.keys(checkins).filter((dateKey) => checkins[dateKey] && checkins[dateKey].completed).length;
   return {
     userName: state.user.name,
     vocabulary: result ? result.vocabulary : "未测",
@@ -662,8 +661,43 @@ function buildProfileData(state) {
     totalMinutes: learnedCount * 2,
     streakDays: state.user.streakDays,
     longestStreak: state.user.longestStreak || 0,
+    checkinDays,
     week
   };
+}
+
+function buildCalendarWeek(checkins, now) {
+  const today = now || new Date();
+  const weekStart = startOfWeek(today);
+  const labels = ["一", "二", "三", "四", "五", "六", "日"];
+  return labels.map((day, index) => {
+    const date = new Date(weekStart);
+    date.setDate(weekStart.getDate() + index);
+    const dateKey = localDateKey(date);
+    const checkin = checkins[dateKey] || {};
+    return {
+      key: dateKey,
+      day,
+      date: String(date.getDate()),
+      active: Boolean(checkin.completed),
+      completedGroups: checkin.completedGroups || 0,
+      learnedWords: checkin.learnedWords || 0
+    };
+  });
+}
+
+function startOfWeek(date) {
+  const value = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = value.getDay() || 7;
+  value.setDate(value.getDate() - day + 1);
+  return value;
+}
+
+function localDateKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function buildLevelSelectData(state) {

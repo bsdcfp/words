@@ -149,6 +149,11 @@ assert.equal(state.daily.reviewPhase, "mixed", "three completed groups should tr
 assert.equal(state.daily.mixedReviewWordIds.length, 9, "three groups should mix nine words");
 finishMixedReview(state);
 assert.equal(state.daily.reviewPhase, "initial", "nine-word mixed review should restart a new round");
+const todayKey = new Date().toLocaleDateString("en-CA");
+assert.equal(state.user.streakDays, 1, "completing a daily round should count as one calendar-day checkin");
+assert.equal(state.user.checkins[todayKey].completed, true, "daily completion should be stored in the user's checkin calendar");
+assert.equal(state.user.checkins[todayKey].learnedWords, 9, "today's checkin should store the learned word count");
+assert.equal(state.user.checkins[todayKey].completedGroups, 3, "today's checkin should store completed groups");
 assert.equal(state.daily.completedWordIds.length, 0, "new round should reset round progress");
 assert.equal(state.daily.batchWordIds.length, 0, "new round should reset mixed review batch");
 assert.equal(state.daily.candidateWordIds.length, 9, "new round should expose nine fresh candidates");

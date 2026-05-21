@@ -10,6 +10,7 @@ export const defaultState = {
     activeGroup: "高考课标词",
     streakDays: 0,
     longestStreak: 0,
+    checkins: {},
     badges: [],
     vocabularyAssessment: null
   },

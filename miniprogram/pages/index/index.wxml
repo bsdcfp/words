@@ -56,10 +56,14 @@
       <view><text>{{profile.streakDays}}</text><text>连续天数</text></view>
     </view>
     <view class="profile-card">
-      <view class="card-row"><text class="card-title">本周进展</text><text class="muted">最长连续 {{profile.longestStreak}} 天</text></view>
+      <view class="card-row"><text class="card-title">本周进展</text><text class="muted">累计打卡 {{profile.checkinDays}} 天</text></view>
       <view class="week-row">
-        <view wx:for="{{profile.week}}" wx:key="day" class="week-dot {{item.active ? 'active' : ''}}"><text>{{item.day}}</text></view>
+        <view wx:for="{{profile.week}}" wx:key="key" class="week-dot {{item.active ? 'active' : ''}}">
+          <text>{{item.day}}</text>
+          <text>{{item.date}}</text>
+        </view>
       </view>
+      <text class="muted week-summary">最长连续 {{profile.longestStreak}} 天，打卡来自全部历史记录</text>
     </view>
     <view class="profile-list">
       <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openLevelSelect"><text>选择单词水平</text><text>{{profile.startLevelLabel}}</text><text class="entry-arrow">›</text></view>

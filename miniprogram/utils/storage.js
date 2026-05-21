@@ -12,6 +12,7 @@ const defaultState = {
     activeGroup: "高考课标词",
     streakDays: 0,
     longestStreak: 0,
+    checkins: {},
     badges: [],
     vocabularyAssessment: null
   },
@@ -93,6 +94,7 @@ function normaliseState(state) {
   if (!state.userWordStates || typeof state.userWordStates !== "object") state.userWordStates = {};
   if (!Array.isArray(state.answerRecords)) state.answerRecords = [];
   if (!Array.isArray(state.user.badges)) state.user.badges = [];
+  if (!state.user.checkins || typeof state.user.checkins !== "object" || Array.isArray(state.user.checkins)) state.user.checkins = {};
   ensureArrayFields(state.assessment, ["answers", "questions"]);
   ensureArrayFields(state.daily, [
     "selectedWordIds",

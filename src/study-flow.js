@@ -288,8 +288,7 @@ export function completeMixedReview(state) {
   }
 
   state.daily.completed = true;
-  state.user.streakDays = Math.max(1, state.user.streakDays + 1);
-  state.user.longestStreak = Math.max(state.user.longestStreak || 0, state.user.streakDays);
+  markDailyCheckin(state);
   if (state.user.streakDays >= 1 && !state.user.badges.includes("起步徽章")) {
     state.user.badges.push("起步徽章");
   }
@@ -298,6 +297,71 @@ export function completeMixedReview(state) {
   }
   state.lastReport = buildDailyReport(state, words);
   return startNextRound(state) ? "next-round" : "daily-report";
+}
+
+function markDailyCheckin(state) {
+  const today = localDateKey();
+  if (!state.user.checkins || typeof state.user.checkins !== "object" || Array.isArray(state.user.checkins)) {
+    state.user.checkins = {};
+  }
+  const existing = state.user.checkins[today] || {};
+  const learnedWords = (state.daily.sessionCompletedWordIds || []).length;
+  const completedGroups = Math.floor(learnedWords / 3);
+  state.user.checkins[today] = {
+    date: today,
+    completed: true,
+    learnedWords: Math.max(existing.learnedWords || 0, learnedWords),
+    completedGroups: Math.max(existing.completedGroups || 0, completedGroups),
+    completedAt: new Date().toISOString()
+  };
+  state.user.streakDays = calculateCurrentStreak(state.user.checkins);
+  state.user.longestStreak = Math.max(state.user.longestStreak || 0, calculateLongestStreak(state.user.checkins));
+}
+
+function calculateCurrentStreak(checkins, fromDate = new Date()) {
+  let cursor = startOfLocalDay(fromDate);
+  let streak = 0;
+  while (checkins[localDateKey(cursor)]?.completed) {
+    streak += 1;
+    cursor.setDate(cursor.getDate() - 1);
+  }
+  return streak;
+}
+
+function calculateLongestStreak(checkins) {
+  const days = Object.keys(checkins || {})
+    .filter((dateKey) => checkins[dateKey]?.completed)
+    .sort();
+  let longest = 0;
+  let current = 0;
+  let previous = null;
+  days.forEach((dateKey) => {
+    const currentDate = parseLocalDateKey(dateKey);
+    current = previous && daysBetween(previous, currentDate) === 1 ? current + 1 : 1;
+    longest = Math.max(longest, current);
+    previous = currentDate;
+  });
+  return longest;
+}
+
+function localDateKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function parseLocalDateKey(dateKey) {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function startOfLocalDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function daysBetween(left, right) {
+  return Math.round((startOfLocalDay(right).getTime() - startOfLocalDay(left).getTime()) / 86400000);
 }
 
 function createAudioQuestion(wordId) {

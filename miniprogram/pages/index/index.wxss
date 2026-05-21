@@ -1205,19 +1205,32 @@ button::after {
 
 .week-dot {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 58rpx;
-  border-radius: 999rpx;
+  min-height: 76rpx;
+  border-radius: 22rpx;
   background: rgba(255, 255, 255, 0.56);
   color: #6e6a62;
-  font-size: 24rpx;
   font-weight: 900;
+}
+
+.week-dot text:first-child {
+  font-size: 22rpx;
+}
+
+.week-dot text:last-child {
+  font-size: 26rpx;
 }
 
 .week-dot.active {
   background: rgba(120, 140, 93, 0.16);
   color: #4f623c;
+}
+
+.week-summary {
+  margin-top: -6rpx;
+  font-size: 23rpx;
 }
 
 .profile-list {
