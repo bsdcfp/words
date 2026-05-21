@@ -11,9 +11,9 @@ const require = createRequire(import.meta.url);
 
 const { chromium } = loadPlaywright();
 const selectedGroups = [
-  ["absolutely", "accident", "account"],
-  ["ache", "achievement", "acquire"],
-  ["actually", "adapt", "addict"]
+  ["flash", "duty", "energetic"],
+  ["tear", "loss", "fortunately"],
+  ["ballet", "alarm", "recover"]
 ];
 const firstTwoGroupWords = selectedGroups.slice(0, 2).flat();
 const mixedReviewWords = selectedGroups.flat();
@@ -85,12 +85,13 @@ try {
   await page.getByRole("button", { name: "开始今日学习" }).click();
   await page.waitForSelector('[data-view="precheck"].active');
   assert.match(await page.locator("#view-precheck").innerText(), /训前检测/);
-  assert.match(await page.locator("#view-precheck").innerText(), /ability/, "vocabulary assessment should move the first precheck window to foundation words");
+  assert.match(await page.locator("#view-precheck").innerText(), /book/, "vocabulary assessment should move the first precheck window to shuffled foundation words");
+  assert.doesNotMatch(await page.locator("#view-precheck").innerText(), /\ba\b/, "foundation precheck should not start with single-letter function words");
   await page.getByRole("button", { name: "返回首页" }).click();
   await page.getByRole("button", { name: "重置体验数据" }).click();
   await page.getByRole("button", { name: "开始今日学习" }).click();
   await page.waitForSelector('[data-view="precheck"].active');
-  assert.match(await page.locator("#view-precheck").innerText(), /absolutely/);
+  assert.match(await page.locator("#view-precheck").innerText(), /flash/);
   const precheckFooter = page.locator('#view-precheck .bottom-actions');
   const initialCards = page.locator('#view-precheck .precheck-row');
   assert.equal(await initialCards.count(), 9);
@@ -131,14 +132,14 @@ try {
     assert.match(await page.locator("#view-audio-meaning").innerText(), /1\/3/);
     await page.waitForFunction(() => window.__spokenWords.length > 0);
     if (groupIndex === 0) {
-      await page.locator('[data-action="answer-audio"]').filter({ hasNotText: "完全地" }).first().click();
+      await page.locator('[data-action="answer-audio"]').filter({ hasNotText: meaningFor("flash") }).first().click();
       await page.locator('[data-action="next-audio"]:not([disabled])').click();
       await waitForText(page, "#view-audio-meaning.active", "2/4");
-      await clickAnswer(page, "answer-audio", meaningFor("accident"));
+      await clickAnswer(page, "answer-audio", meaningFor("duty"));
       await waitForText(page, "#view-audio-meaning.active", "3/4");
-      await clickAnswer(page, "answer-audio", meaningFor("account"));
+      await clickAnswer(page, "answer-audio", meaningFor("energetic"));
       await waitForText(page, "#view-audio-meaning.active", "4/4");
-      await clickAnswer(page, "answer-audio", meaningFor("absolutely"));
+      await clickAnswer(page, "answer-audio", meaningFor("flash"));
     } else {
       for (let index = 0; index < 3; index += 1) {
         await clickAnswer(page, "answer-audio", meaningFor(selectedGroups[groupIndex][index]));
@@ -171,13 +172,13 @@ try {
 
   await page.waitForSelector('[data-view="precheck"].active');
   assert.match(await page.locator("#view-precheck").innerText(), /上一轮完成/);
-  assert.match(await page.locator("#view-precheck").innerText(), /addition/);
+  assert.match(await page.locator("#view-precheck").innerText(), /file/);
   assert.equal(await page.locator('#view-precheck .precheck-row').count(), 9);
   await page.getByRole("button", { name: "返回首页" }).click();
   assert.match(await page.locator("#view-home").innerText(), /连续打卡 1 天/);
   await page.getByRole("button", { name: /错词本/ }).click();
   await page.waitForSelector('[data-view="wrong-book"].active');
-  assert.match(await page.locator("#view-wrong-book").innerText(), /absolutely/);
+  assert.match(await page.locator("#view-wrong-book").innerText(), /flash/);
 
   await page.reload({ waitUntil: "networkidle" });
   assert.match(await page.locator("#view-home").innerText(), /现实词汇量/);

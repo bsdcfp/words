@@ -468,7 +468,7 @@ function curriculumStageOrderFor(stateOrWordStates) {
 }
 
 function orderWordsByStages(items, stageOrder) {
-  return stageOrder.flatMap((stage) => items.filter((word) => word.starLevel === stage));
+  return stageOrder.flatMap((stage) => orderLearnableWordsForStage(items, stage));
 }
 
 function buildInitialAssessmentQuestions() {
@@ -513,7 +513,8 @@ function buildAdaptiveAssessmentQuestions(answers, existingQuestions) {
 
 function buildAssessmentQuestionsForLayer(layer, count, usedWordIds) {
   const layerConfig = ASSESSMENT_LAYERS[layer];
-  const layerWords = words.filter((word) => word.starLevel === layerConfig.starLevel && !usedWordIds.has(word.id));
+  const layerWords = orderLearnableWordsForStage(words, layerConfig.starLevel)
+    .filter((word) => !usedWordIds.has(word.id));
   return layerWords.slice(0, count).map((word, index) => {
     usedWordIds.add(word.id);
     return createAssessmentQuestion(word, layer, index);
@@ -565,7 +566,7 @@ function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
 function buildCurrentStageNewWordIds(userWordStates, excluded, count, stageOrder = CURRICULUM_STAGE_ORDER) {
   const result = [];
   for (const stage of stageOrder) {
-    const stageWords = words.filter((word) => word.starLevel === stage);
+    const stageWords = orderLearnableWordsForStage(words, stage);
     for (const word of stageWords) {
       if (result.length >= count) return result;
       if (excluded.has(word.id) || !isFreshWordCandidate(userWordStates[word.id])) continue;
@@ -575,6 +576,30 @@ function buildCurrentStageNewWordIds(userWordStates, excluded, count, stageOrder
     if (result.length > 0 && result.length >= count) return result;
   }
   return result;
+}
+
+function orderLearnableWordsForStage(items, stage) {
+  return items
+    .filter((word) => word.starLevel === stage && isLearnableNewWord(word))
+    .map((word) => ({ word, rank: stableWordRank(word, stage) }))
+    .sort((a, b) => a.rank - b.rank || a.word.sourceIndex - b.word.sourceIndex)
+    .map((item) => item.word);
+}
+
+function isLearnableNewWord(word) {
+  if (!word?.word || word.word.length <= 1) return false;
+  if (/^(art\.|conj\.|prep\.|pron\.)/.test(word.pos || "")) return false;
+  return true;
+}
+
+function stableWordRank(word, stage) {
+  const text = `${stage}:${word.id}:${word.sourceIndex}`;
+  let hash = 2166136261;
+  for (let index = 0; index < text.length; index += 1) {
+    hash ^= text.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return hash >>> 0;
 }
 
 function refillPrecheckCandidateWordIds(state) {

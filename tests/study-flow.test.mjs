@@ -89,10 +89,19 @@ assert.deepEqual(
 const foundationStartState = structuredClone(defaultState);
 foundationStartState.user.learningStartLevel = "foundation";
 startDailyLearning(foundationStartState);
+const foundationCandidateWords = foundationStartState.daily.candidateWordIds.map((wordId) => words.find((word) => word.id === wordId));
 assert.deepEqual(
-  [...new Set(foundationStartState.daily.candidateWordIds.map((wordId) => words.find((word) => word.id === wordId)?.starLevel))],
+  [...new Set(foundationCandidateWords.map((word) => word?.starLevel))],
   [0],
   "assessment start level should move fresh candidates to foundation words"
+);
+assert.ok(
+  !foundationCandidateWords.some((word) => word.word === "a" || /^(art\.|conj\.|prep\.|pron\.)/.test(word.pos)),
+  "foundation candidates should not surface single-letter or function words as learning targets"
+);
+assert.ok(
+  new Set(foundationCandidateWords.map((word) => word.word[0].toLowerCase())).size > 3,
+  "foundation candidates should be stably shuffled instead of alphabetical"
 );
 const firstCandidateId = state.daily.candidateWordIds[0];
 markPrecheck(state, firstCandidateId, "known");
