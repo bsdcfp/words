@@ -562,7 +562,7 @@ button {
 
 .precheck-row {
   display: grid;
-  grid-template-columns: 24px 38px minmax(0, 1fr) auto;
+  grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1.1fr) 38px;
   gap: 10px;
   align-items: center;
   min-height: 70px;
@@ -602,11 +602,36 @@ button {
   background: transparent;
   font-size: 22px;
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.precheck-meaning {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.precheck-meaning span {
+  margin-right: 4px;
+  color: var(--brand);
+  font-weight: 900;
 }
 
 .segmented {
   display: flex;
   gap: 6px;
+}
+
+.precheck-row .segmented {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .segmented button {
@@ -893,10 +918,10 @@ button {
   }
 
   .precheck-row {
-    grid-template-columns: 22px 34px 1fr;
+    grid-template-columns: 22px minmax(0, 0.9fr) minmax(0, 1.1fr) 34px;
   }
 
   .segmented {
-    grid-column: 3;
+    grid-column: 2 / -1;
   }
 }
