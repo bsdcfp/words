@@ -579,7 +579,7 @@ button::after {
 }
 
 .precheck-view .precheck-head {
-  grid-template-columns: 34rpx minmax(0, 1fr) minmax(0, 1.15fr) 52rpx;
+  grid-template-columns: 34rpx minmax(0, 0.95fr) minmax(0, 1.2fr) 52rpx;
   gap: 12rpx;
   min-width: 0;
 }
@@ -646,9 +646,10 @@ button::after {
 }
 
 .precheck-view .word-link {
-  padding: 8rpx 20rpx;
-  font-size: 32rpx;
-  background: rgba(255, 255, 255, 0.92);
+  padding: 8rpx 16rpx;
+  background: rgba(250, 249, 245, 0.96);
+  color: #141413;
+  font-size: 36rpx;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -676,9 +677,16 @@ button::after {
 
 .precheck-view .precheck-meaning {
   padding-left: 0;
+  color: #4f623c;
+  font-size: 29rpx;
+  font-weight: 900;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.precheck-view .precheck-meaning text {
+  color: #d97757;
 }
 
 .segmented {
@@ -708,10 +716,23 @@ button::after {
 }
 
 .precheck-view .segmented-button {
-  min-height: 54rpx;
+  min-height: 62rpx;
   border-radius: 14rpx;
-  background: rgba(255, 251, 244, 0.76);
-  font-size: 26rpx;
+  border: 2rpx solid transparent;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.precheck-view .segmented-button.known {
+  border-color: rgba(120, 140, 93, 0.28);
+  background: rgba(120, 140, 93, 0.12);
+  color: #4f623c;
+}
+
+.precheck-view .segmented-button.unfamiliar {
+  border-color: rgba(217, 119, 87, 0.3);
+  background: rgba(217, 119, 87, 0.12);
+  color: #8f412b;
 }
 
 .segmented .selected {

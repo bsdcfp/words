@@ -123,8 +123,8 @@
             <view class="select-toggle {{item.selected ? 'on' : ''}}" data-word-id="{{item.id}}" bindtap="togglePrecheckWord">{{item.selected ? '✓' : '+'}}</view>
           </view>
           <view class="segmented">
-            <view class="segmented-button {{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</view>
-            <view class="segmented-button {{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</view>
+            <view class="segmented-button known {{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</view>
+            <view class="segmented-button unfamiliar {{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</view>
           </view>
         </view>
       </view>

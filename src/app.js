@@ -281,8 +281,8 @@ function renderPrecheck() {
             <span class="meaning-inline precheck-meaning"><span>${word.pos}</span>${word.cn.join("，")}</span>
             <button class="select-toggle ${state.daily.selectedWordIds.includes(word.id) ? "on" : ""}" type="button" data-action="toggle-precheck-word" data-word-id="${word.id}" aria-label="${state.daily.selectedWordIds.includes(word.id) ? `取消选择 ${word.word}` : `选择 ${word.word}`}">${state.daily.selectedWordIds.includes(word.id) ? "✓" : "+"}</button>
             <div class="segmented">
-              <button class="${status === "known" ? "selected" : ""}" type="button" data-action="mark-precheck" data-word-id="${word.id}" data-value="known">认识</button>
-              <button class="${status === "unfamiliar" ? "selected danger" : ""}" type="button" data-action="mark-precheck" data-word-id="${word.id}" data-value="unfamiliar">不熟</button>
+              <button class="known ${status === "known" ? "selected" : ""}" type="button" data-action="mark-precheck" data-word-id="${word.id}" data-value="known">认识</button>
+              <button class="unfamiliar ${status === "unfamiliar" ? "selected danger" : ""}" type="button" data-action="mark-precheck" data-word-id="${word.id}" data-value="unfamiliar">不熟</button>
             </div>
           </article>
         `;
