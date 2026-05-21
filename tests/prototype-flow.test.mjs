@@ -152,7 +152,7 @@ try {
       await page.waitForSelector('[data-view="precheck"].active');
       assert.match(await page.locator("#view-precheck").innerText(), /本组完成/);
       assert.match(await precheckFooter.innerText(), new RegExp(`已选 0/3`));
-      assert.equal(await page.locator('#view-precheck .precheck-row').count(), 6 - groupIndex * 3);
+      assert.equal(await page.locator('#view-precheck .precheck-row').count(), 9);
       await page.getByRole("button", { name: "自动选词" }).click();
       assert.match(await precheckFooter.innerText(), /已选 3\/3/);
       await page.getByRole("button", { name: "开始识记" }).click();
@@ -161,7 +161,7 @@ try {
       await page.waitForSelector('[data-view="precheck"].active');
       assert.match(await page.locator("#view-precheck").innerText(), /2 组混合复习完成/);
       assert.match(await precheckFooter.innerText(), new RegExp(`已选 0/3`));
-      assert.equal(await page.locator('#view-precheck .precheck-row').count(), 3);
+      assert.equal(await page.locator('#view-precheck .precheck-row').count(), 9);
       await page.getByRole("button", { name: "自动选词" }).click();
       assert.match(await precheckFooter.innerText(), /已选 3\/3/);
       await page.getByRole("button", { name: "开始识记" }).click();

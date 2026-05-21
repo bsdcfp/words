@@ -212,6 +212,7 @@ function moveToNextAudioQuestion(state) {
     return "mixed-review";
   }
   state.daily.groupFeedback = "本组完成，重新选下一组";
+  refillPrecheckCandidateWordIds(state);
   return "next-selection";
 }
 
@@ -235,6 +236,7 @@ function completeMixedReview(state) {
     state.daily.mixedQuestions = [];
     state.daily.mixedIndex = 0;
     state.daily.groupFeedback = "2 组混合复习完成，继续选择第 3 组";
+    refillPrecheckCandidateWordIds(state);
     return "next-selection";
   }
   state.daily.completed = true;

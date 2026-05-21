@@ -126,6 +126,11 @@ assert.ok(!state.daily.candidateWordIds.includes(firstCandidateId), "known words
 
 completeGroup(state, ["absolutely", "accident", "account"]);
 assert.equal(state.daily.reviewPhase, "initial", "one group should continue to next selection without mixed review");
+assert.equal(state.daily.candidateWordIds.length, 9, "second group selection should already be refilled to nine candidates");
+assert.ok(
+  !state.daily.candidateWordIds.some((id) => selectedIds(["absolutely", "accident", "account"]).includes(id)),
+  "second group selection should not wait for a known tap to remove completed words"
+);
 
 completeGroup(state, ["ache", "achievement", "acquire"]);
 assert.equal(state.daily.reviewPhase, "mixed", "two completed groups should trigger mixed review");
@@ -133,6 +138,11 @@ assert.equal(state.daily.mixedReviewWordIds.length, 6, "two groups should mix si
 finishMixedReview(state);
 assert.equal(state.daily.reviewPhase, "initial", "six-word mixed review should return to selecting the third group");
 assert.equal(state.daily.completedWordIds.length, 6, "six-word mixed review should keep the current round progress");
+assert.equal(state.daily.candidateWordIds.length, 9, "third group selection should already be refilled to nine candidates");
+assert.ok(
+  !state.daily.candidateWordIds.some((id) => selectedIds(["absolutely", "accident", "account", "ache", "achievement", "acquire"]).includes(id)),
+  "third group selection should not include completed words"
+);
 
 completeGroup(state, ["actually", "adapt", "addict"]);
 assert.equal(state.daily.reviewPhase, "mixed", "three completed groups should trigger mixed review");
