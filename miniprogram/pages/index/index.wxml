@@ -77,7 +77,7 @@
   </view>
 
   <view wx:elif="{{view == 'month-progress'}}" class="view month-progress-view sticky-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">本月进展</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">月度进展</text></view>
     <view class="month-panel">
       <picker mode="date" fields="month" value="{{monthProgress.pickerValue}}" bindchange="changeProgressMonth">
         <view class="month-picker">
