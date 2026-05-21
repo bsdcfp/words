@@ -6,6 +6,7 @@ const flow = require("../../utils/study-flow");
 const VIEWS = {
   HOME: "home",
   PROFILE: "profile",
+  MONTH_PROGRESS: "month-progress",
   LEVEL_SELECT: "level-select",
   TEST: "test",
   TEST_RESULT: "test-result",
@@ -83,6 +84,7 @@ Page({
     state: null,
     home: {},
     profile: {},
+    monthProgress: {},
     levelSelect: {},
     test: {},
     testResult: {},
@@ -136,6 +138,24 @@ Page({
 
   openProfile() {
     this.saveAndRender(VIEWS.PROFILE);
+  },
+
+  openMonthProgress() {
+    this.progressMonthCursor = new Date();
+    this.saveAndRender(VIEWS.MONTH_PROGRESS);
+  },
+
+  changeProgressMonth(event) {
+    const [year, month] = event.detail.value.split("-").map(Number);
+    this.progressMonthCursor = new Date(year, month - 1, 1);
+    this.saveAndRender(VIEWS.MONTH_PROGRESS, { track: false });
+  },
+
+  shiftProgressMonth(event) {
+    const offset = Number(event.currentTarget.dataset.offset || 0);
+    const cursor = this.progressMonthCursor || new Date();
+    this.progressMonthCursor = new Date(cursor.getFullYear(), cursor.getMonth() + offset, 1);
+    this.saveAndRender(VIEWS.MONTH_PROGRESS, { track: false });
   },
 
   openLevelSelect() {
@@ -416,6 +436,7 @@ Page({
     const patch = { view, state, studyTransition: false };
     if (view === VIEWS.HOME) patch.home = buildHomeData(state);
     if (view === VIEWS.PROFILE) patch.profile = buildProfileData(state);
+    if (view === VIEWS.MONTH_PROGRESS) patch.monthProgress = buildMonthProgressData(state, this.progressMonthCursor);
     if (view === VIEWS.LEVEL_SELECT) patch.levelSelect = buildLevelSelectData(state);
     if (view === VIEWS.TEST) patch.test = buildTestData(state);
     if (view === VIEWS.TEST_RESULT) patch.testResult = buildTestResultData(state);
@@ -473,7 +494,7 @@ Page({
 
   canRenderBackTarget(view) {
     if (!view) return false;
-    if ([VIEWS.HOME, VIEWS.PROFILE, VIEWS.LEVEL_SELECT, VIEWS.WRONG_BOOK, VIEWS.DAILY_REPORT].includes(view)) return true;
+    if ([VIEWS.HOME, VIEWS.PROFILE, VIEWS.MONTH_PROGRESS, VIEWS.LEVEL_SELECT, VIEWS.WRONG_BOOK, VIEWS.DAILY_REPORT].includes(view)) return true;
     if (view === VIEWS.TEST) return Boolean(this.state.assessment && !this.state.assessment.completed && flow.getCurrentTestQuestion(this.state));
     if (view === VIEWS.TEST_RESULT) return Boolean(this.state.assessment && this.state.assessment.completed && this.state.assessment.result);
     if (view === VIEWS.PRECHECK) return Boolean(this.state.daily && this.state.daily.candidateWordIds && this.state.daily.candidateWordIds.length);
@@ -684,6 +705,42 @@ function buildCalendarWeek(checkins, now) {
       learnedWords: checkin.learnedWords || 0
     };
   });
+}
+
+function buildMonthProgressData(state, cursor) {
+  const checkins = state.user.checkins || {};
+  const current = cursor || new Date();
+  const year = current.getFullYear();
+  const month = current.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay() || 7;
+  const leadingBlanks = firstDay - 1;
+  const cells = [];
+  for (let index = 0; index < leadingBlanks; index += 1) {
+    cells.push({ key: `blank-${index}`, blank: true });
+  }
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const date = new Date(year, month, day);
+    const dateKey = localDateKey(date);
+    const checkin = checkins[dateKey] || {};
+    cells.push({
+      key: dateKey,
+      day,
+      active: Boolean(checkin.completed),
+      completedGroups: checkin.completedGroups || 0,
+      learnedWords: checkin.learnedWords || 0
+    });
+  }
+  const activeCells = cells.filter((cell) => cell.active);
+  return {
+    title: `${year} 年 ${month + 1} 月`,
+    pickerValue: `${year}-${String(month + 1).padStart(2, "0")}`,
+    weekdays: ["一", "二", "三", "四", "五", "六", "日"],
+    cells,
+    checkinDays: activeCells.length,
+    learnedWords: activeCells.reduce((sum, cell) => sum + cell.learnedWords, 0),
+    completedGroups: activeCells.reduce((sum, cell) => sum + cell.completedGroups, 0)
+  };
 }
 
 function startOfWeek(date) {

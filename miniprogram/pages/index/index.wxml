@@ -55,8 +55,8 @@
       <view><text>{{profile.todayMinutes}}</text><text>今日分钟</text></view>
       <view><text>{{profile.streakDays}}</text><text>连续天数</text></view>
     </view>
-    <view class="profile-card">
-      <view class="card-row"><text class="card-title">本周进展</text><text class="muted">累计打卡 {{profile.checkinDays}} 天</text></view>
+    <view class="profile-card action-card" hover-class="action-entry-pressed" bindtap="openMonthProgress">
+      <view class="card-row"><text class="card-title">本周进展</text><text class="muted">累计打卡 {{profile.checkinDays}} 天</text><text class="entry-arrow">›</text></view>
       <view class="week-row">
         <view wx:for="{{profile.week}}" wx:key="key" class="week-dot {{item.active ? 'active' : ''}}">
           <text>{{item.day}}</text>
@@ -73,6 +73,35 @@
     <view class="tab-bar">
       <view class="tab-item" bindtap="openWordsTab">单词</view>
       <view class="tab-item active" bindtap="openProfile">我的</view>
+    </view>
+  </view>
+
+  <view wx:elif="{{view == 'month-progress'}}" class="view month-progress-view sticky-view">
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">本月进展</text></view>
+    <view class="month-panel">
+      <picker mode="date" fields="month" value="{{monthProgress.pickerValue}}" bindchange="changeProgressMonth">
+        <view class="month-picker">
+          <text>{{monthProgress.title}}</text>
+          <text>选择年月 ›</text>
+        </view>
+      </picker>
+      <view class="month-switch">
+        <view data-offset="-1" bindtap="shiftProgressMonth">上一月</view>
+        <view>{{monthProgress.checkinDays}} 天打卡</view>
+        <view data-offset="1" bindtap="shiftProgressMonth">下一月</view>
+      </view>
+      <view class="profile-grid month-summary">
+        <view><text>{{monthProgress.checkinDays}}</text><text>打卡天数</text></view>
+        <view><text>{{monthProgress.learnedWords}}</text><text>已学单词</text></view>
+        <view><text>{{monthProgress.completedGroups}}</text><text>完成组数</text></view>
+      </view>
+      <view class="month-calendar">
+        <text wx:for="{{monthProgress.weekdays}}" wx:key="*this" class="month-weekday">{{item}}</text>
+        <view wx:for="{{monthProgress.cells}}" wx:key="key" class="month-day {{item.blank ? 'blank' : ''}} {{item.active ? 'active' : ''}}">
+          <text wx:if="{{!item.blank}}">{{item.day}}</text>
+          <text wx:if="{{item.active}}" class="month-day-meta">{{item.completedGroups}}组</text>
+        </view>
+      </view>
     </view>
   </view>
 
