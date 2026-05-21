@@ -62,9 +62,9 @@
       </view>
     </view>
     <view class="profile-list">
-      <view class="list-button" bindtap="openLevelSelect"><text>选择单词水平</text><text>{{profile.startLevelLabel}}</text></view>
-      <view class="list-button" bindtap="startTest"><text>词汇量测试</text><text>当前 {{profile.vocabulary}}</text></view>
-      <view class="list-button" bindtap="openWrongBook"><text>错词本</text><text>{{profile.weakCount}} 个待巩固</text></view>
+      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openLevelSelect"><text>选择单词水平</text><text>{{profile.startLevelLabel}}</text><text class="entry-arrow">›</text></view>
+      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="startTest"><text>词汇量测试</text><text>当前 {{profile.vocabulary}}</text><text class="entry-arrow">›</text></view>
+      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openWrongBook"><text>错词本</text><text>{{profile.weakCount}} 个待巩固</text><text class="entry-arrow">›</text></view>
     </view>
     <view class="tab-bar">
       <view class="tab-item" bindtap="openWordsTab">单词</view>

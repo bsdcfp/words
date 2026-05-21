@@ -263,6 +263,38 @@ button::after {
   text-align: left;
 }
 
+.action-entry {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) auto 42rpx;
+  border: 2rpx solid rgba(217, 119, 87, 0.34);
+  background:
+    linear-gradient(135deg, rgba(217, 119, 87, 0.12), rgba(250, 249, 245, 0.9));
+  box-shadow: 0 16rpx 34rpx rgba(20, 20, 19, 0.08);
+}
+
+.action-entry::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 24rpx;
+  bottom: 24rpx;
+  width: 8rpx;
+  border-radius: 999rpx;
+  background: #d97757;
+}
+
+.action-entry text:nth-child(2) {
+  color: #6e6a62;
+  font-size: 24rpx;
+  text-align: right;
+  word-break: break-word;
+}
+
+.action-entry-pressed {
+  transform: scale(0.985);
+  opacity: 0.86;
+}
+
 .list-button text:first-child {
   display: block;
   font-weight: 900;
@@ -274,6 +306,20 @@ button::after {
   font-size: 24rpx;
   text-align: right;
   word-break: break-word;
+}
+
+.entry-arrow {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 42rpx;
+  height: 42rpx;
+  border-radius: 999rpx;
+  background: #d97757;
+  color: #141413 !important;
+  font-size: 34rpx !important;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .progress-label {

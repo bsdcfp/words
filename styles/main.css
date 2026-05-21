@@ -261,6 +261,18 @@ button {
   text-align: left;
 }
 
+.list-button::after {
+  content: "›";
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--text);
+  font-weight: 900;
+}
+
 .list-button span {
   font-weight: 900;
 }
