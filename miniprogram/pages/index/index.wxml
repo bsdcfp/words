@@ -149,7 +149,6 @@
       <text class="ipa">{{study.word.ipa}}</text>
       <text class="meaning"><text>{{study.word.pos}}</text>{{study.word.meaningText}}</text>
       <view class="study-tool-row">
-        <view class="tool-button" data-word-id="{{study.word.id}}" bindtap="openDetail">更多</view>
         <view class="tool-button {{studyImageMode ? 'active' : ''}}" bindtap="toggleStudyImageMode">图片</view>
         <view class="tool-button" data-word-id="{{study.word.id}}" bindtap="openDetail">搭配</view>
         <view class="tool-button primary" data-word-id="{{study.word.id}}" bindtap="speak">播放</view>
