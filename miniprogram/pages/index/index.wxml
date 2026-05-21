@@ -73,7 +73,7 @@
   </view>
 
   <view wx:elif="{{view == 'level-select'}}" class="view level-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="openProfile">‹</view><text class="page-title">你现在是</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">你现在是</text></view>
     <view class="level-panel">
       <text class="section-label">当前：{{levelSelect.currentLevel}}</text>
       <view wx:for="{{levelSelect.groups}}" wx:key="title" wx:for-item="group" class="level-group">
@@ -87,7 +87,7 @@
   </view>
 
   <view wx:elif="{{view == 'test'}}" class="view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="progress-label">{{test.progress}}</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="progress-label">{{test.progress}}</text></view>
     <view class="question-panel">
       <text class="section-label">词汇量测试</text>
       <text class="test-word">{{test.question.word}}</text>
@@ -101,7 +101,7 @@
   </view>
 
   <view wx:elif="{{view == 'test-result'}}" class="view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">测评结果</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">测评结果</text></view>
     <view class="result-panel">
       <text class="section-label">现实掌握词汇</text>
       <text class="vocab-number">{{testResult.vocabulary}}</text>
@@ -112,7 +112,7 @@
   </view>
 
   <view wx:elif="{{view == 'precheck'}}" class="view precheck-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">训前检测</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">训前检测</text></view>
     <scroll-view class="precheck-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
       <view class="word-list precheck-list">
         <view wx:for="{{precheck.candidates}}" wx:key="id" class="precheck-row {{item.selected ? 'picked' : ''}}">
@@ -141,7 +141,7 @@
   </view>
 
   <view wx:elif="{{view == 'word-study'}}" class="view study-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="progress-label">{{study.progress}}</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="progress-label">{{study.progress}}</text></view>
     <view wx:if="{{study.word}}" class="study-focus-card">
       <text class="section-label">单词识记</text>
       <view wx:if="{{studyImageMode}}" class="memory-image"><text class="memory-mark">记忆图</text><text class="strong">{{study.word.memoryMeaning}}</text><text>{{study.word.scene}}</text></view>
@@ -162,7 +162,7 @@
   </view>
 
   <view wx:elif="{{view == 'group-review'}}" class="view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">{{review.isMixed ? '混组复习' : '本组复习'}}</text><text class="progress-label">{{review.progress}}</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">{{review.isMixed ? '混组复习' : '本组复习'}}</text><text class="progress-label">{{review.progress}}</text></view>
     <view wx:if="{{!review.isMixed}}" class="review-stack">
       <view wx:if="{{review.word}}" class="audio-panel audio-minimal visual-question">
         <text class="test-word">{{review.word.word}}</text>
@@ -186,7 +186,7 @@
   </view>
 
   <view wx:elif="{{view == 'audio-meaning'}}" class="view audio-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="progress-label">{{audio.progress}}</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="progress-label">{{audio.progress}}</text></view>
     <view class="audio-panel audio-minimal">
       <view class="speaker-tile" data-word-id="{{audio.word.id}}" bindtap="speak">播放</view>
       <view class="option-stack">
@@ -201,7 +201,7 @@
   </view>
 
   <view wx:elif="{{view == 'wrong-book'}}" class="view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">错词本</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">错词本</text></view>
     <view class="review-summary"><text>{{wrongBook.count}} 个词</text><text>优先复盘听音辨义和混组复习里的错词</text></view>
     <view class="review-stack">
       <view wx:for="{{wrongBook.words}}" wx:key="id" class="review-card"><view class="review-copy"><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}} · 错 {{item.wrongCount}} 次</text><view class="text-link" data-word-id="{{item.id}}" bindtap="openDetail">查看词卡</view></view><view class="sound-mini" data-word-id="{{item.id}}" bindtap="speak">播放</view></view>
@@ -210,7 +210,7 @@
   </view>
 
   <view wx:elif="{{view == 'daily-report'}}" class="view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goHome">‹</view><text class="page-title">学习报告</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">学习报告</text></view>
     <view class="report-panel">
       <text class="report-ring">{{report.accuracy}}%</text>
       <text class="section-label">发音辨义正确率</text>

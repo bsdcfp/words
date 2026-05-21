@@ -103,6 +103,7 @@ Page({
 
   onLoad() {
     try {
+      this.viewHistory = [];
       this.state = loadState();
       this.render(VIEWS.HOME);
     } catch (error) {
@@ -385,7 +386,13 @@ Page({
   },
 
   goHome() {
-    this.saveAndRender(VIEWS.HOME);
+    this.viewHistory = [];
+    this.saveAndRender(VIEWS.HOME, { track: false });
+  },
+
+  goBack() {
+    const target = this.popBackTarget();
+    this.saveAndRender(target || VIEWS.HOME, { track: false });
   },
 
   openWrongBook() {
@@ -398,13 +405,14 @@ Page({
     this.saveAndRender(VIEWS.HOME);
   },
 
-  saveAndRender(view) {
+  saveAndRender(view, options = {}) {
     saveState(this.state);
-    this.render(view);
+    this.render(view, options);
   },
 
-  render(view) {
+  render(view, options = {}) {
     const state = this.state;
+    this.rememberCurrentView(view, options);
     const patch = { view, state, studyTransition: false };
     if (view === VIEWS.HOME) patch.home = buildHomeData(state);
     if (view === VIEWS.PROFILE) patch.profile = buildProfileData(state);
@@ -436,6 +444,41 @@ Page({
         this.setData({ precheckNotice: "" });
       }, NOTICE_DURATION_MS);
     }
+  },
+
+  rememberCurrentView(nextView, options = {}) {
+    const shouldTrack = options.track !== false;
+    const currentView = this.data && this.data.view;
+    if (!shouldTrack || !currentView || currentView === nextView) return;
+    if (!this.viewHistory) this.viewHistory = [];
+    if (this.viewHistory[this.viewHistory.length - 1] !== currentView) {
+      this.viewHistory.push(currentView);
+    }
+  },
+
+  popBackTarget() {
+    if (!this.viewHistory) this.viewHistory = [];
+    while (this.viewHistory.length) {
+      const target = this.viewHistory.pop();
+      if (this.canRenderBackTarget(target)) return target;
+    }
+    return VIEWS.HOME;
+  },
+
+  canRenderBackTarget(view) {
+    if (!view) return false;
+    if ([VIEWS.HOME, VIEWS.PROFILE, VIEWS.LEVEL_SELECT, VIEWS.WRONG_BOOK, VIEWS.DAILY_REPORT].includes(view)) return true;
+    if (view === VIEWS.TEST) return Boolean(this.state.assessment && !this.state.assessment.completed && flow.getCurrentTestQuestion(this.state));
+    if (view === VIEWS.TEST_RESULT) return Boolean(this.state.assessment && this.state.assessment.completed && this.state.assessment.result);
+    if (view === VIEWS.PRECHECK) return Boolean(this.state.daily && this.state.daily.candidateWordIds && this.state.daily.candidateWordIds.length);
+    if (view === VIEWS.WORD_STUDY) return Boolean(flow.getCurrentStudyWord(this.state));
+    if (view === VIEWS.AUDIO_MEANING) return Boolean(flow.getCurrentAudioQuestion(this.state));
+    if (view === VIEWS.GROUP_REVIEW) {
+      return this.state.daily && this.state.daily.reviewPhase === "mixed"
+        ? Boolean(flow.getCurrentMixedReviewQuestion(this.state))
+        : Boolean(flow.getCurrentGroupReviewQuestion(this.state));
+    }
+    return false;
   },
 
   scheduleAutoPlay(view, delay) {
