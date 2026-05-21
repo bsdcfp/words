@@ -480,13 +480,12 @@ function renderWrongBook() {
     </section>
     <section class="review-stack">
       ${wrongWords.length ? wrongWords.map(({ word, wordState }) => `
-        <article class="review-card">
+        <article class="review-card detail-entry" data-action="open-detail" data-word-id="${word.id}">
           <button class="sound-mini" type="button" data-action="speak" data-word-id="${word.id}" aria-label="播放 ${word.word}">播放</button>
           <div>
             <h2>${word.word}</h2>
             <p>${word.ipa}</p>
             <small>${word.cn.join("，")} · 错 ${wordState.wrongCount} 次</small>
-            <button class="text-link" type="button" data-action="open-detail" data-word-id="${word.id}">查看词卡</button>
           </div>
         </article>
       `).join("") : `

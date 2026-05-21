@@ -842,6 +842,17 @@ button::after {
   gap: 18rpx;
 }
 
+.detail-entry {
+  border-color: rgba(120, 140, 93, 0.18);
+  background:
+    linear-gradient(135deg, rgba(250, 249, 245, 0.88), rgba(232, 230, 220, 0.72));
+}
+
+.review-card-pressed {
+  transform: scale(0.985);
+  opacity: 0.88;
+}
+
 .review-copy {
   flex: 1;
   min-width: 0;

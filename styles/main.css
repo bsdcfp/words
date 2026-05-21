@@ -712,6 +712,18 @@ button {
   padding: 14px;
 }
 
+.review-card.detail-entry {
+  cursor: pointer;
+  background:
+    linear-gradient(135deg, rgba(250, 249, 245, 0.88), rgba(232, 230, 220, 0.72));
+  transition: transform 120ms ease, opacity 120ms ease;
+}
+
+.review-card.detail-entry:active {
+  transform: scale(0.985);
+  opacity: 0.88;
+}
+
 .review-summary {
   display: flex;
   align-items: center;
