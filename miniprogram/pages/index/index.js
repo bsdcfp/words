@@ -435,6 +435,7 @@ Page({
     if (view === VIEWS.WRONG_BOOK) patch.wrongBook = buildWrongBookData(state);
     if (view === VIEWS.DAILY_REPORT) patch.report = buildReportData(state);
     this.setData(patch, () => {
+      this.scrollPageToTop();
       this.scheduleAutoPlay(view, AUTO_PLAY_DELAY_MS);
     });
     if (patch.precheckNotice) {
@@ -444,6 +445,11 @@ Page({
         this.setData({ precheckNotice: "" });
       }, NOTICE_DURATION_MS);
     }
+  },
+
+  scrollPageToTop() {
+    if (typeof wx.pageScrollTo !== "function") return;
+    wx.pageScrollTo({ scrollTop: 0, duration: 0 });
   },
 
   rememberCurrentView(nextView, options = {}) {
