@@ -1,0 +1,185 @@
+<svg viewBox="0 0 720 880" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, sans-serif; background: #fff;">
+  <title>专注力设计原则：当前问题 vs 优化方向</title>
+
+  <style>
+    .h1 { font-size: 16px; font-weight: 700; fill: #222; }
+    .h2 { font-size: 13px; font-weight: 700; fill: #222; }
+    .body { font-size: 10px; fill: #555; }
+    .label { font-size: 9px; fill: #888; font-weight: 600; }
+    .phone { fill: #1a1a1a; rx: 20; }
+    .screen { fill: #faf9f5; rx: 12; }
+    .accent { fill: #d97757; }
+    .dim { fill: #e8e6dc; }
+    .word-big { font-size: 22px; font-weight: 900; fill: #141413; }
+    .word-med { font-size: 16px; font-weight: 800; fill: #141413; }
+    .ipa-text { font-size: 9px; fill: #999; }
+  </style>
+
+  <text x="360" y="28" class="h1" text-anchor="middle">专注力设计：三个核心原则</text>
+
+  <!-- Principle 1 -->
+  <text x="20" y="62" class="h2">原则一：一屏一件事</text>
+  <text x="20" y="78" class="body">学习页面上，视觉焦点只有一个。用户不需要扫描，只需要反应。</text>
+
+  <text x="85" y="105" class="label" text-anchor="middle">当前 · 识记页</text>
+  <rect x="30" y="112" width="110" height="200" class="phone"/>
+  <rect x="36" y="122" width="98" height="180" class="screen"/>
+  <rect x="40" y="126" width="12" height="8" rx="2" class="dim"/>
+  <text x="75" y="133" font-size="6" fill="#999" text-anchor="middle">单词识记</text>
+  <text x="125" y="133" font-size="6" fill="#999">1/3</text>
+  <text x="85" y="155" class="word-med" text-anchor="middle">absolutely</text>
+  <rect x="63" y="160" width="44" height="14" rx="7" fill="#e8e6dc" stroke="#788c5d" stroke-width="0.5"/>
+  <text x="85" y="170" font-size="6" fill="#788c5d" text-anchor="middle">播放</text>
+  <text x="85" y="184" class="ipa-text" text-anchor="middle">/ˈæbsəluːtli/</text>
+  <text x="85" y="197" font-size="8" font-weight="800" text-anchor="middle" fill="#141413">adv. 绝对地，完全地</text>
+  <rect x="44" y="204" width="30" height="10" rx="3" fill="#e8e6dc"/>
+  <text x="59" y="212" font-size="5" fill="#788c5d" text-anchor="middle">图片</text>
+  <rect x="78" y="204" width="30" height="10" rx="3" fill="#e8e6dc"/>
+  <text x="93" y="212" font-size="5" fill="#788c5d" text-anchor="middle">例句</text>
+  <text x="85" y="228" font-size="5" fill="#999" text-anchor="middle">跟读中</text>
+  <rect x="44" y="234" width="82" height="24" rx="4" fill="#e8f5e9" stroke="#788c5d" stroke-width="0.3"/>
+  <text x="85" y="248" font-size="5" fill="#4f623c" text-anchor="middle">记忆图 · 场景描述...</text>
+  <rect x="40" y="270" width="42" height="16" rx="6" fill="#e8e6dc"/>
+  <text x="61" y="281" font-size="6" fill="#4f623c" text-anchor="middle">再听听</text>
+  <rect x="86" y="270" width="42" height="16" rx="6" class="accent"/>
+  <text x="107" y="281" font-size="6" fill="#141413" text-anchor="middle">记住了</text>
+  <line x1="142" y1="161" x2="160" y2="148" stroke="#e65100" stroke-width="0.8"/>
+  <text x="162" y="148" font-size="7" fill="#e65100">播放按钮多余</text>
+  <line x1="142" y1="208" x2="160" y2="200" stroke="#e65100" stroke-width="0.8"/>
+  <text x="162" y="200" font-size="7" fill="#e65100">图片/例句分散注意力</text>
+  <line x1="142" y1="240" x2="160" y2="232" stroke="#e65100" stroke-width="0.8"/>
+  <text x="162" y="232" font-size="7" fill="#e65100">记忆图默认展开太重</text>
+
+  <text x="475" y="105" class="label" text-anchor="middle">优化 · 沉浸识记</text>
+  <rect x="420" y="112" width="110" height="200" class="phone"/>
+  <rect x="426" y="122" width="98" height="180" class="screen"/>
+  <circle cx="461" cy="130" r="3" fill="#d97757"/>
+  <circle cx="475" cy="130" r="3" fill="#e8e6dc"/>
+  <circle cx="489" cy="130" r="3" fill="#e8e6dc"/>
+  <text x="475" y="185" class="word-big" text-anchor="middle">absolutely</text>
+  <text x="475" y="200" class="ipa-text" text-anchor="middle">/ˈæbsəluːtli/</text>
+  <text x="475" y="218" font-size="9" font-weight="800" text-anchor="middle" fill="#141413">adv. 绝对地，完全地</text>
+  <text x="475" y="235" font-size="6" fill="#999" text-anchor="middle">🔊 2/3</text>
+  <rect x="436" y="270" width="68" height="18" rx="8" class="accent"/>
+  <text x="470" y="282" font-size="7" fill="#141413" text-anchor="middle" font-weight="800">记住了</text>
+  <line x1="532" y1="130" x2="548" y2="124" stroke="#2e7d32" stroke-width="0.8"/>
+  <text x="550" y="124" font-size="7" fill="#2e7d32">进度用圆点，极轻</text>
+  <line x1="532" y1="185" x2="548" y2="178" stroke="#2e7d32" stroke-width="0.8"/>
+  <text x="550" y="178" font-size="7" fill="#2e7d32">单词垂直居中，唯一焦点</text>
+  <line x1="532" y1="235" x2="548" y2="230" stroke="#2e7d32" stroke-width="0.8"/>
+  <text x="550" y="230" font-size="7" fill="#2e7d32">自动播放，无播放按钮</text>
+  <line x1="532" y1="275" x2="548" y2="270" stroke="#2e7d32" stroke-width="0.8"/>
+  <text x="550" y="270" font-size="7" fill="#2e7d32">只留一个主操作</text>
+
+  <!-- Principle 2 -->
+  <text x="20" y="340" class="h2">原则二：渐进揭示，速度即快感</text>
+  <text x="20" y="356" class="body">本组复习不用选择题。先只给英文 → 2秒后揭示中文。快速节奏创造掌控感。</text>
+
+  <rect x="30" y="370" width="660" height="120" rx="12" fill="#f7f7f7" stroke="#ddd" stroke-width="1"/>
+
+  <rect x="50" y="385" width="120" height="80" rx="10" fill="#fff" stroke="#ddd" stroke-width="0.8"/>
+  <text x="110" y="405" font-size="7" fill="#999" text-anchor="middle">T=0s 英文+音标</text>
+  <text x="110" y="430" class="word-med" text-anchor="middle">access</text>
+  <text x="110" y="445" class="ipa-text" text-anchor="middle">/ˈækses/</text>
+
+  <defs><marker id="arr" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#999"/></marker></defs>
+  <path d="M175 425 L195 425" stroke="#999" stroke-width="1" marker-end="url(#arr)"/>
+
+  <rect x="200" y="385" width="120" height="80" rx="10" fill="#fff" stroke="#788c5d" stroke-width="1"/>
+  <text x="260" y="405" font-size="7" fill="#788c5d" text-anchor="middle">T=2s 自动揭示</text>
+  <text x="260" y="425" class="word-med" text-anchor="middle">access</text>
+  <text x="260" y="440" class="ipa-text" text-anchor="middle">/ˈækses/</text>
+  <rect x="215" y="448" width="90" height="12" rx="4" fill="#e8f5e9"/>
+  <text x="260" y="457" font-size="7" fill="#4f623c" text-anchor="middle" font-weight="700">n. 通道；使用权</text>
+
+  <path d="M325 425 L345 425" stroke="#999" stroke-width="1" marker-end="url(#arr)"/>
+
+  <rect x="350" y="385" width="120" height="80" rx="10" fill="#fff" stroke="#ddd" stroke-width="0.8"/>
+  <text x="410" y="405" font-size="7" fill="#999" text-anchor="middle">用户响应</text>
+  <rect x="365" y="418" width="90" height="18" rx="6" class="accent"/>
+  <text x="410" y="430" font-size="7" fill="#141413" text-anchor="middle" font-weight="800">记住了 → 下一个</text>
+  <text x="410" y="452" font-size="7" fill="#999" text-anchor="middle">或 超时自动下一个</text>
+
+  <path d="M475 425 L495 425" stroke="#999" stroke-width="1" marker-end="url(#arr)"/>
+
+  <rect x="500" y="385" width="120" height="80" rx="10" fill="#fff3e0" stroke="#e65100" stroke-width="0.8"/>
+  <text x="560" y="405" font-size="7" fill="#e65100" text-anchor="middle">超时未点击</text>
+  <text x="560" y="428" font-size="8" fill="#e65100" text-anchor="middle" font-weight="700">→ 加入错词本</text>
+  <text x="560" y="445" font-size="7" fill="#999" text-anchor="middle">自动进入下一个</text>
+  <text x="560" y="458" font-size="7" fill="#999" text-anchor="middle">无需手动操作</text>
+
+  <!-- Principle 3 -->
+  <text x="20" y="520" class="h2">原则三：隐藏复杂度，只暴露下一步</text>
+  <text x="20" y="536" class="body">用户不需要知道混组节奏、大group结构。只感知：当前词 → 下一个词 → 完成提示。</text>
+
+  <text x="85" y="565" class="label" text-anchor="middle">当前 · 信息过载</text>
+  <rect x="30" y="572" width="110" height="140" class="phone"/>
+  <rect x="36" y="582" width="98" height="120" class="screen"/>
+  <text x="43" y="593" font-size="5" fill="#999">‹</text>
+  <text x="70" y="593" font-size="5.5" fill="#141413" font-weight="700">混组复习</text>
+  <text x="125" y="593" font-size="5" fill="#999">2/6</text>
+  <rect x="42" y="598" width="86" height="14" rx="3" fill="#e8f5e9"/>
+  <text x="85" y="608" font-size="5" fill="#4f623c" text-anchor="middle">6 个词 · 打乱前面学过的词</text>
+  <rect x="42" y="616" width="86" height="10" rx="3" fill="#f0ede5"/>
+  <text x="85" y="623" font-size="4.5" fill="#999" text-anchor="middle">第1组 + 第2组 混组复习</text>
+  <text x="85" y="645" font-size="14" font-weight="900" text-anchor="middle" fill="#141413">consider</text>
+  <text x="85" y="656" class="ipa-text" text-anchor="middle">/kənˈsɪdə/</text>
+  <text x="85" y="668" font-size="5" fill="#999" text-anchor="middle">混组抽查：看到英文，选择中文释义</text>
+  <rect x="42" y="672" width="86" height="10" rx="3" fill="#faf9f5" stroke="#ddd" stroke-width="0.3"/>
+  <rect x="42" y="685" width="86" height="10" rx="3" fill="#faf9f5" stroke="#ddd" stroke-width="0.3"/>
+  <line x1="142" y1="605" x2="160" y2="598" stroke="#e65100" stroke-width="0.8"/>
+  <text x="162" y="598" font-size="7" fill="#e65100">"6个词""打乱"不必暴露</text>
+  <line x1="142" y1="621" x2="160" y2="616" stroke="#e65100" stroke-width="0.8"/>
+  <text x="162" y="616" font-size="7" fill="#e65100">"第1组+第2组"增加认知负担</text>
+  <line x1="142" y1="668" x2="160" y2="664" stroke="#e65100" stroke-width="0.8"/>
+  <text x="162" y="664" font-size="7" fill="#e65100">提示文字冗余</text>
+
+  <text x="475" y="565" class="label" text-anchor="middle">优化 · 极简复习</text>
+  <rect x="420" y="572" width="110" height="140" class="phone"/>
+  <rect x="426" y="582" width="98" height="120" class="screen"/>
+  <circle cx="455" cy="590" r="2.5" fill="#d97757"/>
+  <circle cx="463" cy="590" r="2.5" fill="#d97757"/>
+  <circle cx="471" cy="590" r="2.5" fill="#e8e6dc"/>
+  <circle cx="479" cy="590" r="2.5" fill="#e8e6dc"/>
+  <circle cx="487" cy="590" r="2.5" fill="#e8e6dc"/>
+  <circle cx="495" cy="590" r="2.5" fill="#e8e6dc"/>
+  <text x="475" y="645" font-size="18" font-weight="900" text-anchor="middle" fill="#141413">consider</text>
+  <text x="475" y="660" class="ipa-text" text-anchor="middle">/kənˈsɪdə/</text>
+  <text x="475" y="680" font-size="6" fill="#ccc" text-anchor="middle">2s 后揭示释义</text>
+  <rect x="448" y="688" width="54" height="14" rx="6" class="accent"/>
+  <text x="475" y="698" font-size="6" fill="#141413" text-anchor="middle" font-weight="800">记住了</text>
+  <line x1="532" y1="590" x2="548" y2="584" stroke="#2e7d32" stroke-width="0.8"/>
+  <text x="550" y="584" font-size="7" fill="#2e7d32">圆点即进度，无需数字</text>
+  <line x1="532" y1="645" x2="548" y2="640" stroke="#2e7d32" stroke-width="0.8"/>
+  <text x="550" y="640" font-size="7" fill="#2e7d32">不说"混组"，用户无感知</text>
+  <line x1="532" y1="680" x2="548" y2="676" stroke="#2e7d32" stroke-width="0.8"/>
+  <text x="550" y="676" font-size="7" fill="#2e7d32">倒计时暗示取代文字说明</text>
+
+  <!-- Summary -->
+  <rect x="20" y="740" width="680" height="120" rx="12" fill="#f7f7f7" stroke="#ddd" stroke-width="1"/>
+  <text x="360" y="768" class="h2" text-anchor="middle">四条执行规则</text>
+
+  <circle cx="60" cy="795" r="16" fill="#d97757"/>
+  <text x="60" y="799" font-size="10" fill="#141413" text-anchor="middle" font-weight="900">1</text>
+  <text x="60" y="820" font-size="8" fill="#333" text-anchor="middle" font-weight="700">学习页无导航</text>
+  <text x="60" y="832" font-size="7" fill="#888" text-anchor="middle">隐藏返回/Tab</text>
+  <text x="60" y="843" font-size="7" fill="#888" text-anchor="middle">只留暂停手势</text>
+
+  <circle cx="240" cy="795" r="16" fill="#d97757"/>
+  <text x="240" y="799" font-size="10" fill="#141413" text-anchor="middle" font-weight="900">2</text>
+  <text x="240" y="820" font-size="8" fill="#333" text-anchor="middle" font-weight="700">单词垂直居中</text>
+  <text x="240" y="832" font-size="7" fill="#888" text-anchor="middle">所有辅助信息</text>
+  <text x="240" y="843" font-size="7" fill="#888" text-anchor="middle">藏在展开/详情</text>
+
+  <circle cx="420" cy="795" r="16" fill="#d97757"/>
+  <text x="420" y="799" font-size="10" fill="#141413" text-anchor="middle" font-weight="900">3</text>
+  <text x="420" y="820" font-size="8" fill="#333" text-anchor="middle" font-weight="700">零等待过渡</text>
+  <text x="420" y="832" font-size="7" fill="#888" text-anchor="middle">答对即切下一题</text>
+  <text x="420" y="843" font-size="7" fill="#888" text-anchor="middle">不弹"回答正确"</text>
+
+  <circle cx="600" cy="795" r="16" fill="#d97757"/>
+  <text x="600" y="799" font-size="10" fill="#141413" text-anchor="middle" font-weight="900">4</text>
+  <text x="600" y="820" font-size="8" fill="#333" text-anchor="middle" font-weight="700">进度用体感</text>
+  <text x="600" y="832" font-size="7" fill="#888" text-anchor="middle">圆点/色块/动画</text>
+  <text x="600" y="843" font-size="7" fill="#888" text-anchor="middle">不用"2/6""第3组"</text>
+</svg>

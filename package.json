@@ -5,12 +5,31 @@
   "type": "module",
   "scripts": {
     "build:words": "node tools/build-real-word-data.mjs",
-    "serve": "node tools/serve.mjs",
-    "test": "npm run test:data && npm run test:report && npm run test:flow && npm run test:e2e && npm run test:miniprogram",
+    "build:3500": "node tools/build-calibrated-3500.mjs",
+    "build:usage": "node tools/build-oald-usage.mjs",
+    "build:miniprogram": "node tools/build-miniprogram-data.mjs",
+    "audit:interactions": "node tools/audit-mini-interactions.mjs",
+    "report:local-gaps": "node tools/report-local-pdf-gaps.mjs",
+    "test": "npm run test:data && npm run test:3500 && npm run test:usage && npm run test:report && npm run test:flow && npm run test:miniprogram && npm run audit:interactions",
     "test:data": "node tests/word-data.test.mjs",
+    "test:3500": "node tests/gaokao-3500-owned.test.mjs",
+    "test:usage": "node tests/oald-usage.test.mjs",
     "test:report": "node tests/reward-display.test.mjs",
     "test:flow": "node tests/study-flow.test.mjs",
-    "test:e2e": "node tests/prototype-flow.test.mjs",
-    "test:miniprogram": "node tests/miniprogram-project.test.mjs"
+    "test:miniprogram": "node tests/miniprogram-project.test.mjs",
+    "visual:regression": "node tools/visual-regression.mjs --compare-existing",
+    "visual:regression:capture": "node tools/visual-regression.mjs --capture",
+    "visual:regression:compare": "node tools/visual-regression.mjs --compare-existing",
+    "figma:references": "node tools/build-figma-reference-board.mjs"
+  },
+  "devDependencies": {
+    "cheerio": "^1.0.0",
+    "mdict-js": "^10.0.1",
+    "miniprogram-automator": "^0.12.1",
+    "pixelmatch": "^7.2.0",
+    "pngjs": "^7.0.0"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "^0.8.13"
   }
 }

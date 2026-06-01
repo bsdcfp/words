@@ -4,17 +4,29 @@ const defaultState = {
   user: {
     id: "demo_student",
     name: "体验学生",
-    level: "高二",
-    levelId: "senior_2",
-    levelLabel: "高二",
-    learningStartLevel: "required",
-    learningStartLevelLabel: "高中必修词",
-    activeGroup: "高考课标词",
+    level: "",
+    levelId: "",
+    levelLabel: "",
+    wordLevelId: "",
+    wordLevelLabel: "",
+    learningStartLevel: "",
+    learningStartLevelLabel: "",
+    activeGroup: "高考 3500 词",
     streakDays: 0,
     longestStreak: 0,
     checkins: {},
     badges: [],
-    vocabularyAssessment: null
+    vocabularyAssessment: null,
+    settings: {
+      listGroupCount: 15,
+      dailyTargetListCount: 1,
+      pronunciationLoopCount: 3,
+      learningTheme: "light",
+      themeDefaultVersion: 2,
+      sleepTime: "22:00",
+      wakeTime: "06:00",
+      wrongReminderEnabled: true
+    }
   },
   assessment: {
     completed: false,
@@ -27,10 +39,22 @@ const defaultState = {
     startedAt: null,
     selectedWordIds: [],
     groupQueue: [],
+    learningWordIds: [],
+    skippedWordIds: [],
+    dailyTargetListCount: 1,
+    dailyTargetWordCount: 9,
+    currentListIndex: 0,
+    currentMicroListIndex: 0,
+    precheckCompleted: false,
+    listTargetGroupCount: 15,
+    completedGroups: [],
+    pendingMixedReviews: [],
+    activeMixedReview: null,
     roundIndex: 1,
     batchWordIds: [],
     completedWordIds: [],
     sessionCompletedWordIds: [],
+    seenWordIds: [],
     mixedReviewWordIds: [],
     candidateWordIds: [],
     precheck: {},
@@ -40,6 +64,8 @@ const defaultState = {
     groupIndex: 0,
     audioQuestions: [],
     audioIndex: 0,
+    recallQuestions: [],
+    recallIndex: 0,
     mixedQuestions: [],
     mixedIndex: 0,
     groupFeedback: "",
@@ -99,16 +125,36 @@ function normaliseState(state) {
   ensureArrayFields(state.daily, [
     "selectedWordIds",
     "groupQueue",
+    "learningWordIds",
+    "skippedWordIds",
+    "completedGroups",
+    "pendingMixedReviews",
     "batchWordIds",
     "completedWordIds",
     "sessionCompletedWordIds",
+    "seenWordIds",
     "mixedReviewWordIds",
     "candidateWordIds",
     "groupQuestions",
     "audioQuestions",
+    "recallQuestions",
     "mixedQuestions"
   ]);
   if (!state.daily.precheck || typeof state.daily.precheck !== "object") state.daily.precheck = {};
+  if (!state.user.settings || typeof state.user.settings !== "object") state.user.settings = clone(defaultState.user.settings);
+  if (state.user.settings.themeDefaultVersion !== 2) {
+    state.user.settings.learningTheme = "light";
+    state.user.settings.themeDefaultVersion = 2;
+  }
+  if (!state.user.settings.dailyTargetListCount) {
+    const legacyGroups = Number(state.user.settings.listGroupCount || 0);
+    state.user.settings.dailyTargetListCount = legacyGroups >= 6 ? Math.max(1, Math.round(legacyGroups / 3)) : 1;
+  }
+  if (!state.daily.dailyTargetListCount) state.daily.dailyTargetListCount = state.user.settings.dailyTargetListCount || 1;
+  if (!state.daily.dailyTargetWordCount) state.daily.dailyTargetWordCount = state.daily.dailyTargetListCount * 9;
+  if (typeof state.daily.currentListIndex !== "number") state.daily.currentListIndex = 0;
+  if (typeof state.daily.currentMicroListIndex !== "number") state.daily.currentMicroListIndex = state.daily.completedGroups.length;
+  if (typeof state.daily.precheckCompleted !== "boolean") state.daily.precheckCompleted = false;
   return mergeState(clone(defaultState), state);
 }
 

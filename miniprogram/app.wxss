@@ -1,10 +1,10 @@
 page {
   min-height: 100vh;
   background:
-    radial-gradient(circle at 12% 8%, rgba(217, 119, 87, 0.18) 0 180rpx, transparent 184rpx),
-    radial-gradient(circle at 88% 26%, rgba(120, 140, 93, 0.2) 0 220rpx, transparent 224rpx),
-    linear-gradient(180deg, #faf9f5 0%, #e8e6dc 100%);
-  color: #141413;
+    radial-gradient(circle at 18% 8%, rgba(103, 216, 200, 0.12), transparent 32%),
+    radial-gradient(circle at 84% 86%, rgba(215, 128, 85, 0.1), transparent 32%),
+    linear-gradient(180deg, #f8f5ec 0%, #eee3d4 56%, #f6efe4 100%);
+  color: #1b201f;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 

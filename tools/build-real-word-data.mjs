@@ -277,15 +277,11 @@ function buildTestQuestions(words) {
   const selected = pickSpread(pool, 50);
   return selected.map((word, index) => {
     const answer = word.cn.join("，");
-    const distractors = pool
-      .filter((item) => item.id !== word.id)
-      .map((item) => item.cn.join("，"))
-      .filter((meaning) => meaning !== answer);
     return {
       id: `gaokao_test_${String(index + 1).padStart(2, "0")}`,
       word: word.word,
       sourceWordId: word.id,
-      options: shuffleItems([answer, ...unique(distractors).slice(index % 11, index % 11 + 3), "不认识"]).slice(0, 5),
+      options: [answer, "不认识"],
       answer
     };
   });
@@ -379,17 +375,4 @@ function slugify(word) {
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "")
     .slice(0, 32) || "word";
-}
-
-function unique(items) {
-  return [...new Set(items)];
-}
-
-function shuffleItems(items) {
-  const result = [...items];
-  for (let index = result.length - 1; index > 0; index -= 1) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
-    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
-  }
-  return result;
 }

@@ -1,0 +1,994 @@
+{
+  "generated_at": "2026-05-22T11:56:31.932Z",
+  "sources": {
+    "local_order_pdf": {
+      "name": "高考英语考纲3500词汇表（英汉）.doc",
+      "path": "/Users/fuping.chu/Documents/Personal/学习力/单词/高考英语考纲3500词汇表（英汉）.doc",
+      "role": "提供当前主词表、词性和中文释义；作为核心学习版优先依据"
+    },
+    "pronunciation_and_pos": {
+      "name": "Oxford Advanced Learner's Dictionary 10th bilingual MDX",
+      "path": "/Users/fuping.chu/Documents/Personal/学习力/单词/牛津高阶（第10版 英汉双解） V11_8.mdx",
+      "license": "user-provided authorized database",
+      "role": "提供英/美音标；主 DOC 词性缺失时，用它按中文释义匹配补词性"
+    }
+  },
+  "counts": {
+    "primary_doc_entries": 3155,
+    "calibrated_entries": 3473,
+    "owned_core_entries": 3368
+  },
+  "owned_core": {
+    "target": 3500,
+    "selection_rule": "从《高考英语考纲3500词汇表（英汉）.doc》命中的完整候选池中选取英文词形有效、非明显 OCR 噪声、非 a/an/the 这类低学习价值词条；词性缺失和英/美音标只用牛津高阶 MDX 补齐。",
+    "high_confidence": 3196,
+    "needs_review": 172
+  },
+  "quality": {
+    "high_confidence": 3297,
+    "needs_review": 176,
+    "flag_counts": {
+      "needs_pos_split_review": 176
+    }
+  },
+  "known_corrections": {
+    "accuse": {
+      "id": "gk3500_0031_accuse_v",
+      "word": "accuse",
+      "lemma": "accuse",
+      "headword": "accuse",
+      "senseKey": "accuse:v",
+      "ipa": "/əˈkjuːz/",
+      "phonetics": {
+        "en": "/əˈkjuːz/",
+        "us": "/əˈkjuːz/",
+        "default": "en",
+        "source": "oald10_mdx"
+      },
+      "pronunciation": {
+        "defaultAccent": "en",
+        "provider": "youdao",
+        "youdaoType": 1
+      },
+      "pos": "v.",
+      "posKey": "v",
+      "cn": [
+        "控告"
+      ],
+      "definitionSource": "local_order_pdf",
+      "sourceOrder": {
+        "local": 31
+      },
+      "sourcePresence": {
+        "local": true,
+        "oald": true
+      },
+      "calibrationStatus": "high_confidence",
+      "qualityFlags": [],
+      "sourceMeanings": {
+        "local": [
+          "控告"
+        ]
+      }
+    },
+    "accurate": {
+      "id": "gk3500_0030_accurate_adj",
+      "word": "accurate",
+      "lemma": "accurate",
+      "headword": "accurate",
+      "senseKey": "accurate:adj",
+      "ipa": "/ˈækjərət/",
+      "phonetics": {
+        "en": "/ˈækjərət/",
+        "us": "/ˈækjərət/",
+        "default": "en",
+        "source": "oald10_mdx"
+      },
+      "pronunciation": {
+        "defaultAccent": "en",
+        "provider": "youdao",
+        "youdaoType": 1
+      },
+      "pos": "adj.",
+      "posKey": "adj",
+      "cn": [
+        "正确的",
+        "精确的"
+      ],
+      "definitionSource": "local_order_pdf",
+      "sourceOrder": {
+        "local": 30
+      },
+      "sourcePresence": {
+        "local": true,
+        "oald": true
+      },
+      "calibrationStatus": "high_confidence",
+      "qualityFlags": [],
+      "sourceMeanings": {
+        "local": [
+          "正确的",
+          "精确的"
+        ]
+      }
+    }
+  },
+  "review_samples": [
+    {
+      "word": "ache",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "痛",
+        "疼痛"
+      ]
+    },
+    {
+      "word": "ache",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "痛",
+        "疼痛"
+      ]
+    },
+    {
+      "word": "blame",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "责备",
+        "责怪"
+      ]
+    },
+    {
+      "word": "blame",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "责备",
+        "责怪"
+      ]
+    },
+    {
+      "word": "blank",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "空格",
+        "空白处",
+        "空的"
+      ]
+    },
+    {
+      "word": "blank",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "空格",
+        "空白处",
+        "空的"
+      ]
+    },
+    {
+      "word": "bow",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "鞠躬",
+        "弯腰行礼"
+      ]
+    },
+    {
+      "word": "bow",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "鞠躬",
+        "弯腰行礼"
+      ]
+    },
+    {
+      "word": "control",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "控制"
+      ]
+    },
+    {
+      "word": "control",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "控制"
+      ]
+    },
+    {
+      "word": "cough",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "咳嗽"
+      ]
+    },
+    {
+      "word": "cough",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "咳嗽"
+      ]
+    },
+    {
+      "word": "crash",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "碰撞",
+        "坠落"
+      ]
+    },
+    {
+      "word": "crash",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "碰撞",
+        "坠落"
+      ]
+    },
+    {
+      "word": "damage",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "毁坏",
+        "损害"
+      ]
+    },
+    {
+      "word": "damage",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "毁坏",
+        "损害"
+      ]
+    },
+    {
+      "word": "dance",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "跳舞"
+      ]
+    },
+    {
+      "word": "dance",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "跳舞"
+      ]
+    },
+    {
+      "word": "dare",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "敢",
+        "敢于"
+      ]
+    },
+    {
+      "word": "dare",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "敢",
+        "敢于"
+      ]
+    },
+    {
+      "word": "delay",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "拖延",
+        "延误"
+      ]
+    },
+    {
+      "word": "delay",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "拖延",
+        "延误"
+      ]
+    },
+    {
+      "word": "doubt",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "怀疑",
+        "疑惑"
+      ]
+    },
+    {
+      "word": "doubt",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "怀疑",
+        "疑惑"
+      ]
+    },
+    {
+      "word": "download",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "下载"
+      ]
+    },
+    {
+      "word": "download",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "下载"
+      ]
+    },
+    {
+      "word": "each",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "每人",
+        "每个",
+        "每件"
+      ]
+    },
+    {
+      "word": "each",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "每人",
+        "每个",
+        "每件"
+      ]
+    },
+    {
+      "word": "envy",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "忌妒",
+        "羡慕"
+      ]
+    },
+    {
+      "word": "envy",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "忌妒",
+        "羡慕"
+      ]
+    },
+    {
+      "word": "escape",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "逃跑",
+        "逃脱"
+      ]
+    },
+    {
+      "word": "escape",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "逃跑",
+        "逃脱"
+      ]
+    },
+    {
+      "word": "fine2",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "罚款"
+      ]
+    },
+    {
+      "word": "fine2",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "罚款"
+      ]
+    },
+    {
+      "word": "half",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "半",
+        "一半",
+        "半个"
+      ]
+    },
+    {
+      "word": "half",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "半",
+        "一半",
+        "半个"
+      ]
+    },
+    {
+      "word": "harm",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "伤害",
+        "损伤"
+      ]
+    },
+    {
+      "word": "harm",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "伤害",
+        "损伤"
+      ]
+    },
+    {
+      "word": "harvest",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "收割",
+        "收获物"
+      ]
+    },
+    {
+      "word": "harvest",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "收割",
+        "收获物"
+      ]
+    },
+    {
+      "word": "hate",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "恨",
+        "讨厌"
+      ]
+    },
+    {
+      "word": "hate",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "恨",
+        "讨厌"
+      ]
+    },
+    {
+      "word": "hit",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "打",
+        "撞",
+        "击中"
+      ]
+    },
+    {
+      "word": "hit",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "打",
+        "撞",
+        "击中"
+      ]
+    },
+    {
+      "word": "hope",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "希望"
+      ]
+    },
+    {
+      "word": "hope",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "希望"
+      ]
+    },
+    {
+      "word": "import",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "进口",
+        "输入"
+      ]
+    },
+    {
+      "word": "import",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "进口",
+        "输入"
+      ]
+    },
+    {
+      "word": "influence",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "影响"
+      ]
+    },
+    {
+      "word": "influence",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "影响"
+      ]
+    },
+    {
+      "word": "interview",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "采访",
+        "会见",
+        "面试"
+      ]
+    },
+    {
+      "word": "interview",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "采访",
+        "会见",
+        "面试"
+      ]
+    },
+    {
+      "word": "kick",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "踢"
+      ]
+    },
+    {
+      "word": "kick",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "踢"
+      ]
+    },
+    {
+      "word": "kiss",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "吻",
+        "亲吻"
+      ]
+    },
+    {
+      "word": "kiss",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "吻",
+        "亲吻"
+      ]
+    },
+    {
+      "word": "knock",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "敲",
+        "打",
+        "击"
+      ]
+    },
+    {
+      "word": "knock",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "敲",
+        "打",
+        "击"
+      ]
+    },
+    {
+      "word": "lack",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "缺乏",
+        "缺少"
+      ]
+    },
+    {
+      "word": "lack",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "缺乏",
+        "缺少"
+      ]
+    },
+    {
+      "word": "laugh",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "笑",
+        "大笑",
+        "嘲笑"
+      ]
+    },
+    {
+      "word": "laugh",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "笑",
+        "大笑",
+        "嘲笑"
+      ]
+    },
+    {
+      "word": "lie1",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "谎言",
+        "说谎"
+      ]
+    },
+    {
+      "word": "lie1",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "谎言",
+        "说谎"
+      ]
+    },
+    {
+      "word": "love",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "爱",
+        "热爱",
+        "很喜欢"
+      ]
+    },
+    {
+      "word": "love",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "爱",
+        "热爱",
+        "很喜欢"
+      ]
+    },
+    {
+      "word": "low",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "低",
+        "矮"
+      ]
+    },
+    {
+      "word": "low",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "低",
+        "矮"
+      ]
+    },
+    {
+      "word": "maximum",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "最大量的"
+      ]
+    },
+    {
+      "word": "maximum",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "最大量的"
+      ]
+    },
+    {
+      "word": "normal",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "正常的状态"
+      ]
+    },
+    {
+      "word": "normal",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "正常的状态"
+      ]
+    },
+    {
+      "word": "offer",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "提供",
+        "建议"
+      ]
+    },
+    {
+      "word": "offer",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "提供",
+        "建议"
+      ]
+    },
+    {
+      "word": "ought",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "应该",
+        "应当"
+      ]
+    },
+    {
+      "word": "ought",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "应该",
+        "应当"
+      ]
+    },
+    {
+      "word": "Part-time",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "兼职的"
+      ]
+    },
+    {
+      "word": "Part-time",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "兼职的"
+      ]
+    },
+    {
+      "word": "pause",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "中止",
+        "暂停",
+        "停止"
+      ]
+    },
+    {
+      "word": "pause",
+      "definitionSource": "local_order_pdf",
+      "flags": [
+        "needs_pos_split_review"
+      ],
+      "local": [
+        "中止",
+        "暂停",
+        "停止"
+      ]
+    }
+  ]
+}

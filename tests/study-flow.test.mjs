@@ -1,40 +1,45 @@
 import assert from "node:assert/strict";
-import { words } from "../data/words.js";
-import { buildAssessmentResult } from "../src/report.js";
-import { defaultState } from "../src/storage.js";
-import {
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const { words } = require("../miniprogram/data/words.js");
+const { buildAssessmentResult } = require("../miniprogram/utils/report.js");
+const { defaultState } = require("../miniprogram/utils/storage.js");
+const {
   answerAudioQuestion,
   answerAssessmentQuestion,
   answerGroupReviewQuestion,
+  answerMeaningRecallQuestion,
   answerMixedReviewQuestion,
   completeMixedReview,
   confirmPrecheck,
   getCurrentAudioQuestion,
   getCurrentTestQuestion,
   getCurrentGroupReviewQuestion,
+  getCurrentMeaningRecallQuestion,
   getCurrentMixedReviewQuestion,
   markPrecheck,
   moveToNextAudioQuestion,
   moveToNextGroupReviewQuestion,
+  moveToNextMeaningRecallQuestion,
   moveToNextMixedReviewQuestion,
   prepareAudioQuestions,
   prepareGroupReviewQuestions,
+  refillPrecheckCandidateWordIds,
   startAssessment,
   startDailyLearning
-} from "../src/study-flow.js";
+} = require("../miniprogram/utils/study-flow.js");
 
-const absolutely = words.find((word) => word.word === "absolutely");
-assert.ok(absolutely, "fixture word should exist");
+const abandon = words.find((word) => word.word === "abandon");
+assert.ok(abandon, "fixture word should exist");
 
-const optionOrders = new Set();
-for (let index = 0; index < 24; index += 1) {
-  const state = structuredClone(defaultState);
-  state.daily.selectedWordIds = [absolutely.id];
-  prepareAudioQuestions(state);
-  optionOrders.add(state.daily.audioQuestions[0].options.join("|"));
-}
-
-assert.ok(optionOrders.size > 1, "audio options should be shuffled randomly across attempts");
+const noDistractorState = structuredClone(defaultState);
+noDistractorState.daily.selectedWordIds = [abandon.id];
+prepareAudioQuestions(noDistractorState);
+assert.deepEqual(
+  noDistractorState.daily.audioQuestions[0].options,
+  [abandon.cn.join("，")],
+  "audio questions should only expose the original meaning"
+);
 
 const fullScore = buildAssessmentResult({
   answers: ["foundation", "required", "selective"].flatMap((layer) => Array.from({ length: 12 }, (_, index) => ({
@@ -61,6 +66,10 @@ assert.ok(mostlyUnknown.vocabularyRange.upper < 900, "many unknown answers shoul
 const assessmentState = structuredClone(defaultState);
 startAssessment(assessmentState, "assessment-critical-required");
 assert.equal(assessmentState.assessment.questions.length, 18, "assessment should start with an 18-question first phase");
+assert.ok(
+  assessmentState.assessment.questions.every((question) => question.options.length === 2 && question.options.includes(question.answer) && question.options.includes("不认识")),
+  "assessment questions should only include the original meaning plus unknown"
+);
 assert.deepEqual(
   ["foundation", "required", "selective"].map((layer) => assessmentState.assessment.questions.filter((question) => question.layer === layer).length),
   [6, 6, 6],
@@ -95,8 +104,10 @@ assert.equal(
 );
 
 const state = structuredClone(defaultState);
+state.user.settings.dailyTargetListCount = 1;
 startDailyLearning(state);
 assert.equal(state.daily.candidateWordIds.length, 9, "daily learning should open with a nine-word precheck window");
+assert.equal(state.daily.dailyTargetWordCount, 9, "one daily List should require nine unfamiliar words");
 assert.deepEqual(
   [...new Set(state.daily.candidateWordIds.map((wordId) => words.find((word) => word.id === wordId)?.starLevel))],
   [1],
@@ -116,7 +127,7 @@ assert.ok(
   "foundation candidates should not surface single-letter or function words as learning targets"
 );
 assert.ok(
-  new Set(foundationCandidateWords.map((word) => word.word[0].toLowerCase())).size > 3,
+  foundationCandidateWords.map((word) => word.word).join("|") !== foundationCandidateWords.map((word) => word.word).sort().join("|"),
   "foundation candidates should be stably shuffled instead of alphabetical"
 );
 const firstCandidateId = state.daily.candidateWordIds[0];
@@ -124,66 +135,142 @@ markPrecheck(state, firstCandidateId, "known");
 assert.equal(state.daily.candidateWordIds.length, 9, "marking a word known should refill the precheck list to nine candidates");
 assert.ok(!state.daily.candidateWordIds.includes(firstCandidateId), "known words should be removed from the visible precheck candidates");
 
-completeGroup(state, ["absolutely", "accident", "account"]);
-assert.equal(state.daily.reviewPhase, "initial", "one group should continue to next selection without mixed review");
-assert.equal(state.daily.candidateWordIds.length, 9, "second group selection should already be refilled to nine candidates");
+const interruptedGroupState = structuredClone(defaultState);
+startDailyLearning(interruptedGroupState);
+interruptedGroupState.daily.learningWordIds = selectedIds([
+  "abandon", "accident", "account",
+  "ache", "acquire", "adapt",
+  "add", "address", "advantage"
+]);
+confirmPrecheck(interruptedGroupState);
+assert.deepEqual(interruptedGroupState.daily.seenWordIds, selectedIds([
+  "abandon", "accident", "account",
+  "ache", "acquire", "adapt",
+  "add", "address", "advantage"
+]), "confirmed precheck words should be remembered as seen for today");
+interruptedGroupState.daily.candidateWordIds = selectedIds(["abandon", "accident", "account", "ache", "acquire", "adapt", "add", "address", "advantage"]);
+refillPrecheckCandidateWordIds(interruptedGroupState);
 assert.ok(
-  !state.daily.candidateWordIds.some((id) => selectedIds(["absolutely", "accident", "account"]).includes(id)),
-  "second group selection should not wait for a known tap to remove completed words"
+  !interruptedGroupState.daily.candidateWordIds.some((id) => selectedIds([
+    "abandon", "accident", "account",
+    "ache", "acquire", "adapt",
+    "add", "address", "advantage"
+  ]).includes(id)),
+  "words selected into an interrupted list should not reappear in precheck before tomorrow"
+);
+assert.equal(interruptedGroupState.daily.completedWordIds.length, 0, "seen words should not be treated as completed");
+startDailyLearning(interruptedGroupState);
+assert.ok(
+  !interruptedGroupState.daily.candidateWordIds.some((id) => selectedIds([
+    "abandon", "accident", "account",
+    "ache", "acquire", "adapt",
+    "add", "address", "advantage"
+  ]).includes(id)),
+  "restarting today's learning should still exclude words already selected into an interrupted list"
+);
+assert.deepEqual(interruptedGroupState.daily.seenWordIds, selectedIds([
+  "abandon", "accident", "account",
+  "ache", "acquire", "adapt",
+  "add", "address", "advantage"
+]), "today's seen words should survive a same-day restart");
+
+const directSeenState = structuredClone(defaultState);
+directSeenState.daily.startedAt = new Date().toISOString();
+directSeenState.daily.seenWordIds = selectedIds(["abandon", "accident", "account"]);
+startDailyLearning(directSeenState);
+assert.ok(
+  !directSeenState.daily.candidateWordIds.some((id) => selectedIds(["abandon", "accident", "account"]).includes(id)),
+  "candidate generation itself should exclude today's seen words even without completed state"
 );
 
-completeGroup(state, ["ache", "achievement", "acquire"]);
-assert.equal(state.daily.reviewPhase, "mixed", "two completed groups should trigger mixed review");
-assert.equal(state.daily.mixedReviewWordIds.length, 6, "two groups should mix six words");
-finishMixedReview(state);
-assert.equal(state.daily.reviewPhase, "initial", "six-word mixed review should return to selecting the third group");
-assert.equal(state.daily.completedWordIds.length, 6, "six-word mixed review should keep the current round progress");
-assert.equal(state.daily.candidateWordIds.length, 9, "third group selection should already be refilled to nine candidates");
-assert.ok(
-  !state.daily.candidateWordIds.some((id) => selectedIds(["absolutely", "accident", "account", "ache", "achievement", "acquire"]).includes(id)),
-  "third group selection should not include completed words"
-);
+setLearningList(state, [
+  "abandon", "accident", "account",
+  "ache", "acquire", "adapt",
+  "add", "address", "advantage"
+]);
+assert.deepEqual(state.daily.selectedWordIds, selectedIds(["abandon", "accident", "account"]), "precheck should prepare the first micro-list");
 
-completeGroup(state, ["actually", "adapt", "addict"]);
-assert.equal(state.daily.reviewPhase, "mixed", "three completed groups should trigger mixed review");
-assert.equal(state.daily.mixedReviewWordIds.length, 9, "three groups should mix nine words");
-finishMixedReview(state);
-assert.equal(state.daily.reviewPhase, "initial", "nine-word mixed review should restart a new round");
+assert.equal(completeGroup(state, ["abandon", "accident", "account"]), "word-study", "first micro-list should move straight to the second micro-list");
+assert.equal(state.daily.reviewPhase, "initial", "one micro-list should not trigger mixed review");
+assert.deepEqual(state.daily.selectedWordIds, selectedIds(["ache", "acquire", "adapt"]), "second micro-list should be prepared automatically");
+
+assert.equal(completeGroup(state, ["ache", "acquire", "adapt"]), "mixed-review", "second micro-list should trigger 1+2 mixed review");
+assert.equal(state.daily.activeMixedReview.groupLabel, "片段 1 + 片段 2", "two micro-lists should name their source fragments");
+assert.equal(state.daily.mixedReviewWordIds.length, 6, "two micro-lists should mix six words");
+assert.equal(finishMixedReview(state), "word-study", "six-word mixed review should continue to the third micro-list");
+assert.equal(state.daily.completedWordIds.length, 6, "six-word mixed review should keep the current list progress");
+assert.deepEqual(state.daily.selectedWordIds, selectedIds(["add", "address", "advantage"]), "third micro-list should be prepared after mixed review");
+
+assert.equal(completeGroup(state, ["add", "address", "advantage"]), "mixed-review", "third micro-list should trigger list-level mixed review");
+assert.equal(state.daily.activeMixedReview.groupLabel, "List 1 内复习", "third micro-list should mix the whole List");
+assert.equal(state.daily.mixedReviewWordIds.length, 9, "third micro-list should mix all nine words in the List");
+assert.equal(finishMixedReview(state), "daily-report", "one configured List should complete after its list-level review");
 const todayKey = new Date().toLocaleDateString("en-CA");
 assert.equal(state.user.streakDays, 1, "completing a daily round should count as one calendar-day checkin");
 assert.equal(state.user.checkins[todayKey].completed, true, "daily completion should be stored in the user's checkin calendar");
 assert.equal(state.user.checkins[todayKey].learnedWords, 9, "today's checkin should store the learned word count");
 assert.equal(state.user.checkins[todayKey].completedGroups, 3, "today's checkin should store completed groups");
-assert.equal(state.daily.completedWordIds.length, 0, "new round should reset round progress");
-assert.equal(state.daily.batchWordIds.length, 0, "new round should reset mixed review batch");
-assert.equal(state.daily.candidateWordIds.length, 9, "new round should expose nine fresh candidates");
-assert.ok(
-  !state.daily.candidateWordIds.some((id) => selectedIds(["absolutely", "accident", "account", "ache", "achievement", "acquire", "actually", "adapt", "addict"]).includes(id)),
-  "new round candidates should not repeat the just completed round"
-);
+assert.equal(state.daily.completedWordIds.length, 9, "completed list should keep the learned words for reporting");
+
+const crossBigGroupState = structuredClone(defaultState);
+crossBigGroupState.user.settings.dailyTargetListCount = 2;
+startDailyLearning(crossBigGroupState);
+setLearningList(crossBigGroupState, [
+  "abandon", "accident", "account",
+  "ache", "acquire", "adapt",
+  "add", "address", "advantage",
+  "advice", "advise", "afford",
+  "afraid", "after", "ability",
+  "able", "abnormal", "abroad"
+]);
+completeGroup(crossBigGroupState, ["abandon", "accident", "account"]);
+completeGroup(crossBigGroupState, ["ache", "acquire", "adapt"]);
+finishMixedReview(crossBigGroupState);
+completeGroup(crossBigGroupState, ["add", "address", "advantage"]);
+assert.equal(crossBigGroupState.daily.activeMixedReview.groupLabel, "List 1 内复习", "third micro-list should queue List 1 review");
+assert.equal(crossBigGroupState.daily.mixedReviewWordIds.length, 9, "List 1 review should contain nine words");
+assert.equal(finishMixedReview(crossBigGroupState), "word-study", "first List review should continue to List 2");
+completeGroup(crossBigGroupState, ["advice", "advise", "afford"]);
+completeGroup(crossBigGroupState, ["afraid", "after", "ability"]);
+finishMixedReview(crossBigGroupState);
+completeGroup(crossBigGroupState, ["able", "abnormal", "abroad"]);
+assert.equal(crossBigGroupState.daily.activeMixedReview.groupLabel, "List 2 内复习", "sixth micro-list should first run List 2 review");
+assert.equal(crossBigGroupState.daily.mixedReviewWordIds.length, 9, "List 2 review should contain nine words");
+assert.equal(finishMixedReview(crossBigGroupState), "mixed-review", "two completed Lists should then queue one group review");
+assert.equal(crossBigGroupState.daily.activeMixedReview.groupLabel, "List 1 + List 2", "two completed Lists should name the paired group review");
+assert.equal(crossBigGroupState.daily.mixedReviewWordIds.length, 18, "two completed Lists should trigger one paired group review");
+assert.equal(finishMixedReview(crossBigGroupState), "daily-report", "two-List target should finish after the paired group review");
 
 const reviewState = structuredClone(defaultState);
 startDailyLearning(reviewState);
-reviewState.daily.selectedWordIds = selectedIds(["absolutely", "accident", "account"]);
-confirmPrecheck(reviewState);
+setLearningList(reviewState, [
+  "abandon", "accident", "account",
+  "ache", "acquire", "adapt",
+  "add", "address", "advantage"
+]);
 prepareGroupReviewQuestions(reviewState);
 assert.equal(reviewState.daily.groupQuestions.length, 3, "group review should start with three visual questions");
 assert.equal(getCurrentGroupReviewQuestion(reviewState).mode, "visual", "group review should test visual word meaning first");
 answerGroupReviewQuestion(reviewState, "错误释义");
 assert.equal(reviewState.daily.groupQuestions.length, 4, "wrong visual answer should append one retry question");
-assert.equal(reviewState.daily.groupQuestions.at(-1).wordId, absolutely.id, "retry question should use the missed word");
+assert.equal(reviewState.daily.groupQuestions.at(-1).wordId, abandon.id, "retry question should use the missed word");
 assert.equal(moveToNextGroupReviewQuestion(reviewState), "group-review", "wrong answer should keep the group review running");
 answerGroupReviewQuestion(reviewState, meaningFor("accident"));
 assert.equal(moveToNextGroupReviewQuestion(reviewState), "group-review");
 answerGroupReviewQuestion(reviewState, meaningFor("account"));
 assert.equal(moveToNextGroupReviewQuestion(reviewState), "group-review", "retry should still be pending");
-answerGroupReviewQuestion(reviewState, meaningFor("absolutely"));
+answerGroupReviewQuestion(reviewState, meaningFor("abandon"));
 assert.equal(moveToNextGroupReviewQuestion(reviewState), "audio-meaning", "group review should finish only after the retry is cleared");
 
 const mixedModeState = structuredClone(defaultState);
 startDailyLearning(mixedModeState);
-completeGroup(mixedModeState, ["absolutely", "accident", "account"]);
-completeGroup(mixedModeState, ["ache", "achievement", "acquire"]);
+setLearningList(mixedModeState, [
+  "abandon", "accident", "account",
+  "ache", "acquire", "adapt",
+  "add", "address", "advantage"
+]);
+completeGroup(mixedModeState, ["abandon", "accident", "account"]);
+completeGroup(mixedModeState, ["ache", "acquire", "adapt"]);
 assert.equal(mixedModeState.daily.mixedQuestions.length, 6, "six-word mixed review should include visual questions only");
 assert.equal(
   mixedModeState.daily.mixedQuestions.filter((question) => question.mode === "visual").length,
@@ -198,12 +285,12 @@ assert.equal(
 
 answerAllMixedQuestions(mixedModeState);
 completeMixedReview(mixedModeState);
-const masteredWordState = mixedModeState.userWordStates[absolutely.id];
+const masteredWordState = mixedModeState.userWordStates[abandon.id];
 assert.equal(masteredWordState.groupVisualPassed, true, "a mastered word should pass the group visual check");
 assert.equal(masteredWordState.groupAudioPassed, true, "a mastered word should pass the group audio check");
 assert.equal(masteredWordState.mixedVisualPassed, true, "a mastered word should pass the mixed visual check");
-assert.equal(masteredWordState.reviewStage, 1, "a word should enter the first review node only after full round mastery");
-assert.ok(masteredWordState.nextReviewAt, "a mastered word should receive the next review time");
+assert.equal(masteredWordState.reviewStage, 0, "mastered words should no longer enter an Ebbinghaus review node");
+assert.equal(masteredWordState.nextReviewAt, null, "mastered words should not receive Ebbinghaus next-review time");
 
 const dueReviewState = structuredClone(defaultState);
 const account = words.find((word) => word.word === "account");
@@ -219,81 +306,13 @@ dueReviewState.userWordStates[account.id] = {
   lastReviewAt: new Date(Date.now() - 3 * 86400000).toISOString()
 };
 startDailyLearning(dueReviewState);
-assert.equal(dueReviewState.daily.candidateWordIds[0], account.id, "due review words should outrank fresh words");
-
-const reviewCapState = structuredClone(defaultState);
-const dueReviewWords = words.filter((word) => word.starLevel === 2).slice(0, 4);
-assert.equal(dueReviewWords.length, 4, "fixture should include enough stage-2 words for review cap testing");
-dueReviewWords.forEach((word) => {
-  reviewCapState.userWordStates[word.id] = {
-    familiarity: 3,
-    correctStreak: 1,
-    wrongCount: 1,
-    lastSeenAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-    favorite: false,
-    reviewStage: 1,
-    nextReviewAt: new Date(Date.now() - 86400000).toISOString(),
-    lastReviewAt: new Date(Date.now() - 2 * 86400000).toISOString(),
-    lastResult: "wrong"
-  };
-});
-startDailyLearning(reviewCapState);
-const dueReviewWordIds = dueReviewWords.map((word) => word.id);
-const insertedReviewIds = reviewCapState.daily.candidateWordIds.filter((wordId) => dueReviewWordIds.includes(wordId));
-assert.equal(insertedReviewIds.length, 3, "a precheck window should insert at most three review or wrong words");
 assert.ok(
-  reviewCapState.daily.candidateWordIds
-    .filter((wordId) => !dueReviewWordIds.includes(wordId))
-    .every((wordId) => words.find((word) => word.id === wordId)?.starLevel === 1),
-  "review inserts should leave the remaining slots for current-stage fresh words"
+  !dueReviewState.daily.candidateWordIds.includes(account.id),
+  "due review words should no longer be injected into the main list flow"
 );
-
-const failedReviewState = structuredClone(defaultState);
-failedReviewState.userWordStates[account.id] = {
-  familiarity: 5,
-  correctStreak: 3,
-  wrongCount: 0,
-  lastSeenAt: new Date(Date.now() - 86400000).toISOString(),
-  favorite: false,
-  reviewStage: 2,
-  nextReviewAt: new Date(Date.now() - 86400000).toISOString(),
-  lastReviewAt: new Date(Date.now() - 3 * 86400000).toISOString()
-};
-startDailyLearning(failedReviewState);
-completeGroupWithOneWrongAnswer(failedReviewState, ["account", "absolutely", "accident"], "account");
-completeGroup(failedReviewState, ["ache", "achievement", "acquire"]);
-answerAllMixedQuestions(failedReviewState);
-completeMixedReview(failedReviewState);
-assert.equal(
-  failedReviewState.userWordStates[account.id].reviewStage,
-  2,
-  "a due review word should stay on the current node after same-day remediation"
-);
-assert.ok(
-  Date.parse(failedReviewState.userWordStates[account.id].nextReviewAt) > Date.now(),
-  "same-day remediation should reschedule the current review node"
-);
-
-const overdueState = structuredClone(defaultState);
-const achievement = words.find((word) => word.word === "achievement");
-assert.ok(achievement, "fixture word should exist: achievement");
-overdueState.userWordStates[achievement.id] = {
-  familiarity: 5,
-  correctStreak: 4,
-  wrongCount: 0,
-  lastSeenAt: new Date(Date.now() - 9 * 86400000).toISOString(),
-  favorite: false,
-  reviewStage: 4,
-  nextReviewAt: new Date(Date.now() - 8 * 86400000).toISOString(),
-  lastReviewAt: new Date(Date.now() - 15 * 86400000).toISOString()
-};
-startDailyLearning(overdueState);
-assert.equal(overdueState.userWordStates[achievement.id].reviewStage, 1, "seriously overdue review should fall back to day-1 review");
-assert.equal(overdueState.daily.candidateWordIds[0], achievement.id, "overdue downgraded words should be reviewed first");
 
 function completeGroup(state, headwords) {
-  state.daily.selectedWordIds = selectedIds(headwords);
-  confirmPrecheck(state);
+  assert.deepEqual(state.daily.selectedWordIds, selectedIds(headwords), "current micro-list should match the expected fixture words");
   prepareGroupReviewQuestions(state);
   for (let index = 0; index < headwords.length; index += 1) {
     const question = getCurrentGroupReviewQuestion(state);
@@ -308,11 +327,11 @@ function completeGroup(state, headwords) {
     answerAudioQuestion(state, word.cn.join("，"));
     moveToNextAudioQuestion(state);
   }
+  return completeMeaningRecall(state, headwords);
 }
 
 function completeGroupWithOneWrongAnswer(state, headwords, wrongHeadword) {
-  state.daily.selectedWordIds = selectedIds(headwords);
-  confirmPrecheck(state);
+  assert.deepEqual(state.daily.selectedWordIds, selectedIds(headwords), "current micro-list should match the expected fixture words");
   prepareGroupReviewQuestions(state);
   for (let index = 0; index < headwords.length; index += 1) {
     const question = getCurrentGroupReviewQuestion(state);
@@ -332,6 +351,44 @@ function completeGroupWithOneWrongAnswer(state, headwords, wrongHeadword) {
     answerAudioQuestion(state, word.cn.join("，"));
     moveToNextAudioQuestion(state);
   }
+  return completeMeaningRecall(state, headwords);
+}
+
+function completeMeaningRecall(state, headwords) {
+  let phase = "meaning-recall";
+  for (let index = 0; index < headwords.length; index += 1) {
+    const question = getCurrentMeaningRecallQuestion(state);
+    assert.ok(question, "meaning recall question should exist");
+    answerMeaningRecallQuestion(state);
+    phase = moveToNextMeaningRecallQuestion(state);
+  }
+  return phase;
+}
+
+function setLearningList(state, headwords) {
+  const listCount = Math.ceil(headwords.length / 9);
+  const ids = selectedIds(headwords);
+  state.user.settings.dailyTargetListCount = listCount;
+  state.user.settings.listGroupCount = listCount * 3;
+  state.daily.learningWordIds = ids;
+  state.daily.dailyTargetListCount = listCount;
+  state.daily.dailyTargetWordCount = listCount * 9;
+  state.daily.listTargetGroupCount = listCount * 3;
+  state.daily.currentListIndex = 0;
+  state.daily.currentMicroListIndex = 0;
+  state.daily.completedGroups = [];
+  state.daily.pendingMixedReviews = [];
+  state.daily.activeMixedReview = null;
+  state.daily.completedWordIds = [];
+  state.daily.sessionCompletedWordIds = [];
+  state.daily.batchWordIds = [];
+  state.daily.precheck = ids.reduce((result, id) => {
+    result[id] = "unfamiliar";
+    return result;
+  }, {});
+  state.daily.precheckCompleted = true;
+  state.daily.seenWordIds = ids;
+  confirmPrecheck(state);
 }
 
 function finishMixedReview(state) {

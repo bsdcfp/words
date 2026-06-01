@@ -4,11 +4,8 @@ export const testQuestions = [
     "word": "absolutely",
     "sourceWordId": "moe_0012_absolutely",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "完全地"
+      "完全地",
+      "不认识"
     ],
     "answer": "完全地"
   },
@@ -17,11 +14,8 @@ export const testQuestions = [
     "word": "behaviour",
     "sourceWordId": "moe_0279_behaviour",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "行为"
+      "行为",
+      "不认识"
     ],
     "answer": "行为"
   },
@@ -30,11 +24,8 @@ export const testQuestions = [
     "word": "creative",
     "sourceWordId": "moe_0673_creative",
     "options": [
-      "不认识",
       "有创造力的",
-      "完成",
-      "疼痛",
-      "报告"
+      "不认识"
     ],
     "answer": "有创造力的"
   },
@@ -43,11 +34,8 @@ export const testQuestions = [
     "word": "erupt",
     "sourceWordId": "moe_0955_erupt",
     "options": [
-      "不认识",
-      "获得",
-      "完成",
-      "疼痛",
-      "爆发"
+      "爆发",
+      "不认识"
     ],
     "answer": "爆发"
   },
@@ -56,11 +44,8 @@ export const testQuestions = [
     "word": "horrible",
     "sourceWordId": "moe_1329_horrible",
     "options": [
-      "不认识",
-      "事实上",
-      "获得",
       "可怕的",
-      "完成"
+      "不认识"
     ],
     "answer": "可怕的"
   },
@@ -69,11 +54,8 @@ export const testQuestions = [
     "word": "moreover",
     "sourceWordId": "moe_1714_moreover",
     "options": [
-      "不认识",
-      "使适应",
-      "事实上",
-      "获得",
-      "而且"
+      "而且",
+      "不认识"
     ],
     "answer": "而且"
   },
@@ -82,11 +64,8 @@ export const testQuestions = [
     "word": "press",
     "sourceWordId": "moe_2053_press",
     "options": [
-      "不认识",
-      "使沉溺",
-      "使适应",
-      "事实上",
-      "压"
+      "压",
+      "不认识"
     ],
     "answer": "压"
   },
@@ -95,11 +74,8 @@ export const testQuestions = [
     "word": "shock",
     "sourceWordId": "moe_2390_shock",
     "options": [
-      "不认识",
-      "使沉溺",
-      "加法",
-      "使适应",
-      "震动"
+      "震动",
+      "不认识"
     ],
     "answer": "震动"
   },
@@ -108,11 +84,8 @@ export const testQuestions = [
     "word": "turkey",
     "sourceWordId": "moe_2792_turkey",
     "options": [
-      "不认识",
-      "赞美",
-      "使沉溺",
-      "加法",
-      "火鸡"
+      "火鸡",
+      "不认识"
     ],
     "answer": "火鸡"
   },
@@ -121,11 +94,8 @@ export const testQuestions = [
     "word": "anger",
     "sourceWordId": "moe_0118_anger",
     "options": [
-      "不认识",
-      "承认",
-      "赞美",
-      "加法",
-      "忿怒"
+      "忿怒",
+      "不认识"
     ],
     "answer": "忿怒"
   },
@@ -134,11 +104,8 @@ export const testQuestions = [
     "word": "bend",
     "sourceWordId": "moe_0288_bend",
     "options": [
-      "不认识",
-      "成人",
-      "承认",
       "变弯曲",
-      "赞美"
+      "不认识"
     ],
     "answer": "变弯曲"
   },
@@ -147,11 +114,8 @@ export const testQuestions = [
     "word": "centimetre",
     "sourceWordId": "moe_0454_centimetre",
     "options": [
-      "不认识",
-      "意外事件",
-      "报告",
-      "完全地",
-      "厘米"
+      "厘米",
+      "不认识"
     ],
     "answer": "厘米"
   },
@@ -160,11 +124,8 @@ export const testQuestions = [
     "word": "concept",
     "sourceWordId": "moe_0591_concept",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "观念"
+      "观念",
+      "不认识"
     ],
     "answer": "观念"
   },
@@ -173,11 +134,8 @@ export const testQuestions = [
     "word": "decline",
     "sourceWordId": "moe_0728_decline",
     "options": [
-      "不认识",
-      "完成",
-      "疼痛",
-      "报告",
-      "衰退"
+      "衰退",
+      "不认识"
     ],
     "answer": "衰退"
   },
@@ -186,11 +144,8 @@ export const testQuestions = [
     "word": "duration",
     "sourceWordId": "moe_0866_duration",
     "options": [
-      "不认识",
       "持续时间",
-      "获得",
-      "完成",
-      "疼痛"
+      "不认识"
     ],
     "answer": "持续时间"
   },
@@ -199,11 +154,8 @@ export const testQuestions = [
     "word": "fault",
     "sourceWordId": "moe_1046_fault",
     "options": [
-      "不认识",
-      "事实上",
-      "获得",
-      "完成",
-      "过错"
+      "过错",
+      "不认识"
     ],
     "answer": "过错"
   },
@@ -212,11 +164,8 @@ export const testQuestions = [
     "word": "grand",
     "sourceWordId": "moe_1222_grand",
     "options": [
-      "不认识",
-      "使适应",
-      "事实上",
       "庄重的",
-      "获得"
+      "不认识"
     ],
     "answer": "庄重的"
   },
@@ -225,11 +174,8 @@ export const testQuestions = [
     "word": "integrate",
     "sourceWordId": "moe_1422_integrate",
     "options": [
-      "不认识",
-      "使沉溺",
-      "使适应",
-      "事实上",
-      "综合"
+      "综合",
+      "不认识"
     ],
     "answer": "综合"
   },
@@ -238,11 +184,8 @@ export const testQuestions = [
     "word": "mankind",
     "sourceWordId": "moe_1619_mankind",
     "options": [
-      "不认识",
-      "使沉溺",
-      "加法",
-      "使适应",
-      "人类"
+      "人类",
+      "不认识"
     ],
     "answer": "人类"
   },
@@ -251,11 +194,8 @@ export const testQuestions = [
     "word": "objective",
     "sourceWordId": "moe_1818_objective",
     "options": [
-      "不认识",
-      "赞美",
-      "使沉溺",
-      "加法",
-      "目的"
+      "目的",
+      "不认识"
     ],
     "answer": "目的"
   },
@@ -264,11 +204,8 @@ export const testQuestions = [
     "word": "pork",
     "sourceWordId": "moe_2019_pork",
     "options": [
-      "不认识",
-      "承认",
-      "赞美",
-      "加法",
-      "猪肉"
+      "猪肉",
+      "不认识"
     ],
     "answer": "猪肉"
   },
@@ -277,11 +214,8 @@ export const testQuestions = [
     "word": "recognition",
     "sourceWordId": "moe_2170_recognition",
     "options": [
-      "不认识",
-      "成人",
-      "承认",
-      "赞美",
-      "赞誉"
+      "赞誉",
+      "不认识"
     ],
     "answer": "赞誉"
   },
@@ -290,11 +224,8 @@ export const testQuestions = [
     "word": "scientific",
     "sourceWordId": "moe_2320_scientific",
     "options": [
-      "不认识",
-      "意外事件",
-      "报告",
-      "完全地",
-      "科学的"
+      "科学的",
+      "不认识"
     ],
     "answer": "科学的"
   },
@@ -303,11 +234,8 @@ export const testQuestions = [
     "word": "stretch",
     "sourceWordId": "moe_2564_stretch",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "伸展"
+      "伸展",
+      "不认识"
     ],
     "answer": "伸展"
   },
@@ -316,11 +244,8 @@ export const testQuestions = [
     "word": "trunk",
     "sourceWordId": "moe_2784_trunk",
     "options": [
-      "不认识",
-      "完成",
-      "疼痛",
-      "报告",
-      "树干"
+      "树干",
+      "不认识"
     ],
     "answer": "树干"
   },
@@ -330,10 +255,7 @@ export const testQuestions = [
     "sourceWordId": "moe_0001_a",
     "options": [
       "第一个字母 A",
-      "不认识",
-      "获得",
-      "完成",
-      "疼痛"
+      "不认识"
     ],
     "answer": "第一个字母 A"
   },
@@ -342,11 +264,8 @@ export const testQuestions = [
     "word": "anything",
     "sourceWordId": "moe_0137_anything",
     "options": [
-      "不认识",
-      "事实上",
-      "获得",
       "任何事",
-      "完成"
+      "不认识"
     ],
     "answer": "任何事"
   },
@@ -355,11 +274,8 @@ export const testQuestions = [
     "word": "believe",
     "sourceWordId": "moe_0283_believe",
     "options": [
-      "不认识",
-      "使适应",
-      "事实上",
-      "获得",
-      "相信"
+      "相信",
+      "不认识"
     ],
     "answer": "相信"
   },
@@ -368,11 +284,8 @@ export const testQuestions = [
     "word": "cake",
     "sourceWordId": "moe_0398_cake",
     "options": [
-      "不认识",
-      "使沉溺",
-      "使适应",
-      "事实上",
-      "蛋糕"
+      "蛋糕",
+      "不认识"
     ],
     "answer": "蛋糕"
   },
@@ -381,11 +294,8 @@ export const testQuestions = [
     "word": "close",
     "sourceWordId": "moe_0536_close",
     "options": [
-      "不认识",
-      "使沉溺",
-      "加法",
-      "使适应",
-      "结束"
+      "结束",
+      "不认识"
     ],
     "answer": "结束"
   },
@@ -394,11 +304,8 @@ export const testQuestions = [
     "word": "cute",
     "sourceWordId": "moe_0699_cute",
     "options": [
-      "不认识",
-      "赞美",
-      "使沉溺",
-      "加法",
-      "可爱的"
+      "可爱的",
+      "不认识"
     ],
     "answer": "可爱的"
   },
@@ -407,11 +314,8 @@ export const testQuestions = [
     "word": "dry",
     "sourceWordId": "moe_0862_dry",
     "options": [
-      "不认识",
-      "承认",
-      "赞美",
-      "加法",
-      "干的"
+      "干的",
+      "不认识"
     ],
     "answer": "干的"
   },
@@ -420,11 +324,8 @@ export const testQuestions = [
     "word": "expensive",
     "sourceWordId": "moe_0999_expensive",
     "options": [
-      "不认识",
-      "成人",
-      "承认",
-      "赞美",
-      "贵的"
+      "贵的",
+      "不认识"
     ],
     "answer": "贵的"
   },
@@ -433,11 +334,8 @@ export const testQuestions = [
     "word": "forest",
     "sourceWordId": "moe_1119_forest",
     "options": [
-      "不认识",
-      "意外事件",
-      "报告",
-      "完全地",
-      "森林"
+      "森林",
+      "不认识"
     ],
     "answer": "森林"
   },
@@ -446,11 +344,8 @@ export const testQuestions = [
     "word": "grow",
     "sourceWordId": "moe_1242_grow",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "种植"
+      "种植",
+      "不认识"
     ],
     "answer": "种植"
   },
@@ -459,11 +354,8 @@ export const testQuestions = [
     "word": "hope",
     "sourceWordId": "moe_1328_hope",
     "options": [
-      "不认识",
-      "完成",
-      "疼痛",
-      "报告",
-      "希望"
+      "希望",
+      "不认识"
     ],
     "answer": "希望"
   },
@@ -472,11 +364,8 @@ export const testQuestions = [
     "word": "join",
     "sourceWordId": "moe_1464_join",
     "options": [
-      "不认识",
-      "获得",
-      "完成",
-      "疼痛",
-      "参加"
+      "参加",
+      "不认识"
     ],
     "answer": "参加"
   },
@@ -485,11 +374,8 @@ export const testQuestions = [
     "word": "line",
     "sourceWordId": "moe_1564_line",
     "options": [
-      "不认识",
-      "事实上",
       "列",
-      "获得",
-      "完成"
+      "不认识"
     ],
     "answer": "列"
   },
@@ -498,11 +384,8 @@ export const testQuestions = [
     "word": "middle",
     "sourceWordId": "moe_1672_middle",
     "options": [
-      "不认识",
-      "使适应",
-      "事实上",
-      "获得",
-      "中央"
+      "中央",
+      "不认识"
     ],
     "answer": "中央"
   },
@@ -511,11 +394,8 @@ export const testQuestions = [
     "word": "ninety",
     "sourceWordId": "moe_1785_ninety",
     "options": [
-      "不认识",
-      "使沉溺",
-      "使适应",
-      "事实上",
-      "九十"
+      "九十",
+      "不认识"
     ],
     "answer": "九十"
   },
@@ -524,11 +404,8 @@ export const testQuestions = [
     "word": "pale",
     "sourceWordId": "moe_1898_pale",
     "options": [
-      "不认识",
-      "使沉溺",
-      "加法",
-      "使适应",
-      "栅栏"
+      "栅栏",
+      "不认识"
     ],
     "answer": "栅栏"
   },
@@ -537,11 +414,8 @@ export const testQuestions = [
     "word": "pool",
     "sourceWordId": "moe_2015_pool",
     "options": [
-      "不认识",
-      "赞美",
-      "使沉溺",
       "池",
-      "加法"
+      "不认识"
     ],
     "answer": "池"
   },
@@ -551,10 +425,7 @@ export const testQuestions = [
     "sourceWordId": "moe_2155_ready",
     "options": [
       "预备好的状态",
-      "不认识",
-      "承认",
-      "赞美",
-      "加法"
+      "不认识"
     ],
     "answer": "预备好的状态"
   },
@@ -563,11 +434,8 @@ export const testQuestions = [
     "word": "satisfy",
     "sourceWordId": "moe_2304_satisfy",
     "options": [
-      "不认识",
-      "成人",
-      "承认",
       "使满意",
-      "赞美"
+      "不认识"
     ],
     "answer": "使满意"
   },
@@ -576,11 +444,8 @@ export const testQuestions = [
     "word": "sign",
     "sourceWordId": "moe_2408_sign",
     "options": [
-      "不认识",
-      "意外事件",
-      "报告",
-      "完全地",
-      "符号"
+      "符号",
+      "不认识"
     ],
     "answer": "符号"
   },
@@ -589,11 +454,8 @@ export const testQuestions = [
     "word": "speaker",
     "sourceWordId": "moe_2501_speaker",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "说话人"
+      "说话人",
+      "不认识"
     ],
     "answer": "说话人"
   },
@@ -602,11 +464,8 @@ export const testQuestions = [
     "word": "survey",
     "sourceWordId": "moe_2619_survey",
     "options": [
-      "不认识",
-      "完成",
-      "疼痛",
-      "报告",
-      "纵览"
+      "纵览",
+      "不认识"
     ],
     "answer": "纵览"
   },
@@ -615,11 +474,8 @@ export const testQuestions = [
     "word": "tidy",
     "sourceWordId": "moe_2721_tidy",
     "options": [
-      "不认识",
       "椅子的背罩",
-      "获得",
-      "完成",
-      "疼痛"
+      "不认识"
     ],
     "answer": "椅子的背罩"
   },
@@ -628,11 +484,8 @@ export const testQuestions = [
     "word": "understand",
     "sourceWordId": "moe_2811_understand",
     "options": [
-      "不认识",
-      "事实上",
-      "获得",
-      "完成",
-      "理解"
+      "理解",
+      "不认识"
     ],
     "answer": "理解"
   },
@@ -641,11 +494,8 @@ export const testQuestions = [
     "word": "whatever",
     "sourceWordId": "moe_2921_whatever",
     "options": [
-      "不认识",
-      "使适应",
-      "事实上",
       "无论什么",
-      "获得"
+      "不认识"
     ],
     "answer": "无论什么"
   }

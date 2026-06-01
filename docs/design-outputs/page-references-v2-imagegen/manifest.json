@@ -1,0 +1,267 @@
+{
+  "generatedAt": "2026-05-31",
+  "source": "imagegen standalone per-page references, not cropped from boards",
+  "root": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen",
+  "themes": {
+    "light": [
+      {
+        "id": "01",
+        "slug": "new-user-home",
+        "name": "新用户首页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/01-new-user-home.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c277731e88191b99dd1b7a3534e29.png"
+      },
+      {
+        "id": "02",
+        "slug": "level-select",
+        "name": "水平选择页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/02-level-select.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c27c07c7481918f74b69cfdc61afe.png"
+      },
+      {
+        "id": "03",
+        "slug": "entry-assessment",
+        "name": "入学测页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/03-entry-assessment.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c28184208819189f5a796f9edc0f2.png"
+      },
+      {
+        "id": "04",
+        "slug": "assessment-result",
+        "name": "测评结果页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/04-assessment-result.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c286a1a5081919035ddb07e9f18b1.png"
+      },
+      {
+        "id": "05",
+        "slug": "home-normal",
+        "name": "首页-正常状态",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/05-home-normal.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c28beb7d48191bb96d35fbbb134a6.png"
+      },
+      {
+        "id": "06",
+        "slug": "pre-learning-scan",
+        "name": "训前检测页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/06-pre-learning-scan.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2996135c819198cf31b46520b1b4.png"
+      },
+      {
+        "id": "07",
+        "slug": "memorize",
+        "name": "识记页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/07-memorize.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c29e485b88191a08f5e8598d8922e.png"
+      },
+      {
+        "id": "08",
+        "slug": "word-detail-modal",
+        "name": "词卡详情弹窗",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/08-word-detail-modal.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2a7b1c8081919f03fdcb2866f6b4.png"
+      },
+      {
+        "id": "09",
+        "slug": "recall-before-reveal",
+        "name": "回忆页-揭示前",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/09-recall-before-reveal.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2aca5ab0819186f3ff6fcb49e28c.png"
+      },
+      {
+        "id": "10",
+        "slug": "recall-after-reveal",
+        "name": "回忆页-揭示后",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/10-recall-after-reveal.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2b1fe09081919acc3cccdc0df08c.png"
+      },
+      {
+        "id": "11",
+        "slug": "listening",
+        "name": "听音页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/11-listening.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2b7cafd08191831d3767756f859c.png"
+      },
+      {
+        "id": "12",
+        "slug": "list-complete-animation",
+        "name": "List完成动画页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/12-list-complete-animation.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2bd249bc8191a0eb088a6316dadc.png"
+      },
+      {
+        "id": "13",
+        "slug": "wrong-words",
+        "name": "错词本页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/13-wrong-words.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2c2549188191abcfc808623df9bd.png"
+      },
+      {
+        "id": "14",
+        "slug": "celebration",
+        "name": "庆祝页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/14-celebration.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2c82e6788191883887f2de83f1d7.png"
+      },
+      {
+        "id": "15",
+        "slug": "profile-settings",
+        "name": "我的页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/15-profile-settings.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2cd7ad4081918a564f78b19aa43a.png"
+      },
+      {
+        "id": "16",
+        "slug": "monthly-stage-test",
+        "name": "月度进展-阶段测入口页",
+        "theme": "light",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/light/16-monthly-stage-test.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2d3291188191a6ec0268370ed7ea.png"
+      }
+    ],
+    "dark": [
+      {
+        "id": "01",
+        "slug": "new-user-home",
+        "name": "新用户首页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/01-new-user-home.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2ebd7ce48191bc5fd6963610a74c.png"
+      },
+      {
+        "id": "02",
+        "slug": "level-select",
+        "name": "水平选择页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/02-level-select.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2f1d166481919ab3a8824e670f51.png"
+      },
+      {
+        "id": "03",
+        "slug": "entry-assessment",
+        "name": "入学测页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/03-entry-assessment.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c2f72bd3081918d0d083518566fdb.png"
+      },
+      {
+        "id": "04",
+        "slug": "assessment-result",
+        "name": "测评结果页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/04-assessment-result.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c30a8cb308191b533ddead876d059.png"
+      },
+      {
+        "id": "05",
+        "slug": "home-normal",
+        "name": "首页-正常状态",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/05-home-normal.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c311335a48191be3561dae8ff67a3.png"
+      },
+      {
+        "id": "06",
+        "slug": "pre-learning-scan",
+        "name": "训前检测页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/06-pre-learning-scan.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c318087188191873eca535171d6ff.png"
+      },
+      {
+        "id": "07",
+        "slug": "memorize",
+        "name": "识记页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/07-memorize.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c31d9023081919b3732b8b181d56a.png"
+      },
+      {
+        "id": "08",
+        "slug": "word-detail-modal",
+        "name": "词卡详情弹窗",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/08-word-detail-modal.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c323bd38481919187a3c2effa8a58.png"
+      },
+      {
+        "id": "09",
+        "slug": "recall-before-reveal",
+        "name": "回忆页-揭示前",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/09-recall-before-reveal.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c32991e408191b27c6affeec87350.png"
+      },
+      {
+        "id": "10",
+        "slug": "recall-after-reveal",
+        "name": "回忆页-揭示后",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/10-recall-after-reveal.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c32f5ee6c8191a69567e748c60290.png"
+      },
+      {
+        "id": "11",
+        "slug": "listening",
+        "name": "听音页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/11-listening.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c33560cec8191a478a5d371dbaaa7.png"
+      },
+      {
+        "id": "12",
+        "slug": "list-complete-animation",
+        "name": "List完成动画页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/12-list-complete-animation.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c344e5338819190c058bb0c256496.png"
+      },
+      {
+        "id": "13",
+        "slug": "wrong-words",
+        "name": "错词本页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/13-wrong-words.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c34c9d3f88191bad5436749bbe2f8.png"
+      },
+      {
+        "id": "14",
+        "slug": "celebration",
+        "name": "庆祝页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/14-celebration.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c3540cda881919e4da76aca7bbb8b.png"
+      },
+      {
+        "id": "15",
+        "slug": "profile-settings",
+        "name": "我的页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/15-profile-settings.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c35b7c1e08191ada6427a48bad915.png"
+      },
+      {
+        "id": "16",
+        "slug": "monthly-stage-test",
+        "name": "月度进展-阶段测入口页",
+        "theme": "dark",
+        "file": "/Users/fuping.chu/Documents/Personal/学习力/单词/word-prototype/docs/design-outputs/page-references-v2-imagegen/dark/16-monthly-stage-test.png",
+        "sourceGeneratedFile": "/Users/fuping.chu/.codex/generated_images/019e7c2f-66c0-7f23-be16-490c44cf159e/ig_04c172a4165f5d04016a1c3624aa0c819199f67f88b58acbe3.png"
+      }
+    ]
+  }
+}

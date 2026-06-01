@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-05-22T11:37:18.533Z",
+  "summary": {
+    "ownedTotal": 3368,
+    "localDefinitionUsed": 3368,
+    "secondaryDefinitionUsedBecauseLocalMissing": 0,
+    "posFallbackTotal": 0,
+    "localPosParseFailed": 0
+  },
+  "policy": {
+    "sourcePriority": "中文释义和词性优先使用《高考英语考纲3500词汇表（英汉）.doc》。主 DOC 未解析到或疑似错位时，先列入复核清单，再决定人工补录。",
+    "addingRule": "人工补录时保留 source=manual_from_local_pdf 或 manual_review，不能继续写 pos=词条。词性不同的同一英文词拆成多个学习项。"
+  },
+  "lists": {
+    "localMissing": [],
+    "localFallbackPos": []
+  }
+}

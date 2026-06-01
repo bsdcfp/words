@@ -1,47 +1,77 @@
-<view class="app-shell">
-  <view wx:if="{{view == 'home'}}" class="view home-view">
-    <view class="topbar">
-      <view>
-        <text class="eyebrow">{{home.levelLabel}} · {{home.groupName}}</text>
-        <text class="page-title">今日计划</text>
-      </view>
-      <view class="profile-chip" bindtap="openProfile">我的</view>
-    </view>
+<view class="app-shell {{themeClass}}">
+  <view wx:if="{{view == 'home'}}" class="view home-view {{home.hasSelectedLevel ? '' : 'first-run-home'}}">
     <view wx:if="{{bootError}}" class="boot-error-card">
       <text class="card-title">启动时遇到问题</text>
       <text class="muted">{{bootError}}</text>
       <view class="secondary-button" bindtap="resetData">重置体验数据</view>
     </view>
-    <view class="plan-panel">
-      <text class="section-label">按记忆曲线安排</text>
-      <text class="hero-title">今日至少完成 1 组</text>
-      <text class="plan-copy">{{home.todayGroups > 0 ? '今日已完成 ' + home.todayGroups + ' 组，继续按计划学习。' : '每组 3 个词，完成后自动进入下一组。错过复习的词会回到识记。'}}</text>
-      <view class="primary-button" bindtap="startDailyLearning">开始今日学习</view>
+    <view wx:if="{{home.hasSelectedLevel}}" class="home-topline">
+      <view class="home-book-select" bindtap="openLevelSelect">
+        <view class="book-cover-mini"></view>
+        <text>{{home.hasSelectedLevel ? home.groupName : '选择学习水平'}}</text>
+        <view class="ui-icon icon-chevron"></view>
+      </view>
+      <view class="home-streak"><view class="streak-dot"></view><text>连续 {{home.streakDays}} 天</text></view>
+      <view class="home-avatar" bindtap="openProfile"><view class="ui-icon icon-user"></view></view>
     </view>
-    <view class="plan-grid">
-      <view><text>{{home.planCount}}</text><text>最低组数</text></view>
-      <view><text>{{home.todayGroups}}</text><text>今日已完成组</text></view>
-      <view><text>{{home.weakCount}}</text><text>待巩固</text></view>
+    <view wx:else class="home-welcome-panel">
+      <text class="home-welcome-title">欢迎！</text>
+      <text class="home-welcome-subtitle">先选择你的学习水平</text>
+      <view class="home-welcome-mark"></view>
     </view>
-    <view class="today-card">
-      <view><text class="card-title">当前词书</text><text>{{home.groupName}}</text><text class="muted">完整词库 {{home.total}} 词，体验包 {{home.miniProgramTotal}} 词</text></view>
-      <view><text class="card-title">连续学习</text><text>{{home.streakDays}} 天</text><text class="muted">{{home.streakText}}</text></view>
+    <view wx:if="{{home.hasSelectedLevel}}" class="home-main-card">
+      <view class="home-card-section">
+        <view class="section-title-row"><view class="ui-icon icon-target"></view><text class="section-label">今日目标</text></view>
+        <view class="target-line"><text class="target-number">{{home.planCount}}</text><text class="target-unit">个 List</text></view>
+        <view class="flag-row"><view wx:for="{{home.planFlags}}" wx:key="*this" class="ui-icon icon-flag {{item}}"></view></view>
+      </view>
+      <view class="home-divider"></view>
+      <view class="home-card-section progress-section">
+        <text class="section-label">单词书进度</text>
+        <view class="progress-number-row"><text class="progress-large">{{home.learnedCount}}</text><text>/ {{home.total}}</text><text>{{home.progressPercent}}%</text></view>
+        <view class="progress-track"><view style="width: {{home.progressPercent}}%;"></view></view>
+      </view>
     </view>
+    <view wx:else class="home-main-card first-run-panel">
+      <view class="section-title-row">
+        <view class="ui-icon icon-book"></view>
+        <text class="section-label">单词书进度</text>
+      </view>
+      <text class="first-run-book-name">{{home.bookTitle}}</text>
+      <view class="progress-number-row first-run-progress-row">
+        <text class="progress-large">0</text>
+        <text>/ {{home.displayTotal}}</text>
+        <text>0%</text>
+      </view>
+      <view class="progress-track"><view style="width: 0%;"></view></view>
+    </view>
+    <view class="primary-button home-continue {{home.hasSelectedLevel ? '' : 'first-run-cta'}}" bindtap="startDailyLearning">{{home.primaryActionText}}</view>
+    <view wx:if="{{!home.hasSelectedLevel}}" class="home-first-note" bindtap="openProfile"><text>选择后可随时在【我的】中更改</text></view>
+    <view wx:if="{{home.hasSelectedLevel}}" class="home-action-card" bindtap="openWrongBook" hover-class="action-entry-pressed">
+      <view class="ui-icon card-icon icon-wrongbook"></view>
+      <text>{{home.weakCount}} 个错词待复习</text>
+      <text>晚间入口已开启</text>
+      <view class="entry-arrow ui-icon icon-chevron"></view>
+    </view>
+    <view class="home-landscape"></view>
     <view class="tab-bar">
-      <view class="tab-item active" bindtap="openWordsTab">单词</view>
-      <view class="tab-item" bindtap="openProfile">我的</view>
+      <view class="tab-item active" bindtap="openWordsTab"><view class="ui-icon tab-icon icon-book"></view><text>单词</text></view>
+      <view class="tab-item" bindtap="openProfile"><view class="ui-icon tab-icon icon-user"></view><text>我的</text></view>
     </view>
   </view>
 
   <view wx:elif="{{view == 'profile'}}" class="view profile-view">
     <view class="topbar">
-      <view>
-        <text class="eyebrow">{{profile.userName}}</text>
-        <text class="page-title">我的</text>
+      <view class="profile-toolbar-spacer"></view>
+      <text class="page-title">我的</text>
+      <view class="profile-toolbar-icons">
+        <view class="ui-icon icon-calendar"></view>
+        <view class="ui-icon icon-bell"></view>
+        <view class="icon-button compact" bindtap="resetData"><view class="ui-icon icon-settings"></view></view>
       </view>
-      <view class="icon-button" bindtap="resetData">↺</view>
     </view>
     <view class="profile-hero">
+      <view class="profile-book-art"><view class="book-illustration small-book"><view class="book-page left"></view><view class="book-page right"></view><view class="book-spine"></view></view></view>
       <view>
         <text class="section-label">当前词书</text>
         <text class="profile-book">{{profile.activeGroup}}</text>
@@ -55,8 +85,32 @@
       <view><text>{{profile.todayMinutes}}</text><text>今日分钟</text></view>
       <view><text>{{profile.streakDays}}</text><text>连续天数</text></view>
     </view>
+    <view class="profile-card">
+      <view class="card-row"><text class="card-title">每日目标</text><text class="muted">当前 {{profile.dailyTargetListCount}} 个 List / {{profile.listWordCount}} 词</text></view>
+      <view class="level-options inline-options">
+        <view wx:for="{{profile.listOptions}}" wx:key="count" class="level-option compact enabled {{item.selected ? 'selected' : ''}}" data-count="{{item.count}}" bindtap="setListGroupCount">
+          <text>{{item.count}} List</text>
+        </view>
+      </view>
+    </view>
+    <view class="profile-card">
+      <view class="card-row"><text class="card-title">跟读循环</text><text class="muted">当前 {{profile.pronunciationLoopLabel}}</text></view>
+      <view class="level-options inline-options">
+        <view wx:for="{{profile.pronunciationLoopOptions}}" wx:key="value" class="level-option compact enabled {{item.selected ? 'selected' : ''}}" data-count="{{item.value}}" bindtap="setPronunciationLoopCount">
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="profile-card">
+      <view class="card-row"><text class="card-title">学习页主题</text><text class="muted">默认 {{profile.learningThemeLabel}}</text></view>
+      <view class="level-options inline-options">
+        <view wx:for="{{profile.learningThemeOptions}}" wx:key="value" class="level-option compact enabled {{item.selected ? 'selected' : ''}}" data-theme="{{item.value}}" bindtap="setLearningTheme">
+          <text>{{item.label}}</text>
+        </view>
+      </view>
+    </view>
     <view class="profile-card action-card" hover-class="action-entry-pressed" bindtap="openMonthProgress">
-      <view class="card-row"><text class="card-title">本周进展</text><text class="muted">累计打卡 {{profile.checkinDays}} 天</text><text class="entry-arrow">›</text></view>
+      <view class="card-row"><view class="ui-icon card-icon icon-calendar"></view><text class="card-title">学习数据</text><text class="muted">累计打卡 {{profile.checkinDays}} 天</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
       <view class="week-row">
         <view wx:for="{{profile.week}}" wx:key="key" class="week-dot {{item.active ? 'active' : ''}}">
           <text>{{item.day}}</text>
@@ -65,24 +119,31 @@
       </view>
       <text class="muted week-summary">最长连续 {{profile.longestStreak}} 天，打卡来自全部历史记录</text>
     </view>
+    <view class="profile-card profile-test-card">
+      <text class="card-title">测评</text>
+      <view class="profile-test-grid">
+        <view class="profile-test-entry action-entry" bindtap="startTest"><view class="ui-icon card-icon icon-test"></view><text>入学测</text><text>36 题</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+        <view class="profile-test-entry action-entry" bindtap="startTest"><view class="ui-icon card-icon icon-trophy"></view><text>阶段测</text><text>30 题</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+      </view>
+    </view>
     <view class="profile-list">
-      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openLevelSelect"><text>选择单词水平</text><text>{{profile.startLevelLabel}}</text><text class="entry-arrow">›</text></view>
-      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="startTest"><text>词汇量测试</text><text>当前 {{profile.vocabulary}}</text><text class="entry-arrow">›</text></view>
-      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openWrongBook"><text>错词本</text><text>{{profile.weakCount}} 个待巩固</text><text class="entry-arrow">›</text></view>
+      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openLevelSelect"><view class="ui-icon card-icon icon-level"></view><text>选择单词水平</text><text>{{profile.startLevelLabel}}</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="startTest"><view class="ui-icon card-icon icon-test"></view><text>词汇量测试</text><text>当前 {{profile.vocabulary}}</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openWrongBook"><view class="ui-icon card-icon icon-wrongbook"></view><text>错词本</text><text>{{profile.weakCount}} 个待巩固</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
     </view>
     <view class="tab-bar">
-      <view class="tab-item" bindtap="openWordsTab">单词</view>
-      <view class="tab-item active" bindtap="openProfile">我的</view>
+      <view class="tab-item" bindtap="openWordsTab"><view class="ui-icon tab-icon icon-book"></view><text>单词</text></view>
+      <view class="tab-item active" bindtap="openProfile"><view class="ui-icon tab-icon icon-user"></view><text>我的</text></view>
     </view>
   </view>
 
   <view wx:elif="{{view == 'month-progress'}}" class="view month-progress-view sticky-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">月度进展</text></view>
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">月度进展</text></view>
     <view class="month-panel">
       <picker mode="date" fields="month" value="{{monthProgress.pickerValue}}" bindchange="changeProgressMonth">
         <view class="month-picker">
           <text>{{monthProgress.title}}</text>
-          <text>选择年月 ›</text>
+          <view class="month-picker-action"><text>选择年月</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
         </view>
       </picker>
       <view class="month-switch">
@@ -103,24 +164,41 @@
         </view>
       </view>
     </view>
-  </view>
-
-  <view wx:elif="{{view == 'level-select'}}" class="view level-view sticky-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">你现在是</text></view>
-    <view class="level-panel">
-      <text class="section-label">当前：{{levelSelect.currentLevel}}</text>
-      <view wx:for="{{levelSelect.groups}}" wx:key="title" wx:for-item="group" class="level-group">
-        <text class="level-title">{{group.title}}</text>
-        <view class="level-options">
-          <view wx:for="{{group.options}}" wx:key="id" wx:for-item="option" class="level-option" data-level-id="{{option.id}}" data-level-label="{{option.label}}" data-start-level="{{option.startLevel}}" bindtap="selectLevel">{{option.label}}</view>
-        </view>
+    <view class="month-panel month-trend-panel">
+      <view class="card-row"><text class="card-title">本月已学单词</text><text class="vocab-number compact">{{monthProgress.learnedWords}}</text></view>
+      <view class="trend-bars">
+        <view wx:for="{{profile.week}}" wx:key="key" class="trend-bar"><text>{{item.date}}</text><view style="height: {{item.active ? 96 : 42}}rpx;"></view></view>
       </view>
-      <view class="secondary-button" bindtap="skipLevelSelect">先跳过</view>
+    </view>
+    <view class="month-panel stage-test-panel">
+      <view class="stage-test-copy"><view class="ui-icon card-icon icon-test"></view><view><text class="card-title">阶段测</text><text class="vocab-number compact">30</text><text class="muted">全面检测已学词效果</text></view></view>
+      <view class="stage-skill-row"><text>看词辨义</text><text>听音辨义</text><text>中文回忆英文</text></view>
+      <view class="primary-button" bindtap="startTest">开始阶段测</view>
+      <text class="muted stage-note">阶段测不会打断日常学习进度</text>
     </view>
   </view>
 
-  <view wx:elif="{{view == 'test'}}" class="view sticky-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="progress-label">{{test.progress}}</text></view>
+  <view wx:elif="{{view == 'level-select'}}" class="view level-view sticky-view">
+    <view class="topbar compact level-topbar"><view class="icon-button ghost-back" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">你现在是</text><view class="text-link skip-link" bindtap="skipLevelSelect">跳过</view></view>
+    <view class="level-panel">
+      <text class="level-subtitle">选择一个适合的起点</text>
+      <view class="ornament-line"></view>
+      <view class="level-options single">
+        <view wx:for="{{levelSelect.options}}" wx:key="id" wx:for-item="option" class="level-option {{option.enabled ? 'enabled' : 'disabled'}} {{option.selected ? 'selected' : ''}}" hover-class="{{option.enabled ? 'level-option-pressed' : 'none'}}" data-level-id="{{option.id}}" data-level-label="{{option.label}}" data-start-level="{{option.startLevel}}" data-enabled="{{option.enabled}}" bindtap="selectLevel">
+          <view class="ui-icon level-kind {{option.iconClass}}"></view>
+          <view>
+            <text class="level-option-label">{{option.label}}</text>
+            <text class="level-option-status">{{option.status}}</text>
+          </view>
+          <view wx:if="{{option.selected}}" class="level-check"><view class="ui-icon icon-check"></view></view>
+        </view>
+      </view>
+      <view class="level-test-link" bindtap="startTest"><text>不确定？做个测试</text><view class="ui-icon icon-chevron"></view></view>
+    </view>
+  </view>
+
+  <view wx:elif="{{view == 'test'}}" class="view sticky-view test-view">
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="progress-label">{{test.progress}}</text></view>
     <view class="question-panel">
       <text class="section-label">词汇量测试</text>
       <text class="test-word">{{test.question.word}}</text>
@@ -133,8 +211,8 @@
     <view class="counter-bar"><text class="pill green">{{test.correct}}</text><text class="pill red">{{test.wrong}}</text><text class="pill blue">{{test.remain}}</text></view>
   </view>
 
-  <view wx:elif="{{view == 'test-result'}}" class="view sticky-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">测评结果</text></view>
+  <view wx:elif="{{view == 'test-result'}}" class="view sticky-view test-result-view">
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">测评结果</text></view>
     <view class="result-panel">
       <text class="section-label">现实掌握词汇</text>
       <text class="vocab-number">{{testResult.vocabulary}}</text>
@@ -145,126 +223,161 @@
   </view>
 
   <view wx:elif="{{view == 'precheck'}}" class="view precheck-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">训前检测</text></view>
-    <scroll-view class="precheck-scroll" scroll-y="true" enhanced="true" show-scrollbar="{{false}}">
-      <view class="word-list precheck-list">
-        <view wx:for="{{precheck.candidates}}" wx:key="id" class="precheck-row {{item.selected ? 'picked' : ''}}">
-          <view class="precheck-head">
-            <text class="index">{{item.index}}</text>
-            <view class="precheck-main">
-              <view class="word-link" data-word-id="{{item.id}}" bindtap="openDetail">{{item.word}}</view>
-              <text class="meaning-inline precheck-meaning"><text>{{item.pos}}</text>{{item.meaningText}}</text>
-            </view>
-          </view>
-          <view class="segmented">
-            <view class="segmented-button known {{item.status == 'known' ? 'selected' : ''}}" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">认识</view>
-            <view class="segmented-button unfamiliar {{item.status == 'unfamiliar' ? 'selected danger' : ''}}" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">不熟</view>
-          </view>
+    <view class="precheck-title">训前检测</view>
+    <block wx:for="{{precheck.candidates}}" wx:key="id" wx:for-index="idx">
+      <view
+        wx:if="{{idx == 0}}"
+        class="precheck-stage-card {{precheckSwipeClass}}"
+        data-word-id="{{item.id}}"
+        catchtouchstart="handlePrecheckTouchStart"
+        catchtouchmove="handlePrecheckTouchMove"
+        catchtouchend="handlePrecheckTouchEnd"
+        catchtouchcancel="handlePrecheckTouchCancel"
+      >
+        <text class="precheck-word">{{item.word}}</text>
+        <view class="precheck-audio-dot" data-word-id="{{item.id}}" catchtap="speak"><view class="ui-icon icon-speaker"></view></view>
+        <view class="precheck-hints">
+          <view class="precheck-hint known" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck"><text>↑</text><text>上滑认识</text></view>
+          <view class="precheck-hint unfamiliar" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck"><text>↓</text><text>下滑不熟</text></view>
         </view>
       </view>
-    </scroll-view>
-    <view class="bottom-actions precheck-actions">
-      <text class="selection-count">已选 {{precheck.selectedCount}}/3</text>
-      <view class="secondary-button" bindtap="autoSelect">自动选词</view>
-      <view wx:if="{{precheck.canStart}}" class="primary-button small" bindtap="confirmPrecheck">开始识记</view>
-      <view wx:else class="primary-button small disabled">开始识记</view>
+    </block>
+    <view class="precheck-bottom-status">
+      <text>{{precheck.progressText}}</text>
+      <text>今日待学</text>
     </view>
     <view wx:if="{{precheckNotice}}" class="transition-mask notice-mask">
       <view class="transition-card"><text>{{precheckNotice}}</text></view>
     </view>
   </view>
 
-  <view wx:elif="{{view == 'word-study'}}" class="view study-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="progress-label">{{study.progress}}</text></view>
-    <view wx:if="{{study.word}}" class="study-focus-card">
-      <text class="section-label">单词识记</text>
+  <view wx:elif="{{view == 'word-study'}}" class="view study-view learning-view focus-flow {{study.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel">
+    <view class="focus-pause-handle" catchtap="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+    <view class="focus-progress" catchtap="noop"><view wx:for="{{study.progressDots}}" wx:key="key" class="focus-dot {{item.className}}"></view></view>
+    <view wx:if="{{study.word}}" class="focus-card study-focus-card spec-study-card">
       <text class="study-word">{{study.word.syllables}}</text>
       <text class="ipa">{{study.word.ipa}}</text>
+      <view class="sound-orb small read-pulse {{readAlongStatus ? 'active' : ''}}" data-word-id="{{study.word.id}}" catchtap="speak"><view class="ui-icon icon-soundwave"></view></view>
       <text class="meaning"><text>{{study.word.pos}}</text>{{study.word.meaningText}}</text>
-      <view class="study-tool-row">
-        <view class="tool-button {{studyImageMode ? 'active' : ''}}" bindtap="toggleStudyImageMode">{{studyImageMode ? '收起图片' : '图片'}}</view>
-        <view class="tool-button" data-word-id="{{study.word.id}}" bindtap="openDetail">搭配</view>
-        <view class="tool-button primary" data-word-id="{{study.word.id}}" bindtap="speak">播放</view>
-      </view>
-      <view wx:if="{{studyImageMode}}" class="memory-image study-memory-image"><text class="memory-mark">记忆图</text><text class="strong">{{study.word.memoryMeaning}}</text><text>{{study.word.scene}}</text></view>
+      <text class="study-hint">{{readAlongStatus || '轻点再听'}}</text>
     </view>
-    <view wx:if="{{study.word}}" class="bottom-actions two"><view class="secondary-button" data-value="1" bindtap="markStudy">还不熟</view><view class="primary-button small" data-value="3" bindtap="markStudy">已记住</view></view>
-    <view wx:if="{{studyTransition}}" class="transition-mask">
-      <view class="transition-card"><text>本组识记已完成，自动进入下一组</text></view>
-    </view>
+    <view wx:if="{{study.word}}" class="focus-actions"><view class="primary-button focus-primary" data-value="3" catchtap="markStudy">记住了</view></view>
   </view>
 
-  <view wx:elif="{{view == 'group-review'}}" class="view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">{{review.isMixed ? '混组复习' : '本组复习'}}</text><text class="progress-label">{{review.progress}}</text></view>
-    <view wx:if="{{!review.isMixed}}" class="review-stack">
-      <view wx:if="{{review.word}}" class="audio-panel audio-minimal visual-question">
+  <view wx:elif="{{view == 'group-review'}}" class="view learning-view focus-flow {{review.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel">
+    <view class="focus-pause-handle" catchtap="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+    <view class="focus-progress" catchtap="noop"><view wx:for="{{review.progressDots}}" wx:key="key" class="focus-dot {{item.className}} {{review.isMixed ? 'mixed' : 'review'}}"></view></view>
+    <view wx:if="{{!review.isMixed}}" class="review-stack focus-stack">
+      <view wx:if="{{review.word}}" class="focus-card review-focus-card">
         <text class="test-word">{{review.word.word}}</text>
         <text class="ipa">{{review.word.ipa}}</text>
-        <view class="option-stack">
-          <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerGroupReview"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
+        <view class="sound-orb small" data-word-id="{{review.word.id}}" catchtap="speak"><view class="ui-icon icon-soundwave"></view></view>
+        <text wx:if="{{!(reviewAnswerVisible || review.question.answered)}}" class="study-hint">⏱ 2 秒后揭示</text>
+        <view wx:if="{{reviewAnswerVisible || review.question.answered}}" class="reveal-card">
+          <view wx:for="{{review.question.options}}" wx:key="value" class="focus-reveal {{item.statusClass}}"><text class="option-line"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text></view>
         </view>
-        <view class="audio-tools"><view data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{review.word.id}}" bindtap="speak">播放</view></view>
-        <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '回答正确' : '已加入本轮错词') : '本组看词辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextGroupReview">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
       </view>
     </view>
-    <view wx:else class="audio-panel audio-minimal">
+    <view wx:else class="focus-card audio-panel audio-minimal">
       <text class="test-word">{{review.word.word}}</text>
       <text class="ipa">{{review.word.ipa}}</text>
-      <view class="option-stack">
-        <view wx:for="{{review.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerMixed"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
+      <view class="sound-orb small" data-word-id="{{review.word.id}}" catchtap="speak"><view class="ui-icon icon-soundwave"></view></view>
+      <text wx:if="{{!(reviewAnswerVisible || review.question.answered)}}" class="study-hint">⏱ 2 秒后揭示</text>
+      <view wx:if="{{reviewAnswerVisible || review.question.answered}}" class="reveal-card">
+        <view wx:for="{{review.question.options}}" wx:key="value" class="focus-reveal {{item.statusClass}}"><text class="option-line"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text></view>
       </view>
-      <view class="audio-tools"><view data-word-id="{{review.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{review.word.id}}" bindtap="speak">重播</view></view>
-      <view class="bottom-actions status-actions"><text>{{review.question.answered ? (review.question.isCorrect ? '混组回答正确' : '混组已加入错词') : '混组看词辨义'}}</text><view wx:if="{{review.question.answered}}" class="primary-button small" bindtap="nextMixed">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
+    </view>
+    <view class="focus-actions">
+      <view wx:if="{{review.isMixed}}" class="primary-button focus-primary" catchtap="rememberMixedReview">记住了</view>
+      <view wx:else class="primary-button focus-primary" catchtap="rememberGroupReview">记住了</view>
     </view>
   </view>
 
-  <view wx:elif="{{view == 'audio-meaning'}}" class="view audio-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="progress-label">{{audio.progress}}</text></view>
-    <view class="audio-panel audio-minimal">
-      <view class="speaker-tile" data-word-id="{{audio.word.id}}" bindtap="speak">播放</view>
-      <view class="option-stack">
-        <view wx:for="{{audio.question.options}}" wx:key="value" class="option-card {{item.statusClass}}" data-value="{{item.value}}" bindtap="answerAudio"><text><text class="option-pos">{{item.pos}}</text>{{item.first}}</text><text wx:if="{{item.rest}}" class="option-sub">{{item.rest}}</text></view>
+  <view wx:elif="{{view == 'audio-meaning'}}" class="view audio-view learning-view focus-flow {{audio.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel">
+    <view class="focus-pause-handle" catchtap="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+    <view class="focus-progress" catchtap="noop"><view wx:for="{{audio.progressDots}}" wx:key="key" class="focus-dot {{item.className}} audio"></view></view>
+    <view class="focus-card audio-focus-card">
+      <view class="speaker-tile focus-speaker" data-word-id="{{audio.word.id}}" catchtap="speak"><view class="ui-icon icon-soundwave"></view></view>
+      <text class="audio-playing-text">正在播放…</text>
+      <text class="study-hint">听发音，回忆中文释义</text>
+      <view wx:if="{{audioAnswerVisible || audio.question.answered}}" class="reveal-card audio-answer-reveal">
+        <view wx:for="{{audio.question.options}}" wx:key="value" class="focus-reveal {{item.statusClass}}">
+          <text class="option-line"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text>
+        </view>
       </view>
-      <view class="audio-tools"><view data-word-id="{{audio.word.id}}" bindtap="openDetail">看词卡</view><view data-word-id="{{audio.word.id}}" bindtap="speak">重播</view></view>
+      <view wx:else class="reveal-card ghost"><text>⏱ 2 秒后显示释义</text></view>
     </view>
-    <view class="bottom-actions status-actions"><text>{{audio.question.answered ? (audio.question.isCorrect ? '回答正确' : '已加入错词') : '听音辨义'}}</text><view wx:if="{{audio.question.answered}}" class="primary-button small" bindtap="nextAudio">继续</view><view wx:else class="primary-button small disabled">继续</view></view>
-    <view wx:if="{{audioCompletionNotice}}" class="transition-mask">
-      <view class="transition-card"><text>{{audioCompletionNotice}}</text><text wx:if="{{audioCompletionHint}}">{{audioCompletionHint}}</text></view>
-    </view>
+    <view class="focus-actions"><view class="primary-button focus-primary" catchtap="rememberAudio">记住了</view></view>
   </view>
 
-  <view wx:elif="{{view == 'wrong-book'}}" class="view sticky-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">错词本</text></view>
+  <view wx:elif="{{view == 'meaning-recall'}}" class="view audio-view learning-view focus-flow {{recall.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel">
+    <view class="focus-topbar" catchtap="noop"><view class="icon-button focus-back" catchtap="goBack"><view class="ui-icon icon-back"></view></view><text>中文回忆英文</text></view>
+    <view class="focus-pause-handle" catchtap="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+    <view class="focus-progress" catchtap="noop"><view wx:for="{{recall.progressDots}}" wx:key="key" class="focus-dot {{item.className}} recall"></view></view>
+    <view wx:if="{{recall.word}}" class="focus-card audio-panel audio-minimal meaning-recall-card">
+      <view class="meaning-recall-prompt">
+        <text class="option-line"><text class="option-pos">{{recall.word.pos}}</text>{{recall.word.meaningText}}</text>
+      </view>
+      <view class="meaning-word-reveal {{recallAnswerVisible ? 'visible' : ''}}">
+        <text wx:if="{{recallAnswerVisible}}" class="test-word">{{recall.word.word}}</text>
+        <text wx:else class="recall-placeholder">先在心里拼出英文</text>
+      </view>
+    </view>
+    <view class="focus-actions"><view class="primary-button focus-primary" catchtap="rememberMeaningRecall">记住了</view></view>
+  </view>
+
+  <view wx:elif="{{view == 'wrong-book'}}" class="view sticky-view wrong-book-view">
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">错词本</text></view>
     <view class="review-summary"><text>{{wrongBook.count}} 个词</text><text>优先复盘听音辨义和混组复习里的错词</text></view>
     <view class="review-stack">
-      <view wx:for="{{wrongBook.words}}" wx:key="id" class="review-card detail-entry" hover-class="review-card-pressed" data-word-id="{{item.id}}" bindtap="openDetail"><view class="review-copy"><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}} · 错 {{item.wrongCount}} 次</text></view><view class="sound-mini" data-word-id="{{item.id}}" catchtap="speak">播放</view></view>
+      <view wx:for="{{wrongBook.words}}" wx:key="id" class="review-card detail-entry" hover-class="review-card-pressed" data-word-id="{{item.id}}" bindtap="openDetail"><view class="review-copy"><text class="card-title">{{item.word}}</text><text>{{item.ipa}}</text><text class="muted">{{item.meaningText}} · 错 {{item.wrongCount}} 次</text></view><view class="sound-mini" data-word-id="{{item.id}}" catchtap="speak"><view class="ui-icon icon-speaker"></view><text>播放</text></view></view>
       <view wx:if="{{!wrongBook.count}}" class="empty-state"><text>当前没有错词。</text><view class="primary-button" bindtap="startDailyLearning">开始今日学习</view></view>
     </view>
   </view>
 
-  <view wx:elif="{{view == 'daily-report'}}" class="view sticky-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack">‹</view><text class="page-title">学习报告</text></view>
-    <view class="report-panel">
-      <text class="report-ring">{{report.accuracy}}%</text>
-      <text class="section-label">发音辨义正确率</text>
-      <view class="stats-grid"><view class="metric"><text>{{report.learnedCount}}</text><text>本组学习</text></view><view class="metric"><text>{{report.mixedReviewCount}}</text><text>混组复习</text></view><view class="metric"><text>{{report.audioCount}}</text><text>听音题</text></view></view>
+  <view wx:elif="{{view == 'daily-report'}}" class="view sticky-view celebration-view">
+    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">今日完成</text></view>
+    <view class="report-panel celebration-panel">
+      <view class="report-ring"><view class="ui-icon icon-trophy"></view><text>{{report.accuracy}}%</text></view>
+      <text class="section-label">今日 List 已完成</text>
+      <view class="stats-grid"><view class="metric"><text>{{report.learnedCount}}</text><text>今日新词</text></view><view class="metric"><text>{{report.mixedReviewCount}}</text><text>混组复习</text></view><view class="metric"><text>{{report.audioCount}}</text><text>听音题</text></view></view>
       <view class="copy-card"><text class="card-title">下次复习</text><text>{{report.nextReview}} 优先复盘错词和即将遗忘词。</text></view>
       <view class="copy-card"><text class="card-title">薄弱词</text><text>{{report.weakWordText}}</text></view>
       <view class="copy-card"><text class="card-title">建议</text><text>{{report.summary}}</text></view>
-      <view class="primary-button" bindtap="goHome">完成</view>
+      <view class="primary-button" bindtap="goHome">回到首页</view>
     </view>
   </view>
 
   <view wx:if="{{detail}}" class="modal-mask" bindtap="closeDetail">
     <view class="detail-card" catchtap="noop">
-      <view class="icon-button close" bindtap="closeDetail">×</view>
+      <view class="icon-button close" bindtap="closeDetail"><view class="ui-icon icon-close"></view></view>
       <text class="section-label">详细词卡</text>
       <text class="detail-word">{{detail.syllables}}</text>
       <text class="ipa">{{detail.ipa}}</text>
       <text class="meaning"><text>{{detail.pos}}</text>{{detail.meaningText}}</text>
       <view class="memory-image"><text class="strong">{{detail.memoryImage.meaning}}</text><text>{{detail.memoryImage.scene}}</text></view>
-      <view class="copy-card"><text class="card-title">来源</text><text>{{detail.curriculumStage}} · 课标序号 {{detail.sourceIndex}}</text></view>
-      <view class="copy-card"><text class="card-title">词组搭配</text><text>{{detail.collocationText}}</text></view>
+      <view class="copy-card"><text class="card-title">词库信息</text><text>{{detail.curriculumStage}} · 课标序号 {{detail.sourceIndex}}</text></view>
+      <view wx:if="{{detail.usage.hasUsageContent}}" class="usage-card detail-usage-card">
+        <view wx:if="{{detail.usage.collocations.length}}" class="usage-section">
+          <text class="usage-title">搭配</text>
+          <view wx:for="{{detail.usage.collocations}}" wx:key="text" class="usage-chip"><text>{{item.text}}</text><text wx:if="{{item.cn}}">{{item.cn}}</text></view>
+        </view>
+        <view wx:if="{{detail.usage.example}}" class="usage-section">
+          <text class="usage-title">例句</text>
+          <text class="usage-example-en">{{detail.usage.example.en}}</text>
+          <text wx:if="{{detail.usage.example.cn}}" class="usage-example-cn">{{detail.usage.example.cn}}</text>
+        </view>
+        <text wx:if="{{detail.usage.aiLabel}}" class="usage-ai-label">{{detail.usage.aiLabel}}</text>
+      </view>
+      <view wx:else class="copy-card"><text class="card-title">例句与搭配</text><text>授权词典数据待接入。</text></view>
+    </view>
+  </view>
+  <view wx:if="{{focusPauseVisible}}" class="modal-mask focus-pause-mask" catchtap="closePausePanel">
+    <view class="focus-pause-card" catchtap="noop">
+      <text class="pause-count">{{focusPause.learnedText}}</text>
+      <view class="primary-button" catchtap="closePausePanel">继续学习</view>
+      <view class="secondary-button" catchtap="pauseToHome">暂停休息</view>
+      <view class="secondary-button" catchtap="pauseToProfile">调整计划</view>
     </view>
   </view>
 </view>

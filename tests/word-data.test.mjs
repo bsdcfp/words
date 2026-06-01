@@ -26,3 +26,4 @@ assert.ok(words.every((word) => word.memoryImage?.prompt.includes(word.word)));
 assert.ok(words.every((word) => word.source.word_list.includes("普通高中英语课程标准")));
 assert.ok(testQuestions.every((question) => question.options.includes(question.answer)));
 assert.ok(testQuestions.every((question) => question.options.includes("不认识")));
+assert.ok(testQuestions.every((question) => question.options.length === 2));

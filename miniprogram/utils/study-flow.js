@@ -5,6 +5,10 @@ const { buildAssessmentResult, buildDailyReport } = require("./report");
 const REVIEW_INTERVAL_DAYS = [1, 2, 4, 7, 15];
 const PRECHECK_WINDOW_SIZE = 9;
 const MAX_REVIEW_CANDIDATES = 3;
+const MICRO_LIST_WORD_COUNT = 3;
+const MICRO_LISTS_PER_LIST = 3;
+const WORDS_PER_LIST = MICRO_LIST_WORD_COUNT * MICRO_LISTS_PER_LIST;
+const LISTS_PER_GROUP = 2;
 const CURRICULUM_STAGE_ORDER = [1, 2, 0];
 const ASSESSMENT_LAYER_ORDER = ["foundation", "required", "selective"];
 const ASSESSMENT_LAYERS = {
@@ -63,17 +67,33 @@ function answerAssessmentQuestion(state, selected) {
 }
 
 function startDailyLearning(state) {
-  applyOverdueDowngrades(state);
+  const todaySeenWordIds = todaySeenWordIdsFor(state);
+  state.daily.seenWordIds = todaySeenWordIds;
+  const candidateWordIds = buildCandidateWordIds(state);
+  const dailyTargetListCount = dailyTargetListCountFor(state);
+  const dailyTargetWordCount = dailyTargetListCount * WORDS_PER_LIST;
   state.daily = {
     startedAt: new Date().toISOString(),
     selectedWordIds: [],
     groupQueue: [],
+    learningWordIds: [],
+    skippedWordIds: [],
+    dailyTargetListCount,
+    dailyTargetWordCount,
+    currentListIndex: 0,
+    currentMicroListIndex: 0,
+    precheckCompleted: false,
+    listTargetGroupCount: dailyTargetListCount * MICRO_LISTS_PER_LIST,
+    completedGroups: [],
+    pendingMixedReviews: [],
+    activeMixedReview: null,
     roundIndex: 1,
     batchWordIds: [],
     completedWordIds: [],
     sessionCompletedWordIds: [],
+    seenWordIds: todaySeenWordIds,
     mixedReviewWordIds: [],
-    candidateWordIds: buildCandidateWordIds(state),
+    candidateWordIds,
     precheck: {},
     studyIndex: 0,
     reviewPhase: "initial",
@@ -81,6 +101,8 @@ function startDailyLearning(state) {
     groupIndex: 0,
     audioQuestions: [],
     audioIndex: 0,
+    recallQuestions: [],
+    recallIndex: 0,
     mixedQuestions: [],
     mixedIndex: 0,
     groupFeedback: "",
@@ -88,21 +110,37 @@ function startDailyLearning(state) {
   };
 }
 
+function todaySeenWordIdsFor(state) {
+  const daily = state && state.daily;
+  if (!daily || !daily.startedAt) return [];
+  const startedAt = new Date(daily.startedAt);
+  if (Number.isNaN(startedAt.getTime())) return [];
+  return localDateKey(startedAt) === localDateKey()
+    ? uniqueIds(daily.seenWordIds || [])
+    : [];
+}
+
 function markPrecheck(state, wordId, status) {
+  if (!wordId || state.daily.precheckCompleted) return;
   if (status === "known") {
     state.daily.precheck[wordId] = "known";
+    state.daily.skippedWordIds = uniqueIds((state.daily.skippedWordIds || []).concat(wordId));
+    state.daily.seenWordIds = uniqueIds((state.daily.seenWordIds || []).concat(wordId));
     state.daily.selectedWordIds = state.daily.selectedWordIds.filter((id) => id !== wordId);
     refillPrecheckCandidateWordIds(state);
     return;
   }
-  if (state.daily.precheck[wordId] === status) {
-    delete state.daily.precheck[wordId];
-  } else {
-    state.daily.precheck[wordId] = status;
-    if (!state.daily.selectedWordIds.includes(wordId) && state.daily.selectedWordIds.length < 3) {
-      state.daily.selectedWordIds = state.daily.selectedWordIds.concat(wordId);
-    }
+  state.daily.precheck[wordId] = "unfamiliar";
+  if (!state.daily.learningWordIds.includes(wordId) && state.daily.learningWordIds.length < dailyTargetWordCountFor(state)) {
+    state.daily.learningWordIds = state.daily.learningWordIds.concat(wordId);
+    state.daily.seenWordIds = uniqueIds((state.daily.seenWordIds || []).concat(wordId));
   }
+  if (state.daily.learningWordIds.length >= dailyTargetWordCountFor(state)) {
+    state.daily.precheckCompleted = true;
+    confirmPrecheck(state);
+    return;
+  }
+  refillPrecheckCandidateWordIds(state);
 }
 
 function togglePrecheckWord(state, wordId) {
@@ -116,19 +154,38 @@ function togglePrecheckWord(state, wordId) {
 }
 
 function autoSelectPrecheckWords(state) {
-  const remaining = state.daily.candidateWordIds.filter((wordId) => !state.daily.completedWordIds.includes(wordId));
-  const unfamiliar = remaining.filter((wordId) => state.daily.precheck[wordId] !== "known");
-  const fallback = remaining.filter((wordId) => !unfamiliar.includes(wordId));
-  state.daily.selectedWordIds = unfamiliar.concat(fallback).slice(0, 3);
+  while (state.daily.learningWordIds.length < dailyTargetWordCountFor(state)) {
+    const next = (state.daily.candidateWordIds || []).find((wordId) => state.daily.precheck[wordId] !== "known");
+    if (!next) break;
+    state.daily.precheck[next] = "unfamiliar";
+    state.daily.learningWordIds = uniqueIds(state.daily.learningWordIds.concat(next));
+    state.daily.seenWordIds = uniqueIds((state.daily.seenWordIds || []).concat(next));
+    refillPrecheckCandidateWordIds(state);
+  }
+  if (state.daily.learningWordIds.length >= dailyTargetWordCountFor(state)) {
+    state.daily.precheckCompleted = true;
+  }
 }
 
 function confirmPrecheck(state) {
-  if (state.daily.selectedWordIds.length !== 3) autoSelectPrecheckWords(state);
-  const firstGroup = state.daily.selectedWordIds.slice(0, 3);
+  if (state.daily.learningWordIds.length < dailyTargetWordCountFor(state)) autoSelectPrecheckWords(state);
+  state.daily.seenWordIds = uniqueIds((state.daily.seenWordIds || []).concat(state.daily.learningWordIds || []));
+  state.daily.precheckCompleted = true;
+  prepareCurrentMicroList(state);
+}
+
+function prepareCurrentMicroList(state) {
+  const microIndex = state.daily.currentMicroListIndex || 0;
+  const start = microIndex * MICRO_LIST_WORD_COUNT;
+  const firstGroup = (state.daily.learningWordIds || []).slice(start, start + MICRO_LIST_WORD_COUNT);
+  if (firstGroup.length < MICRO_LIST_WORD_COUNT) return false;
   state.daily.studyIndex = 0;
   state.daily.groupQueue = [firstGroup];
+  state.daily.currentGroupIndex = state.daily.completedGroups ? state.daily.completedGroups.length : 0;
+  state.daily.currentListIndex = Math.floor(microIndex / MICRO_LISTS_PER_LIST);
   resetRoundMasteryForWords(state, firstGroup);
   state.daily.batchWordIds = uniqueIds(state.daily.batchWordIds.concat(firstGroup));
+  state.daily.seenWordIds = uniqueIds((state.daily.seenWordIds || []).concat(firstGroup));
   state.daily.selectedWordIds = firstGroup;
   state.daily.reviewPhase = "initial";
   state.daily.mixedReviewWordIds = [];
@@ -136,9 +193,12 @@ function confirmPrecheck(state) {
   state.daily.groupIndex = 0;
   state.daily.audioQuestions = [];
   state.daily.audioIndex = 0;
+  state.daily.recallQuestions = [];
+  state.daily.recallIndex = 0;
   state.daily.mixedQuestions = [];
   state.daily.mixedIndex = 0;
   state.daily.groupFeedback = "";
+  return true;
 }
 
 function getCurrentStudyWord(state) {
@@ -196,24 +256,55 @@ function answerAudioQuestion(state, selectedCn) {
 function moveToNextAudioQuestion(state) {
   state.daily.audioIndex += 1;
   if (state.daily.audioIndex < state.daily.audioQuestions.length) return "audio";
-  const currentGroup = state.daily.selectedWordIds;
-  state.daily.completedWordIds = uniqueIds(state.daily.completedWordIds.concat(currentGroup));
-  state.daily.sessionCompletedWordIds = uniqueIds(state.daily.sessionCompletedWordIds.concat(currentGroup));
-  state.daily.selectedWordIds = [];
-  state.daily.studyIndex = 0;
+  prepareMeaningRecallQuestions(state);
   state.daily.audioQuestions = [];
   state.daily.audioIndex = 0;
+  return "meaning-recall";
+}
+
+function prepareMeaningRecallQuestions(state) {
+  state.daily.recallQuestions = currentGroupWordIds(state).map((wordId) => createRecallQuestion(wordId, "meaning-word-recall"));
+  state.daily.recallIndex = 0;
+}
+
+function getCurrentMeaningRecallQuestion(state) {
+  return state.daily.recallQuestions[state.daily.recallIndex];
+}
+
+function answerMeaningRecallQuestion(state) {
+  return answerRecallQuestion(state, getCurrentMeaningRecallQuestion(state), "meaning-word-recall");
+}
+
+function missMeaningRecallQuestion(state) {
+  return missRecallQuestion(state, getCurrentMeaningRecallQuestion(state), "meaning-word-recall");
+}
+
+function moveToNextMeaningRecallQuestion(state) {
+  state.daily.recallIndex += 1;
+  if (state.daily.recallIndex < state.daily.recallQuestions.length) return "meaning-recall";
+  const currentGroup = state.daily.selectedWordIds;
+  recordCompletedGroup(state, currentGroup);
+  state.daily.selectedWordIds = [];
+  state.daily.studyIndex = 0;
+  state.daily.recallQuestions = [];
+  state.daily.recallIndex = 0;
   state.daily.groupQueue = [];
-  if (state.daily.completedWordIds.length >= 6) {
-    prepareMixedReview(state);
-    state.daily.groupFeedback = state.daily.completedWordIds.length >= 9
-      ? "3 组完成，进入 9 词混组复习"
-      : "2 组完成，进入 6 词混组复习";
+  if (prepareNextMixedReview(state)) {
     return "mixed-review";
   }
-  state.daily.groupFeedback = "本组完成，重新选下一组";
-  refillPrecheckCandidateWordIds(state);
-  return "next-selection";
+  if (isListNewWordsComplete(state)) {
+    state.daily.groupFeedback = "今日目标完成";
+    completeCurrentList(state);
+    return "daily-report";
+  }
+  const completedMicroLists = state.daily.completedGroups.length;
+  if (completedMicroLists > 0 && completedMicroLists % MICRO_LISTS_PER_LIST === 0) {
+    state.daily.groupFeedback = "List 完成，自动进入下一个 List";
+  } else {
+    state.daily.groupFeedback = "继续下一个 List 片段";
+  }
+  prepareCurrentMicroList(state);
+  return "word-study";
 }
 
 function getCurrentMixedReviewQuestion(state) {
@@ -230,15 +321,27 @@ function moveToNextMixedReviewQuestion(state) {
 }
 
 function completeMixedReview(state) {
-  if (state.daily.mixedReviewWordIds.length < 9) {
-    state.daily.reviewPhase = "initial";
-    state.daily.mixedReviewWordIds = [];
-    state.daily.mixedQuestions = [];
-    state.daily.mixedIndex = 0;
-    state.daily.groupFeedback = "2 组混合复习完成，继续选择第 3 组";
-    refillPrecheckCandidateWordIds(state);
-    return "next-selection";
+  state.daily.activeMixedReview = null;
+  state.daily.mixedReviewWordIds = [];
+  state.daily.mixedQuestions = [];
+  state.daily.mixedIndex = 0;
+  if (prepareNextMixedReview(state)) {
+    return "mixed-review";
   }
+  if (isListNewWordsComplete(state)) {
+    completeCurrentList(state);
+    return "daily-report";
+  }
+  state.daily.reviewPhase = "initial";
+  const completedMicroLists = state.daily.completedGroups.length;
+  state.daily.groupFeedback = completedMicroLists % MICRO_LISTS_PER_LIST === 0
+    ? "List 完成，自动进入下一个 List"
+    : "混组复习完成，继续学习";
+  prepareCurrentMicroList(state);
+  return "word-study";
+}
+
+function completeCurrentList(state) {
   state.daily.completed = true;
   markDailyCheckin(state);
   if (!state.user.badges.includes("起步徽章")) state.user.badges.push("起步徽章");
@@ -246,7 +349,117 @@ function completeMixedReview(state) {
     state.user.badges.push("三日连学");
   }
   state.lastReport = buildDailyReport(state, words);
-  return startNextRound(state) ? "next-round" : "daily-report";
+  return true;
+}
+
+function recordCompletedGroup(state, wordIds) {
+  const group = uniqueIds(wordIds || []);
+  if (!group.length) return;
+  state.daily.completedGroups = Array.isArray(state.daily.completedGroups) ? state.daily.completedGroups : [];
+  state.daily.completedGroups.push(group);
+  state.daily.currentMicroListIndex = state.daily.completedGroups.length;
+  state.daily.currentListIndex = Math.floor(state.daily.currentMicroListIndex / MICRO_LISTS_PER_LIST);
+  state.daily.completedWordIds = uniqueIds(state.daily.completedWordIds.concat(group));
+  state.daily.sessionCompletedWordIds = uniqueIds((state.daily.sessionCompletedWordIds || []).concat(group));
+  state.daily.batchWordIds = uniqueIds((state.daily.batchWordIds || []).concat(group));
+  enqueueMixedReviewsAfterGroup(state);
+}
+
+function enqueueMixedReviewsAfterGroup(state) {
+  const groups = state.daily.completedGroups || [];
+  const groupNumber = groups.length;
+  const positionInList = ((groupNumber - 1) % MICRO_LISTS_PER_LIST) + 1;
+  const queue = Array.isArray(state.daily.pendingMixedReviews) ? state.daily.pendingMixedReviews : [];
+  if (positionInList === 2) {
+    queue.push(createMixedReviewTask([
+      createGroupReviewEntry(groups, groupNumber - 1),
+      createGroupReviewEntry(groups, groupNumber)
+    ]));
+  }
+  if (positionInList === 3) {
+    queue.push(createMixedReviewTask([
+      createGroupReviewEntry(groups, groupNumber - 2),
+      createGroupReviewEntry(groups, groupNumber - 1),
+      createGroupReviewEntry(groups, groupNumber)
+    ]));
+    const listNumber = Math.floor(groupNumber / MICRO_LISTS_PER_LIST);
+    if (listNumber % LISTS_PER_GROUP === 0) {
+      queue.push(createMixedReviewTask([
+        createGroupReviewEntry(groups, groupNumber - 5),
+        createGroupReviewEntry(groups, groupNumber - 4),
+        createGroupReviewEntry(groups, groupNumber - 3),
+        createGroupReviewEntry(groups, groupNumber - 2),
+        createGroupReviewEntry(groups, groupNumber - 1),
+        createGroupReviewEntry(groups, groupNumber)
+      ]));
+    }
+  }
+  state.daily.pendingMixedReviews = queue;
+}
+
+function createGroupReviewEntry(groups, groupNumber) {
+  return {
+    groupNumber,
+    wordIds: groups[groupNumber - 1] || []
+  };
+}
+
+function createMixedReviewTask(groupList) {
+  const groupNumbers = groupList.map((group) => group.groupNumber).filter(Boolean);
+  const groupLabel = formatGroupNumbers(groupNumbers);
+  return {
+    label: `${groupLabel} 混组复习`,
+    groupLabel,
+    groupNumbers,
+    wordIds: uniqueIds([].concat.apply([], groupList.map((group) => group.wordIds || [])))
+  };
+}
+
+function formatGroupNumbers(groupNumbers) {
+  if (groupNumbers.length === 6) {
+    return `List ${Math.ceil(groupNumbers[0] / MICRO_LISTS_PER_LIST)} + List ${Math.ceil(groupNumbers[5] / MICRO_LISTS_PER_LIST)}`;
+  }
+  if (groupNumbers.length === 3) {
+    return `List ${Math.ceil(groupNumbers[0] / MICRO_LISTS_PER_LIST)} 内复习`;
+  }
+  return groupNumbers.map((number) => `片段 ${number}`).join(" + ");
+}
+
+function prepareNextMixedReview(state) {
+  const queue = Array.isArray(state.daily.pendingMixedReviews) ? state.daily.pendingMixedReviews : [];
+  const nextTask = queue.shift();
+  if (!nextTask) return false;
+  state.daily.pendingMixedReviews = queue;
+  state.daily.activeMixedReview = nextTask;
+  state.daily.reviewPhase = "mixed";
+  state.daily.mixedReviewWordIds = uniqueIds(nextTask.wordIds || []);
+  state.daily.mixedQuestions = state.daily.mixedReviewWordIds.map((wordId) => createChoiceQuestion(wordId, "mixed-review", "visual"));
+  state.daily.mixedIndex = 0;
+  state.daily.groupFeedback = nextTask.label;
+  return true;
+}
+
+function isListNewWordsComplete(state) {
+  return (state.daily.completedGroups || []).length >= dailyTargetMicroListCountFor(state);
+}
+
+function listTargetGroupCountFor(state) {
+  return dailyTargetMicroListCountFor(state);
+}
+
+function dailyTargetListCountFor(state) {
+  const configured = Number(state.user?.settings?.dailyTargetListCount || state.daily?.dailyTargetListCount || 1);
+  if (Number.isFinite(configured) && configured > 0) return Math.floor(configured);
+  const legacyGroups = Number(state.user?.settings?.listGroupCount || 0);
+  return legacyGroups > 0 ? Math.max(1, Math.round(legacyGroups / MICRO_LISTS_PER_LIST)) : 1;
+}
+
+function dailyTargetMicroListCountFor(state) {
+  return dailyTargetListCountFor(state) * MICRO_LISTS_PER_LIST;
+}
+
+function dailyTargetWordCountFor(state) {
+  return dailyTargetListCountFor(state) * WORDS_PER_LIST;
 }
 
 function markDailyCheckin(state) {
@@ -325,25 +538,13 @@ function getAllWords() {
 
 function buildCandidateWordIds(stateOrWordStates, excludedWordIds = []) {
   const userWordStates = stateOrWordStates.userWordStates || stateOrWordStates || {};
-  const streakDays = stateOrWordStates.user && stateOrWordStates.user.streakDays ? stateOrWordStates.user.streakDays : 0;
   const excluded = {};
+  (stateOrWordStates.daily?.seenWordIds || []).forEach((id) => { excluded[id] = true; });
+  (stateOrWordStates.daily?.learningWordIds || []).forEach((id) => { excluded[id] = true; });
+  (stateOrWordStates.daily?.skippedWordIds || []).forEach((id) => { excluded[id] = true; });
   excludedWordIds.forEach((id) => { excluded[id] = true; });
   const stageOrder = curriculumStageOrderFor(stateOrWordStates);
-  const reviewWordIds = orderWordsByStages(words, stageOrder)
-    .filter((word) => !excluded[word.id] && isReviewCandidate(userWordStates[word.id]))
-    .map((word, index) => ({
-      id: word.id,
-      index,
-      score: scoreWordRisk(word, userWordStates[word.id], streakDays)
-    }))
-    .sort((a, b) => b.score - a.score || a.index - b.index)
-    .map((item) => item.id)
-    .slice(0, MAX_REVIEW_CANDIDATES);
-
-  reviewWordIds.forEach((wordId) => { excluded[wordId] = true; });
-
-  return reviewWordIds
-    .concat(buildCurrentStageNewWordIds(userWordStates, excluded, PRECHECK_WINDOW_SIZE - reviewWordIds.length, stageOrder))
+  return buildCurrentStageNewWordIds(userWordStates, excluded, PRECHECK_WINDOW_SIZE, stageOrder)
     .slice(0, PRECHECK_WINDOW_SIZE);
 }
 
@@ -370,6 +571,9 @@ function refillPrecheckCandidateWordIds(state) {
   const excluded = uniqueIds([]
     .concat(state.daily.completedWordIds || [])
     .concat(state.daily.sessionCompletedWordIds || [])
+    .concat(state.daily.learningWordIds || [])
+    .concat(state.daily.skippedWordIds || [])
+    .concat(state.daily.seenWordIds || [])
     .concat(visibleWordIds)
     .concat(Object.keys(state.daily.precheck || {}).filter((wordId) => state.daily.precheck[wordId] === "known")));
 
@@ -380,7 +584,8 @@ function isVisiblePrecheckCandidate(state, wordId) {
   return Boolean(
     wordId &&
     !state.daily.completedWordIds.includes(wordId) &&
-    state.daily.precheck[wordId] !== "known"
+    !(state.daily.seenWordIds || []).includes(wordId) &&
+    !state.daily.precheck[wordId]
   );
 }
 
@@ -404,6 +609,7 @@ function startNextRound(state) {
   state.daily.groupQueue = [];
   state.daily.batchWordIds = [];
   state.daily.completedWordIds = [];
+  state.daily.seenWordIds = [];
   state.daily.mixedReviewWordIds = [];
   state.daily.candidateWordIds = nextCandidateWordIds;
   state.daily.precheck = {};
@@ -413,6 +619,8 @@ function startNextRound(state) {
   state.daily.groupIndex = 0;
   state.daily.audioQuestions = [];
   state.daily.audioIndex = 0;
+  state.daily.recallQuestions = [];
+  state.daily.recallIndex = 0;
   state.daily.mixedQuestions = [];
   state.daily.mixedIndex = 0;
   state.daily.groupFeedback = `上一轮完成，开始第 ${state.daily.roundIndex} 轮选词`;
@@ -423,13 +631,63 @@ function startNextRound(state) {
 function createChoiceQuestion(wordId, type, mode) {
   const word = getWordById(wordId);
   const correct = word.cn.join("，");
-  const allDistractors = uniqueIds(words
-    .filter((item) => item.id !== wordId)
-    .map((item) => item.cn.join("，"))
-    .filter((meaning) => meaning !== correct));
-  const offset = word.sourceIndex % Math.max(1, allDistractors.length - 3);
-  const distractors = allDistractors.slice(offset, offset + 3);
-  return { wordId, type, mode: mode || "visual", options: shuffle([correct].concat(distractors)), answered: false, selected: null, isCorrect: null };
+  return { wordId, type, mode: mode || "visual", options: [correct], answered: false, selected: null, isCorrect: null };
+}
+
+function createRecallQuestion(wordId, type) {
+  return { wordId, type, mode: "meaning-to-word", answered: false, selected: null, isCorrect: null };
+}
+
+function answerRecallQuestion(state, question, type) {
+  const word = getWordById(question.wordId);
+  const current = state.userWordStates[word.id] || defaultWordState();
+  const answeredState = Object.assign({}, current, {
+    familiarity: Math.min(current.familiarity + 1, 5),
+    correctStreak: current.correctStreak + 1,
+    lastSeenAt: new Date().toISOString(),
+    lastResult: "correct"
+  }, masteryPatch(current, type, question.mode, true));
+  state.userWordStates[word.id] = Object.assign({}, answeredState, roundMasterySchedulePatch(answeredState));
+  state.answerRecords.push({
+    id: `answer_${Date.now()}_${state.answerRecords.length}`,
+    sessionId: state.daily.startedAt,
+    type,
+    wordId: word.id,
+    selected: word.word,
+    answer: word.word,
+    isCorrect: true,
+    createdAt: new Date().toISOString()
+  });
+  question.answered = true;
+  question.selected = word.word;
+  question.isCorrect = true;
+  return { isCorrect: true, word };
+}
+
+function missRecallQuestion(state, question, type) {
+  const word = getWordById(question.wordId);
+  const current = state.userWordStates[word.id] || defaultWordState();
+  state.userWordStates[word.id] = Object.assign({}, current, {
+    familiarity: Math.max(current.familiarity - 1, 0),
+    correctStreak: 0,
+    wrongCount: current.wrongCount + 1,
+    lastSeenAt: new Date().toISOString(),
+    lastResult: "wrong"
+  }, masteryPatch(current, type, question.mode, false));
+  state.answerRecords.push({
+    id: `answer_${Date.now()}_${state.answerRecords.length}`,
+    sessionId: state.daily.startedAt,
+    type,
+    wordId: word.id,
+    selected: "__missed__",
+    answer: word.word,
+    isCorrect: false,
+    createdAt: new Date().toISOString()
+  });
+  question.answered = true;
+  question.selected = "__missed__";
+  question.isCorrect = false;
+  return { isCorrect: false, word };
 }
 
 function answerChoiceQuestion(state, question, selectedCn, type) {
@@ -498,10 +756,7 @@ function masteryFlagFor(type, mode) {
 
 function roundMasterySchedulePatch(wordState) {
   if (!isRoundMastered(wordState)) return {};
-  if (wordState.nextReviewAt && !isDueForReview(wordState)) {
-    return { roundMasteredAt: wordState.roundMasteredAt || new Date().toISOString() };
-  }
-  return nextReviewPatch(wordState);
+  return { roundMasteredAt: wordState.roundMasteredAt || new Date().toISOString() };
 }
 
 function isRoundMastered(wordState) {
@@ -631,17 +886,12 @@ function buildAssessmentQuestionsForLayer(layer, count, usedWordIds, seed) {
 
 function createAssessmentQuestion(word, layer, index) {
   const correct = word.cn.join("，");
-  const allDistractors = words
-    .filter((item) => item.id !== word.id && item.cn.join("，") !== correct)
-    .map((item) => item.cn.join("，"));
-  const start = (word.sourceIndex + index) % Math.max(1, allDistractors.length - 3);
-  const distractors = allDistractors.slice(start, start + 3);
   return {
     id: `vocab_${layer}_${word.id}`,
     word: word.word,
     sourceWordId: word.id,
     layer,
-    options: shuffle([correct].concat(distractors).concat("不认识")),
+    options: [correct, "不认识"],
     answer: correct
   };
 }
@@ -666,6 +916,12 @@ function isLearnableNewWord(word) {
   if (!word || !word.word || word.word.length <= 1) return false;
   if (/^(art\.|conj\.|prep\.|pron\.)/.test(word.pos || "")) return false;
   return true;
+}
+
+function isSameLemma(left, right) {
+  const leftLemma = left && (left.lemma || left.headword || left.word);
+  const rightLemma = right && (right.lemma || right.headword || right.word);
+  return Boolean(leftLemma && rightLemma && leftLemma === rightLemma);
 }
 
 function hashText(text) {
@@ -730,8 +986,6 @@ function isReviewCandidate(wordState) {
 
 function isFreshWordCandidate(wordState) {
   if (!wordState) return true;
-  if (isReviewCandidate(wordState)) return false;
-  if (wordState.nextReviewAt || wordState.reviewStage) return false;
   return !wordState.lastSeenAt;
 }
 
@@ -793,12 +1047,15 @@ module.exports = {
   answerAssessmentQuestion,
   answerAudioQuestion,
   answerGroupReviewQuestion,
+  answerMeaningRecallQuestion,
+  missMeaningRecallQuestion,
   answerMixedReviewQuestion,
   autoSelectPrecheckWords,
   completeMixedReview,
   confirmPrecheck,
   getCurrentAudioQuestion,
   getCurrentGroupReviewQuestion,
+  getCurrentMeaningRecallQuestion,
   getCurrentMixedReviewQuestion,
   getCurrentStudyWord,
   getCurrentTestQuestion,
@@ -808,9 +1065,12 @@ module.exports = {
   markStudyWord,
   moveToNextAudioQuestion,
   moveToNextGroupReviewQuestion,
+  moveToNextMeaningRecallQuestion,
   moveToNextMixedReviewQuestion,
   prepareGroupReviewQuestions,
   prepareAudioQuestions,
+  prepareMeaningRecallQuestions,
+  refillPrecheckCandidateWordIds,
   startAssessment,
   startDailyLearning,
   togglePrecheckWord

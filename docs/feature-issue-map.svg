@@ -1,0 +1,163 @@
+<svg viewBox="0 0 720 600" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif; background: #fff;">
+  <title>单词项目 v2 功能点与问题总览</title>
+
+  <style>
+    .box { stroke-width: 1.2; rx: 8; }
+    .box-done { fill: #e8f5e9; stroke: #4caf50; }
+    .box-warn { fill: #fff3e0; stroke: #ff9800; }
+    .box-gap { fill: #fce4ec; stroke: #e91e63; }
+    .box-remove { fill: #f3e5f5; stroke: #9c27b0; }
+    .title { font-size: 11px; font-weight: 600; fill: #222; }
+    .sub { font-size: 9px; fill: #666; }
+    .header { font-size: 14px; font-weight: 700; fill: #222; }
+  </style>
+
+  <!-- Legend -->
+  <circle cx="20" cy="16" r="5" fill="#e8f5e9" stroke="#4caf50"/>
+  <text x="30" y="20" class="sub">已实现</text>
+  <circle cx="90" cy="16" r="5" fill="#fff3e0" stroke="#ff9800"/>
+  <text x="100" y="20" class="sub">部分/有隐患</text>
+  <circle cx="190" cy="16" r="5" fill="#fce4ec" stroke="#e91e63"/>
+  <text x="200" y="20" class="sub">未实现</text>
+  <circle cx="260" cy="16" r="5" fill="#f3e5f5" stroke="#9c27b0"/>
+  <text x="270" y="20" class="sub">v2需移除</text>
+
+  <!-- Row 1: v2 学习流程 -->
+  <text x="10" y="52" class="header">v2 每组学习流程（3词一组）</text>
+  <rect x="10" y="60" width="120" height="50" class="box box-done"/>
+  <text x="70" y="80" class="title" text-anchor="middle">单词识记</text>
+  <text x="70" y="93" class="sub" text-anchor="middle">词形/音标/释义</text>
+
+  <rect x="140" y="60" width="120" height="50" class="box box-gap"/>
+  <text x="200" y="80" class="title" text-anchor="middle">回忆→揭示复习</text>
+  <text x="200" y="93" class="sub" text-anchor="middle">2s后自动出释义</text>
+
+  <rect x="270" y="60" width="120" height="50" class="box box-warn"/>
+  <text x="330" y="80" class="title" text-anchor="middle">听音辨义</text>
+  <text x="330" y="93" class="sub" text-anchor="middle">缺语音识别</text>
+
+  <rect x="400" y="60" width="120" height="50" class="box box-warn"/>
+  <text x="460" y="80" class="title" text-anchor="middle">看中文回忆英文</text>
+  <text x="460" y="93" class="sub" text-anchor="middle">仅小程序端有</text>
+
+  <rect x="530" y="60" width="120" height="50" class="box box-done"/>
+  <text x="590" y="80" class="title" text-anchor="middle">混组复习</text>
+  <text x="590" y="93" class="sub" text-anchor="middle">大group节奏</text>
+
+  <!-- Arrows -->
+  <defs><marker id="a" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="#999"/></marker></defs>
+  <line x1="130" y1="85" x2="138" y2="85" stroke="#999" marker-end="url(#a)"/>
+  <line x1="260" y1="85" x2="268" y2="85" stroke="#999" marker-end="url(#a)"/>
+  <line x1="390" y1="85" x2="398" y2="85" stroke="#999" marker-end="url(#a)"/>
+  <line x1="520" y1="85" x2="528" y2="85" stroke="#999" marker-end="url(#a)"/>
+
+  <!-- Row 2: 识记与播放 -->
+  <text x="10" y="140" class="header">识记与播放</text>
+  <rect x="10" y="148" width="120" height="50" class="box box-gap"/>
+  <text x="70" y="168" class="title" text-anchor="middle">循环播放3/6/9次</text>
+  <text x="70" y="181" class="sub" text-anchor="middle">字段有·逻辑未接</text>
+
+  <rect x="140" y="148" width="120" height="50" class="box box-gap"/>
+  <text x="200" y="168" class="title" text-anchor="middle">去掉播放按钮</text>
+  <text x="200" y="181" class="sub" text-anchor="middle">自动循环播放</text>
+
+  <rect x="270" y="148" width="120" height="50" class="box box-warn"/>
+  <text x="330" y="168" class="title" text-anchor="middle">跟读检测</text>
+  <text x="330" y="181" class="sub" text-anchor="middle">小程序部分有</text>
+
+  <rect x="400" y="148" width="120" height="50" class="box box-warn"/>
+  <text x="460" y="168" class="title" text-anchor="middle">发音方案</text>
+  <text x="460" y="181" class="sub" text-anchor="middle">Web:TTS 小程序:有道</text>
+
+  <rect x="530" y="148" width="120" height="50" class="box box-gap"/>
+  <text x="590" y="168" class="title" text-anchor="middle">语音识别验收</text>
+  <text x="590" y="181" class="sub" text-anchor="middle">v2核心·未实现</text>
+
+  <!-- Row 3: 错词与复习 -->
+  <text x="10" y="228" class="header">错词本与复习窗口</text>
+  <rect x="10" y="236" width="120" height="50" class="box box-done"/>
+  <text x="70" y="256" class="title" text-anchor="middle">统一错词本</text>
+  <text x="70" y="269" class="sub" text-anchor="middle">错词记录·展示</text>
+
+  <rect x="140" y="236" width="120" height="50" class="box box-gap"/>
+  <text x="200" y="256" class="title" text-anchor="middle">错词"已记住"移除</text>
+  <text x="200" y="269" class="sub" text-anchor="middle">无交互入口</text>
+
+  <rect x="270" y="236" width="120" height="50" class="box box-gap"/>
+  <text x="330" y="256" class="title" text-anchor="middle">睡前复习窗口</text>
+  <text x="330" y="269" class="sub" text-anchor="middle">20:00-23:59</text>
+
+  <rect x="400" y="236" width="120" height="50" class="box box-gap"/>
+  <text x="460" y="256" class="title" text-anchor="middle">晨间复习窗口</text>
+  <text x="460" y="269" class="sub" text-anchor="middle">05:00-09:00</text>
+
+  <rect x="530" y="236" width="120" height="50" class="box box-gap"/>
+  <text x="590" y="256" class="title" text-anchor="middle">错词提醒策略</text>
+  <text x="590" y="269" class="sub" text-anchor="middle">2次错过→提示调整</text>
+
+  <!-- Row 4: List与完成 -->
+  <text x="10" y="316" class="header">List 管理与完成标准</text>
+  <rect x="10" y="324" width="120" height="50" class="box box-done"/>
+  <text x="70" y="344" class="title" text-anchor="middle">15组=45词/list</text>
+  <text x="70" y="357" class="sub" text-anchor="middle">默认配置</text>
+
+  <rect x="140" y="324" width="120" height="50" class="box box-gap"/>
+  <text x="200" y="344" class="title" text-anchor="middle">暂停/恢复进度</text>
+  <text x="200" y="357" class="sub" text-anchor="middle">当前重置丢进度</text>
+
+  <rect x="270" y="324" width="120" height="50" class="box box-gap"/>
+  <text x="330" y="344" class="title" text-anchor="middle">完成标准状态机</text>
+  <text x="330" y="357" class="sub" text-anchor="middle">新词/睡前/晨间/完整</text>
+
+  <rect x="400" y="324" width="120" height="50" class="box box-gap"/>
+  <text x="460" y="344" class="title" text-anchor="middle">积分三段</text>
+  <text x="460" y="357" class="sub" text-anchor="middle">新词/睡前/晨间各给分</text>
+
+  <rect x="530" y="324" width="120" height="50" class="box box-gap"/>
+  <text x="590" y="344" class="title" text-anchor="middle">"我的"个人中心</text>
+  <text x="590" y="357" class="sub" text-anchor="middle">设计稿有·未开发</text>
+
+  <!-- Row 5: 数据与老问题 -->
+  <text x="10" y="404" class="header">数据底座与老问题</text>
+  <rect x="10" y="412" width="120" height="50" class="box box-done"/>
+  <text x="70" y="432" class="title" text-anchor="middle">3000词数据</text>
+  <text x="70" y="445" class="sub" text-anchor="middle">课标+ECDICT</text>
+
+  <rect x="140" y="412" width="120" height="50" class="box box-warn"/>
+  <text x="200" y="432" class="title" text-anchor="middle">选择题无干扰项</text>
+  <text x="200" y="445" class="sub" text-anchor="middle">P0缺陷</text>
+
+  <rect x="270" y="412" width="120" height="50" class="box box-warn"/>
+  <text x="330" y="432" class="title" text-anchor="middle">Web/小程序双代码</text>
+  <text x="330" y="445" class="sub" text-anchor="middle">同步风险</text>
+
+  <rect x="400" y="412" width="120" height="50" class="box box-warn"/>
+  <text x="460" y="432" class="title" text-anchor="middle">answerRecords膨胀</text>
+  <text x="460" y="445" class="sub" text-anchor="middle">localStorage无清理</text>
+
+  <rect x="530" y="412" width="120" height="50" class="box box-done"/>
+  <text x="590" y="432" class="title" text-anchor="middle">自动化测试</text>
+  <text x="590" y="445" class="sub" text-anchor="middle">7个测试文件</text>
+
+  <!-- Row 6: v2需移除 -->
+  <text x="10" y="492" class="header">v2 需移除的 v1 逻辑</text>
+  <rect x="10" y="500" width="120" height="50" class="box box-remove"/>
+  <text x="70" y="520" class="title" text-anchor="middle">艾宾浩斯排程</text>
+  <text x="70" y="533" class="sub" text-anchor="middle">1/2/4/7/15天</text>
+
+  <rect x="140" y="500" width="120" height="50" class="box box-remove"/>
+  <text x="200" y="520" class="title" text-anchor="middle">超期降级</text>
+  <text x="200" y="533" class="sub" text-anchor="middle">applyOverdueDowngrades</text>
+
+  <rect x="270" y="500" width="120" height="50" class="box box-remove"/>
+  <text x="330" y="520" class="title" text-anchor="middle">风险分排序</text>
+  <text x="330" y="533" class="sub" text-anchor="middle">scoreWordRisk</text>
+
+  <rect x="400" y="500" width="120" height="50" class="box box-remove"/>
+  <text x="460" y="520" class="title" text-anchor="middle">复习节点状态机</text>
+  <text x="460" y="533" class="sub" text-anchor="middle">reviewStage/nextReviewAt</text>
+
+  <rect x="530" y="500" width="120" height="50" class="box box-remove"/>
+  <text x="590" y="520" class="title" text-anchor="middle">首页复习节奏文案</text>
+  <text x="590" y="533" class="sub" text-anchor="middle">"D+1/D+3/D+7"</text>
+</svg>

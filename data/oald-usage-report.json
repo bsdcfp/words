@@ -1,0 +1,809 @@
+{
+  "generatedAt": "2026-05-22T13:47:08.101Z",
+  "source": {
+    "dictionary": "Oxford Advanced Learner's Dictionary 10th bilingual MDX",
+    "mdxPath": "/Users/fuping.chu/Documents/Personal/学习力/单词/牛津高阶（第10版 英汉双解） V11_8.mdx",
+    "license": "user-provided authorized database"
+  },
+  "totals": {
+    "learningItems": 3368,
+    "matchedEntries": 3366,
+    "usageItems": 3368,
+    "examples": 3263,
+    "aiFallbackExamples": 105,
+    "itemsWithAnyExample": 3368,
+    "collocationItems": 3924,
+    "missingEntries": 2,
+    "noUsableUsage": 103
+  },
+  "samples": {
+    "gk3500_0024_accident_n": {
+      "word": "accident",
+      "pos": "n.",
+      "cn": [
+        "事故",
+        "意外的事"
+      ],
+      "senseCn": "（交通）事故；意外遭遇；不测事件",
+      "senseScore": 15,
+      "collocationCount": 3,
+      "hasExample": true
+    },
+    "gk3500_0033_account_n": {
+      "word": "account",
+      "pos": "n.",
+      "cn": [
+        "账目",
+        "描述"
+      ],
+      "senseCn": "描述；叙述；报告",
+      "senseScore": 13,
+      "collocationCount": 3,
+      "hasExample": true
+    },
+    "gk3500_0039_acquire_v": {
+      "word": "acquire",
+      "pos": "v.",
+      "cn": [
+        "获得",
+        "学到"
+      ],
+      "senseCn": "（通过努力、能力、行为表现）获得，得到",
+      "senseScore": 13,
+      "collocationCount": 1,
+      "hasExample": true
+    }
+  },
+  "misses": [
+    {
+      "id": "gk3500_0080_africa_n",
+      "word": "Africa",
+      "pos": "n.",
+      "cn": [
+        "非洲"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0081_african_adj",
+      "word": "African",
+      "pos": "adj.",
+      "cn": [
+        "非洲的",
+        "非洲人的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0132_america_n",
+      "word": "America",
+      "pos": "n.",
+      "cn": [
+        "美国",
+        "美洲"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0134_american_n",
+      "word": "American",
+      "pos": "n.",
+      "cn": [
+        "美国人"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0209_asia_n",
+      "word": "Asia",
+      "pos": "n.",
+      "cn": [
+        "亚洲"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0225_astronomy_n",
+      "word": "astronomy",
+      "pos": "n.",
+      "cn": [
+        "天文学"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0228_atlantic_n",
+      "word": "Atlantic",
+      "pos": "n.",
+      "cn": [
+        "大西洋"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0244_australian_adj",
+      "word": "Australian",
+      "pos": "adj.",
+      "cn": [
+        "澳洲的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0268_badminton_n",
+      "word": "badminton",
+      "pos": "n.",
+      "cn": [
+        "羽毛球"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0272_bakery_n",
+      "word": "bakery",
+      "pos": "n.",
+      "cn": [
+        "面包店"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0379_blouse_n",
+      "word": "blouse",
+      "pos": "n.",
+      "cn": [
+        "宽罩衫",
+        "短上衣"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0435_britain_n",
+      "word": "Britain",
+      "pos": "n.",
+      "cn": [
+        "英国",
+        "不列颠"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0463_businesswoman_n",
+      "word": "businesswoman",
+      "pos": "n.",
+      "cn": [
+        "商人女",
+        "女企业家"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0492_canada_n",
+      "word": "Canada",
+      "pos": "n.",
+      "cn": [
+        "加拿大"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0493_canadian_adj",
+      "word": "Canadian",
+      "pos": "adj.",
+      "cn": [
+        "加拿大的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0494_canadian_n",
+      "word": "Canadian",
+      "pos": "n.",
+      "cn": [
+        "加拿大人"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0501_canteen_n",
+      "word": "canteen",
+      "pos": "n.",
+      "cn": [
+        "餐厅",
+        "食堂"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0542_centimetre_n",
+      "word": "centimetre",
+      "pos": "n.",
+      "cn": [
+        "公分",
+        "厘米"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0553_chairwoman_n",
+      "word": "chairwoman",
+      "pos": "n.",
+      "cn": [
+        "女主席",
+        "女会长",
+        "女议长"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0589_chick_n",
+      "word": "chick",
+      "pos": "n.",
+      "cn": [
+        "小鸡"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0597_chinese_adj",
+      "word": "Chinese",
+      "pos": "adj.",
+      "cn": [
+        "中国的",
+        "中国人的",
+        "中文"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0602_chopsticks_n",
+      "word": "chopsticks",
+      "pos": "n.",
+      "cn": [
+        "筷子"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0651_coke_n",
+      "word": "coke",
+      "pos": "n.",
+      "cn": [
+        "可口可乐"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0715_consist_v",
+      "word": "consist",
+      "pos": "v.",
+      "cn": [
+        "包含",
+        "组成",
+        "构成"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0884_devote_v",
+      "word": "devote",
+      "pos": "vt.",
+      "cn": [
+        "把……奉献"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_0951_dormitory_n",
+      "word": "dormitory",
+      "pos": "n.",
+      "cn": [
+        "学生宿舍缩写式dorm"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1048_england_n",
+      "word": "England",
+      "pos": "n.",
+      "cn": [
+        "英国"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1051_englishman_n",
+      "word": "Englishman",
+      "pos": "n.",
+      "cn": [
+        "英国人"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1072_eraser_n",
+      "word": "eraser",
+      "pos": "n.",
+      "cn": [
+        "橡皮擦",
+        "黑板擦"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1215_fireworks_n",
+      "word": "fireworks",
+      "pos": "n.",
+      "cn": [
+        "焰火"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1277_forty_num",
+      "word": "forty",
+      "pos": "num.",
+      "cn": [
+        "四十"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1280_founding_n",
+      "word": "founding",
+      "pos": "n.",
+      "cn": [
+        "成立",
+        "建立"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1287_france_n",
+      "word": "France",
+      "pos": "n.",
+      "cn": [
+        "法国"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1291_french_n",
+      "word": "French",
+      "pos": "n.",
+      "cn": [
+        "法语",
+        "法国人的",
+        "法语的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1292_frenchman_n",
+      "word": "Frenchman",
+      "pos": "n.",
+      "cn": [
+        "法国人男"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1297_fried_adj",
+      "word": "fried",
+      "pos": "adj.",
+      "cn": [
+        "油煎的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1338_german_adj",
+      "word": "German",
+      "pos": "adj.",
+      "cn": [
+        "德国的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1339_german_n",
+      "word": "German",
+      "pos": "n.",
+      "cn": [
+        "德国人",
+        "德语"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1340_germany_n",
+      "word": "Germany",
+      "pos": "n.",
+      "cn": [
+        "德国"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1345_giraffe_n",
+      "word": "giraffe",
+      "pos": "n.",
+      "cn": [
+        "长颈鹿"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1387_greece_n",
+      "word": "Greece",
+      "pos": "n.",
+      "cn": [
+        "希腊"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1395_grocer_n",
+      "word": "grocer",
+      "pos": "n.",
+      "cn": [
+        "零售商人",
+        "食品店"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1419_hamburger_n",
+      "word": "hamburger",
+      "pos": "n.",
+      "cn": [
+        "汉堡包"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1520_housewife_n",
+      "word": "housewife",
+      "pos": "n.",
+      "cn": [
+        "家庭主妇"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1539_hydrogen_n",
+      "word": "hydrogen",
+      "pos": "n.",
+      "cn": [
+        "氢"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1573_india_n",
+      "word": "India",
+      "pos": "n.",
+      "cn": [
+        "印度"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1630_japan_n",
+      "word": "Japan",
+      "pos": "n.",
+      "cn": [
+        "日本"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1631_japanese_adj",
+      "word": "Japanese",
+      "pos": "adj.",
+      "cn": [
+        "日本的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1632_japanese_n",
+      "word": "Japanese",
+      "pos": "n.",
+      "cn": [
+        "日本人",
+        "日语"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1667_kilo_n",
+      "word": "kilo",
+      "pos": "n.",
+      "cn": [
+        "千克",
+        "千米"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1673_kind_hearted_adj",
+      "word": "Kind-hearted",
+      "pos": "adj.",
+      "cn": [
+        "好心的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1736_lemonade_n",
+      "word": "lemonade",
+      "pos": "n.",
+      "cn": [
+        "柠檬水"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1746_librarian_n",
+      "word": "librarian",
+      "pos": "n.",
+      "cn": [
+        "图书管理员"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1815_mailbox_n",
+      "word": "mailbox",
+      "pos": "n.",
+      "cn": [
+        "邮筒",
+        "邮箱"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1837_marxism_n",
+      "word": "Marxism",
+      "pos": "n.",
+      "cn": [
+        "马克思主义"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1929_moon_cake_n",
+      "word": "moon cake",
+      "pos": "n.",
+      "cn": [
+        "月饼"
+      ],
+      "reason": "missing_entry"
+    },
+    {
+      "id": "gk3500_1959_mutton_n",
+      "word": "mutton",
+      "pos": "n.",
+      "cn": [
+        "羊肉"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1987_nephew_n",
+      "word": "nephew",
+      "pos": "n.",
+      "cn": [
+        "侄子",
+        "外甥"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_1998_niece_n",
+      "word": "niece",
+      "pos": "n.",
+      "cn": [
+        "侄女",
+        "甥女"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2020_northeast_n",
+      "word": "northeast",
+      "pos": "n.",
+      "cn": [
+        "东北部"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2102_ottawa_n",
+      "word": "Ottawa",
+      "pos": "n.",
+      "cn": [
+        "渥太华"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2122_overcoat_n",
+      "word": "overcoat",
+      "pos": "n.",
+      "cn": [
+        "大衣"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2130_ox_n",
+      "word": "ox",
+      "pos": "n.",
+      "cn": [
+        "牛",
+        "公牛"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2133_pacific_adj",
+      "word": "Pacific",
+      "pos": "adj.",
+      "cn": [
+        "太平洋的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2147_panda_n",
+      "word": "panda",
+      "pos": "n.",
+      "cn": [
+        "熊猫"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2155_paris_n",
+      "word": "Paris",
+      "pos": "n.",
+      "cn": [
+        "巴黎"
+      ],
+      "reason": "missing_entry"
+    },
+    {
+      "id": "gk3500_2158_parrot_n",
+      "word": "parrot",
+      "pos": "n.",
+      "cn": [
+        "鹦鹉"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2278_the_north_pole_n",
+      "word": "the North Pole",
+      "pos": "n.",
+      "cn": [
+        "北极"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2305_postman_n",
+      "word": "postman",
+      "pos": "n.",
+      "cn": [
+        "邮递员"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2395_punctuation_n",
+      "word": "punctuation",
+      "pos": "n.",
+      "cn": [
+        "标点符号"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2410_quake_n",
+      "word": "quake",
+      "pos": "n.",
+      "cn": [
+        "震动",
+        "颤抖"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2433_radioactive_adj",
+      "word": "radioactive",
+      "pos": "adj.",
+      "cn": [
+        "放射性的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2440_raincoat_n",
+      "word": "raincoat",
+      "pos": "n.",
+      "cn": [
+        "雨衣"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2469_receptionist_n",
+      "word": "receptionist",
+      "pos": "n.",
+      "cn": [
+        "接待员"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2542_retell_v",
+      "word": "retell",
+      "pos": "vt.",
+      "cn": [
+        "重讲",
+        "重复",
+        "复述"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2594_russia_n",
+      "word": "Russia",
+      "pos": "n.",
+      "cn": [
+        "俄罗斯",
+        "俄国"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2595_russian_adj",
+      "word": "Russian",
+      "pos": "adj.",
+      "cn": [
+        "俄国人的"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2596_russian_n",
+      "word": "Russian",
+      "pos": "n.",
+      "cn": [
+        "俄国人",
+        "俄语"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2602_safe_n",
+      "word": "safe",
+      "pos": "n.",
+      "cn": [
+        "保险柜"
+      ],
+      "reason": "no_usable_usage"
+    },
+    {
+      "id": "gk3500_2611_saleswoman_n",
+      "word": "saleswoman",
+      "pos": "n.",
+      "cn": [
+        "女售货员"
+      ],
+      "reason": "no_usable_usage"
+    }
+  ]
+}

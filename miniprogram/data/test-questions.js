@@ -1,653 +1,553 @@
 const testQuestions = [
   {
-    "id": "gaokao_test_01",
-    "word": "absolutely",
-    "sourceWordId": "moe_0012_absolutely",
+    "id": "gaokao_3500_test_foundation_01",
+    "word": "Regardless",
+    "sourceWordId": "gk3500_2489_regardless_adj",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "完全地"
+      "不管，不顾",
+      "不认识"
     ],
-    "answer": "完全地"
+    "answer": "不管，不顾"
   },
   {
-    "id": "gaokao_test_02",
-    "word": "behaviour",
-    "sourceWordId": "moe_0279_behaviour",
+    "id": "gaokao_3500_test_foundation_02",
+    "word": "rice",
+    "sourceWordId": "gk3500_2549_rice_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "行为"
+      "稻米，米饭",
+      "不认识"
     ],
-    "answer": "行为"
+    "answer": "稻米，米饭"
   },
   {
-    "id": "gaokao_test_03",
-    "word": "creative",
-    "sourceWordId": "moe_0673_creative",
+    "id": "gaokao_3500_test_foundation_03",
+    "word": "same",
+    "sourceWordId": "gk3500_2616_same_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "有创造力的",
-      "完成",
-      "疼痛",
-      "报告"
+      "同样的事",
+      "不认识"
     ],
-    "answer": "有创造力的"
+    "answer": "同样的事"
   },
   {
-    "id": "gaokao_test_04",
-    "word": "erupt",
-    "sourceWordId": "moe_0955_erupt",
+    "id": "gaokao_3500_test_foundation_04",
+    "word": "sensitive",
+    "sourceWordId": "gk3500_2679_sensitive_adj",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "获得",
-      "完成",
-      "疼痛",
-      "爆发"
+      "体贴的，善解人意的",
+      "不认识"
     ],
-    "answer": "爆发"
+    "answer": "体贴的，善解人意的"
   },
   {
-    "id": "gaokao_test_05",
-    "word": "horrible",
-    "sourceWordId": "moe_1329_horrible",
+    "id": "gaokao_3500_test_foundation_05",
+    "word": "sick",
+    "sourceWordId": "gk3500_2741_sick_adj",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "事实上",
-      "获得",
-      "可怕的",
-      "完成"
+      "有病的，患病的，想呕吐",
+      "不认识"
     ],
-    "answer": "可怕的"
+    "answer": "有病的，患病的，想呕吐"
   },
   {
-    "id": "gaokao_test_06",
-    "word": "moreover",
-    "sourceWordId": "moe_1714_moreover",
+    "id": "gaokao_3500_test_foundation_06",
+    "word": "smooth",
+    "sourceWordId": "gk3500_2801_smooth_adj",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "使适应",
-      "事实上",
-      "获得",
-      "而且"
+      "光滑的，平坦的",
+      "不认识"
     ],
-    "answer": "而且"
+    "answer": "光滑的，平坦的"
   },
   {
-    "id": "gaokao_test_07",
-    "word": "press",
-    "sourceWordId": "moe_2053_press",
+    "id": "gaokao_3500_test_foundation_07",
+    "word": "spirit",
+    "sourceWordId": "gk3500_2861_spirit_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "使沉溺",
-      "使适应",
-      "事实上",
-      "压"
+      "精神",
+      "不认识"
     ],
-    "answer": "压"
+    "answer": "精神"
   },
   {
-    "id": "gaokao_test_08",
-    "word": "shock",
-    "sourceWordId": "moe_2390_shock",
+    "id": "gaokao_3500_test_foundation_08",
+    "word": "strawberry",
+    "sourceWordId": "gk3500_2923_strawberry_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "使沉溺",
-      "加法",
-      "使适应",
-      "震动"
+      "草莓",
+      "不认识"
     ],
-    "answer": "震动"
+    "answer": "草莓"
   },
   {
-    "id": "gaokao_test_09",
-    "word": "turkey",
-    "sourceWordId": "moe_2792_turkey",
+    "id": "gaokao_3500_test_foundation_09",
+    "word": "surround",
+    "sourceWordId": "gk3500_2983_surround_v",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "赞美",
-      "使沉溺",
-      "加法",
-      "火鸡"
+      "围绕，包围",
+      "不认识"
     ],
-    "answer": "火鸡"
+    "answer": "围绕，包围"
   },
   {
-    "id": "gaokao_test_10",
-    "word": "anger",
-    "sourceWordId": "moe_0118_anger",
+    "id": "gaokao_3500_test_foundation_10",
+    "word": "tennis",
+    "sourceWordId": "gk3500_3045_tennis_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "承认",
-      "赞美",
-      "加法",
-      "忿怒"
+      "网球",
+      "不认识"
     ],
-    "answer": "忿怒"
+    "answer": "网球"
   },
   {
-    "id": "gaokao_test_11",
-    "word": "bend",
-    "sourceWordId": "moe_0288_bend",
+    "id": "gaokao_3500_test_foundation_11",
+    "word": "throughout",
+    "sourceWordId": "gk3500_3106_throughout_prep",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "成人",
-      "承认",
-      "变弯曲",
-      "赞美"
+      "遍及，贯穿",
+      "不认识"
     ],
-    "answer": "变弯曲"
+    "answer": "遍及，贯穿"
   },
   {
-    "id": "gaokao_test_12",
-    "word": "centimetre",
-    "sourceWordId": "moe_0454_centimetre",
+    "id": "gaokao_3500_test_foundation_12",
+    "word": "toy",
+    "sourceWordId": "gk3500_3166_toy_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "意外事件",
-      "报告",
-      "完全地",
-      "厘米"
+      "玩具，玩物",
+      "不认识"
     ],
-    "answer": "厘米"
+    "answer": "玩具，玩物"
   },
   {
-    "id": "gaokao_test_13",
-    "word": "concept",
-    "sourceWordId": "moe_0591_concept",
+    "id": "gaokao_3500_test_foundation_13",
+    "word": "typhoon",
+    "sourceWordId": "gk3500_3226_typhoon_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "观念"
+      "台风",
+      "不认识"
     ],
-    "answer": "观念"
+    "answer": "台风"
   },
   {
-    "id": "gaokao_test_14",
-    "word": "decline",
-    "sourceWordId": "moe_0728_decline",
+    "id": "gaokao_3500_test_foundation_14",
+    "word": "village",
+    "sourceWordId": "gk3500_3286_village_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "完成",
-      "疼痛",
-      "报告",
-      "衰退"
+      "村庄，乡村",
+      "不认识"
     ],
-    "answer": "衰退"
+    "answer": "村庄，乡村"
   },
   {
-    "id": "gaokao_test_15",
-    "word": "duration",
-    "sourceWordId": "moe_0866_duration",
+    "id": "gaokao_3500_test_foundation_15",
+    "word": "wedding",
+    "sourceWordId": "gk3500_3346_wedding_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "持续时间",
-      "获得",
-      "完成",
-      "疼痛"
+      "婚礼，结婚",
+      "不认识"
     ],
-    "answer": "持续时间"
+    "answer": "婚礼，结婚"
   },
   {
-    "id": "gaokao_test_16",
-    "word": "fault",
-    "sourceWordId": "moe_1046_fault",
+    "id": "gaokao_3500_test_foundation_16",
+    "word": "wing",
+    "sourceWordId": "gk3500_3406_wing_n",
+    "layer": "foundation",
     "options": [
-      "不认识",
-      "事实上",
-      "获得",
-      "完成",
-      "过错"
+      "机翼，翅膀",
+      "不认识"
     ],
-    "answer": "过错"
+    "answer": "机翼，翅膀"
   },
   {
-    "id": "gaokao_test_17",
-    "word": "grand",
-    "sourceWordId": "moe_1222_grand",
+    "id": "gaokao_3500_test_required_01",
+    "word": "abandon",
+    "sourceWordId": "gk3500_0001_abandon_v",
+    "layer": "required",
     "options": [
-      "不认识",
-      "使适应",
-      "事实上",
-      "庄重的",
-      "获得"
+      "放弃",
+      "不认识"
     ],
-    "answer": "庄重的"
+    "answer": "放弃"
   },
   {
-    "id": "gaokao_test_18",
-    "word": "integrate",
-    "sourceWordId": "moe_1422_integrate",
+    "id": "gaokao_3500_test_required_02",
+    "word": "advertise",
+    "sourceWordId": "gk3500_0071_advertise_v",
+    "layer": "required",
     "options": [
-      "不认识",
-      "使沉溺",
-      "使适应",
-      "事实上",
-      "综合"
+      "为……做广告",
+      "不认识"
     ],
-    "answer": "综合"
+    "answer": "为……做广告"
   },
   {
-    "id": "gaokao_test_19",
-    "word": "mankind",
-    "sourceWordId": "moe_1619_mankind",
+    "id": "gaokao_3500_test_required_03",
+    "word": "ancient",
+    "sourceWordId": "gk3500_0141_ancient_adj",
+    "layer": "required",
     "options": [
-      "不认识",
-      "使沉溺",
-      "加法",
-      "使适应",
-      "人类"
+      "古代的，古老的",
+      "不认识"
     ],
-    "answer": "人类"
+    "answer": "古代的，古老的"
   },
   {
-    "id": "gaokao_test_20",
-    "word": "objective",
-    "sourceWordId": "moe_1818_objective",
+    "id": "gaokao_3500_test_required_04",
+    "word": "asleep",
+    "sourceWordId": "gk3500_0214_asleep_adj",
+    "layer": "required",
     "options": [
-      "不认识",
-      "赞美",
-      "使沉溺",
-      "加法",
-      "目的"
+      "睡着的，熟睡",
+      "不认识"
     ],
-    "answer": "目的"
+    "answer": "睡着的，熟睡"
   },
   {
-    "id": "gaokao_test_21",
-    "word": "pork",
-    "sourceWordId": "moe_2019_pork",
+    "id": "gaokao_3500_test_required_05",
+    "word": "bargain",
+    "sourceWordId": "gk3500_0290_bargain_v",
+    "layer": "required",
     "options": [
-      "不认识",
-      "承认",
-      "赞美",
-      "加法",
-      "猪肉"
+      "讨价还价",
+      "不认识"
     ],
-    "answer": "猪肉"
+    "answer": "讨价还价"
   },
   {
-    "id": "gaokao_test_22",
-    "word": "recognition",
-    "sourceWordId": "moe_2170_recognition",
+    "id": "gaokao_3500_test_required_06",
+    "word": "bit",
+    "sourceWordId": "gk3500_0362_bit_n",
+    "layer": "required",
     "options": [
-      "不认识",
-      "成人",
-      "承认",
-      "赞美",
-      "赞誉"
+      "一点，一些，少量的",
+      "不认识"
     ],
-    "answer": "赞誉"
+    "answer": "一点，一些，少量的"
   },
   {
-    "id": "gaokao_test_23",
-    "word": "scientific",
-    "sourceWordId": "moe_2320_scientific",
+    "id": "gaokao_3500_test_required_07",
+    "word": "British",
+    "sourceWordId": "gk3500_0436_british_adj",
+    "layer": "required",
     "options": [
-      "不认识",
-      "意外事件",
-      "报告",
-      "完全地",
-      "科学的"
+      "英国的，大不列颠的",
+      "不认识"
     ],
-    "answer": "科学的"
+    "answer": "英国的，大不列颠的"
   },
   {
-    "id": "gaokao_test_24",
-    "word": "stretch",
-    "sourceWordId": "moe_2564_stretch",
+    "id": "gaokao_3500_test_required_08",
+    "word": "card",
+    "sourceWordId": "gk3500_0507_card_n",
+    "layer": "required",
     "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "伸展"
+      "卡片，名片，纸牌",
+      "不认识"
     ],
-    "answer": "伸展"
+    "answer": "卡片，名片，纸牌"
   },
   {
-    "id": "gaokao_test_25",
-    "word": "trunk",
-    "sourceWordId": "moe_2784_trunk",
+    "id": "gaokao_3500_test_required_09",
+    "word": "cheese",
+    "sourceWordId": "gk3500_0579_cheese_n",
+    "layer": "required",
     "options": [
-      "不认识",
-      "完成",
-      "疼痛",
-      "报告",
-      "树干"
+      "奶酪",
+      "不认识"
     ],
-    "answer": "树干"
+    "answer": "奶酪"
   },
   {
-    "id": "gaokao_test_26",
-    "word": "a",
-    "sourceWordId": "moe_0001_a",
+    "id": "gaokao_3500_test_required_10",
+    "word": "cold",
+    "sourceWordId": "gk3500_0652_cold_adj",
+    "layer": "required",
     "options": [
-      "第一个字母 A",
-      "不认识",
-      "获得",
-      "完成",
-      "疼痛"
+      "冷的，寒的",
+      "不认识"
     ],
-    "answer": "第一个字母 A"
+    "answer": "冷的，寒的"
   },
   {
-    "id": "gaokao_test_27",
-    "word": "anything",
-    "sourceWordId": "moe_0137_anything",
+    "id": "gaokao_3500_test_required_11",
+    "word": "consume",
+    "sourceWordId": "gk3500_0722_consume_v",
+    "layer": "required",
     "options": [
-      "不认识",
-      "事实上",
-      "获得",
-      "任何事",
-      "完成"
+      "消耗，消费",
+      "不认识"
     ],
-    "answer": "任何事"
+    "answer": "消耗，消费"
   },
   {
-    "id": "gaokao_test_28",
-    "word": "believe",
-    "sourceWordId": "moe_0283_believe",
+    "id": "gaokao_3500_test_required_12",
+    "word": "currency",
+    "sourceWordId": "gk3500_0797_currency_n",
+    "layer": "required",
     "options": [
-      "不认识",
-      "使适应",
-      "事实上",
-      "获得",
-      "相信"
+      "货币，现金",
+      "不认识"
     ],
-    "answer": "相信"
+    "answer": "货币，现金"
   },
   {
-    "id": "gaokao_test_29",
-    "word": "cake",
-    "sourceWordId": "moe_0398_cake",
+    "id": "gaokao_3500_test_required_13",
+    "word": "desperate",
+    "sourceWordId": "gk3500_0874_desperate_adj",
+    "layer": "required",
     "options": [
-      "不认识",
-      "使沉溺",
-      "使适应",
-      "事实上",
-      "蛋糕"
+      "令人绝望的",
+      "不认识"
     ],
-    "answer": "蛋糕"
+    "answer": "令人绝望的"
   },
   {
-    "id": "gaokao_test_30",
-    "word": "close",
-    "sourceWordId": "moe_0536_close",
+    "id": "gaokao_3500_test_required_14",
+    "word": "do",
+    "sourceWordId": "gk3500_0944_do_v",
+    "layer": "required",
     "options": [
-      "不认识",
-      "使沉溺",
-      "加法",
-      "使适应",
-      "结束"
+      "做，干",
+      "不认识"
+    ],
+    "answer": "做，干"
+  },
+  {
+    "id": "gaokao_3500_test_required_15",
+    "word": "education",
+    "sourceWordId": "gk3500_1016_education_n",
+    "layer": "required",
+    "options": [
+      "教育，培养",
+      "不认识"
+    ],
+    "answer": "教育，培养"
+  },
+  {
+    "id": "gaokao_3500_test_required_16",
+    "word": "every",
+    "sourceWordId": "gk3500_1086_every_adj",
+    "layer": "required",
+    "options": [
+      "每一，每个的",
+      "不认识"
+    ],
+    "answer": "每一，每个的"
+  },
+  {
+    "id": "gaokao_3500_test_required_17",
+    "word": "fantastic",
+    "sourceWordId": "gk3500_1164_fantastic_adj",
+    "layer": "required",
+    "options": [
+      "幻想的，奇异的",
+      "不认识"
+    ],
+    "answer": "幻想的，奇异的"
+  },
+  {
+    "id": "gaokao_3500_test_selective_01",
+    "word": "foggy",
+    "sourceWordId": "gk3500_1250_foggy_adj",
+    "layer": "selective",
+    "options": [
+      "多雾的",
+      "不认识"
+    ],
+    "answer": "多雾的"
+  },
+  {
+    "id": "gaokao_3500_test_selective_02",
+    "word": "future",
+    "sourceWordId": "gk3500_1321_future_v",
+    "layer": "selective",
+    "options": [
+      "赢得，挣得",
+      "不认识"
+    ],
+    "answer": "赢得，挣得"
+  },
+  {
+    "id": "gaokao_3500_test_selective_03",
+    "word": "green",
+    "sourceWordId": "gk3500_1391_green_n",
+    "layer": "selective",
+    "options": [
+      "绿色",
+      "不认识"
+    ],
+    "answer": "绿色"
+  },
+  {
+    "id": "gaokao_3500_test_selective_04",
+    "word": "heaven",
+    "sourceWordId": "gk3500_1462_heaven_n",
+    "layer": "selective",
+    "options": [
+      "天，天空",
+      "不认识"
+    ],
+    "answer": "天，天空"
+  },
+  {
+    "id": "gaokao_3500_test_selective_05",
+    "word": "hunger",
+    "sourceWordId": "gk3500_1532_hunger_n",
+    "layer": "selective",
+    "options": [
+      "饥饿",
+      "不认识"
+    ],
+    "answer": "饥饿"
+  },
+  {
+    "id": "gaokao_3500_test_selective_06",
+    "word": "intend",
+    "sourceWordId": "gk3500_1603_intend_v",
+    "layer": "selective",
+    "options": [
+      "想要，打算",
+      "不认识"
+    ],
+    "answer": "想要，打算"
+  },
+  {
+    "id": "gaokao_3500_test_selective_07",
+    "word": "king",
+    "sourceWordId": "gk3500_1675_king_n",
+    "layer": "selective",
+    "options": [
+      "国王",
+      "不认识"
+    ],
+    "answer": "国王"
+  },
+  {
+    "id": "gaokao_3500_test_selective_08",
+    "word": "life",
+    "sourceWordId": "gk3500_1753_life_n",
+    "layer": "selective",
+    "options": [
+      "生命，生涯，生活",
+      "不认识"
+    ],
+    "answer": "生命，生涯，生活"
+  },
+  {
+    "id": "gaokao_3500_test_selective_09",
+    "word": "mark",
+    "sourceWordId": "gk3500_1833_mark_v",
+    "layer": "selective",
+    "options": [
+      "标明，作记号于",
+      "不认识"
+    ],
+    "answer": "标明，作记号于"
+  },
+  {
+    "id": "gaokao_3500_test_selective_10",
+    "word": "mist",
+    "sourceWordId": "gk3500_1911_mist_n",
+    "layer": "selective",
+    "options": [
+      "雾",
+      "不认识"
+    ],
+    "answer": "雾"
+  },
+  {
+    "id": "gaokao_3500_test_selective_11",
+    "word": "need",
+    "sourceWordId": "gk3500_1981_need_n",
+    "layer": "selective",
+    "options": [
+      "需要，需求",
+      "不认识"
+    ],
+    "answer": "需要，需求"
+  },
+  {
+    "id": "gaokao_3500_test_selective_12",
+    "word": "ocean",
+    "sourceWordId": "gk3500_2051_ocean_n",
+    "layer": "selective",
+    "options": [
+      "海洋",
+      "不认识"
+    ],
+    "answer": "海洋"
+  },
+  {
+    "id": "gaokao_3500_test_selective_13",
+    "word": "over",
+    "sourceWordId": "gk3500_2121_over_adv",
+    "layer": "selective",
+    "options": [
+      "结束",
+      "不认识"
     ],
     "answer": "结束"
   },
   {
-    "id": "gaokao_test_31",
-    "word": "cute",
-    "sourceWordId": "moe_0699_cute",
+    "id": "gaokao_3500_test_selective_14",
+    "word": "pencil",
+    "sourceWordId": "gk3500_2192_pencil_n",
+    "layer": "selective",
     "options": [
-      "不认识",
-      "赞美",
-      "使沉溺",
-      "加法",
-      "可爱的"
+      "铅笔",
+      "不认识"
     ],
-    "answer": "可爱的"
+    "answer": "铅笔"
   },
   {
-    "id": "gaokao_test_32",
-    "word": "dry",
-    "sourceWordId": "moe_0862_dry",
+    "id": "gaokao_3500_test_selective_15",
+    "word": "please",
+    "sourceWordId": "gk3500_2264_please_v",
+    "layer": "selective",
     "options": [
-      "不认识",
-      "承认",
-      "赞美",
-      "加法",
-      "干的"
+      "请，使人高兴，使人满意",
+      "不认识"
     ],
-    "answer": "干的"
+    "answer": "请，使人高兴，使人满意"
   },
   {
-    "id": "gaokao_test_33",
-    "word": "expensive",
-    "sourceWordId": "moe_0999_expensive",
+    "id": "gaokao_3500_test_selective_16",
+    "word": "presentation",
+    "sourceWordId": "gk3500_2337_presentation_n",
+    "layer": "selective",
     "options": [
-      "不认识",
-      "成人",
-      "承认",
-      "赞美",
-      "贵的"
+      "演示，演出",
+      "不认识"
     ],
-    "answer": "贵的"
+    "answer": "演示，演出"
   },
   {
-    "id": "gaokao_test_34",
-    "word": "forest",
-    "sourceWordId": "moe_1119_forest",
+    "id": "gaokao_3500_test_selective_17",
+    "word": "puzzle",
+    "sourceWordId": "gk3500_2407_puzzle_n",
+    "layer": "selective",
     "options": [
-      "不认识",
-      "意外事件",
-      "报告",
-      "完全地",
-      "森林"
+      "难题，字，画谜",
+      "不认识"
     ],
-    "answer": "森林"
-  },
-  {
-    "id": "gaokao_test_35",
-    "word": "grow",
-    "sourceWordId": "moe_1242_grow",
-    "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "种植"
-    ],
-    "answer": "种植"
-  },
-  {
-    "id": "gaokao_test_36",
-    "word": "hope",
-    "sourceWordId": "moe_1328_hope",
-    "options": [
-      "不认识",
-      "完成",
-      "疼痛",
-      "报告",
-      "希望"
-    ],
-    "answer": "希望"
-  },
-  {
-    "id": "gaokao_test_37",
-    "word": "join",
-    "sourceWordId": "moe_1464_join",
-    "options": [
-      "不认识",
-      "获得",
-      "完成",
-      "疼痛",
-      "参加"
-    ],
-    "answer": "参加"
-  },
-  {
-    "id": "gaokao_test_38",
-    "word": "line",
-    "sourceWordId": "moe_1564_line",
-    "options": [
-      "不认识",
-      "事实上",
-      "列",
-      "获得",
-      "完成"
-    ],
-    "answer": "列"
-  },
-  {
-    "id": "gaokao_test_39",
-    "word": "middle",
-    "sourceWordId": "moe_1672_middle",
-    "options": [
-      "不认识",
-      "使适应",
-      "事实上",
-      "获得",
-      "中央"
-    ],
-    "answer": "中央"
-  },
-  {
-    "id": "gaokao_test_40",
-    "word": "ninety",
-    "sourceWordId": "moe_1785_ninety",
-    "options": [
-      "不认识",
-      "使沉溺",
-      "使适应",
-      "事实上",
-      "九十"
-    ],
-    "answer": "九十"
-  },
-  {
-    "id": "gaokao_test_41",
-    "word": "pale",
-    "sourceWordId": "moe_1898_pale",
-    "options": [
-      "不认识",
-      "使沉溺",
-      "加法",
-      "使适应",
-      "栅栏"
-    ],
-    "answer": "栅栏"
-  },
-  {
-    "id": "gaokao_test_42",
-    "word": "pool",
-    "sourceWordId": "moe_2015_pool",
-    "options": [
-      "不认识",
-      "赞美",
-      "使沉溺",
-      "池",
-      "加法"
-    ],
-    "answer": "池"
-  },
-  {
-    "id": "gaokao_test_43",
-    "word": "ready",
-    "sourceWordId": "moe_2155_ready",
-    "options": [
-      "预备好的状态",
-      "不认识",
-      "承认",
-      "赞美",
-      "加法"
-    ],
-    "answer": "预备好的状态"
-  },
-  {
-    "id": "gaokao_test_44",
-    "word": "satisfy",
-    "sourceWordId": "moe_2304_satisfy",
-    "options": [
-      "不认识",
-      "成人",
-      "承认",
-      "使满意",
-      "赞美"
-    ],
-    "answer": "使满意"
-  },
-  {
-    "id": "gaokao_test_45",
-    "word": "sign",
-    "sourceWordId": "moe_2408_sign",
-    "options": [
-      "不认识",
-      "意外事件",
-      "报告",
-      "完全地",
-      "符号"
-    ],
-    "answer": "符号"
-  },
-  {
-    "id": "gaokao_test_46",
-    "word": "speaker",
-    "sourceWordId": "moe_2501_speaker",
-    "options": [
-      "不认识",
-      "意外事件",
-      "疼痛",
-      "报告",
-      "说话人"
-    ],
-    "answer": "说话人"
-  },
-  {
-    "id": "gaokao_test_47",
-    "word": "survey",
-    "sourceWordId": "moe_2619_survey",
-    "options": [
-      "不认识",
-      "完成",
-      "疼痛",
-      "报告",
-      "纵览"
-    ],
-    "answer": "纵览"
-  },
-  {
-    "id": "gaokao_test_48",
-    "word": "tidy",
-    "sourceWordId": "moe_2721_tidy",
-    "options": [
-      "不认识",
-      "椅子的背罩",
-      "获得",
-      "完成",
-      "疼痛"
-    ],
-    "answer": "椅子的背罩"
-  },
-  {
-    "id": "gaokao_test_49",
-    "word": "understand",
-    "sourceWordId": "moe_2811_understand",
-    "options": [
-      "不认识",
-      "事实上",
-      "获得",
-      "完成",
-      "理解"
-    ],
-    "answer": "理解"
-  },
-  {
-    "id": "gaokao_test_50",
-    "word": "whatever",
-    "sourceWordId": "moe_2921_whatever",
-    "options": [
-      "不认识",
-      "使适应",
-      "事实上",
-      "无论什么",
-      "获得"
-    ],
-    "answer": "无论什么"
+    "answer": "难题，字，画谜"
   }
 ];
 
