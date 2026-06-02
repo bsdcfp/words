@@ -68,7 +68,7 @@ assert.doesNotMatch(pageJs, /replayIfReadAlongMissingVoice/, "word study should 
 assert.doesNotMatch(pageJs, /getRecordRecognitionManager/, "first version should not wait for cloud speech recognition");
 assert.match(pageJs, /getCurrentGroupReviewQuestion/, "group visual review should auto-play pronunciation");
 assert.match(pageJs, /reviewAnswerVisible/, "group review should delay showing meaning until the student hesitates");
-assert.match(pageJs, /onComplete: \(\) => this\.revealCurrentReviewAnswer\(wordId, key\)/, "review meaning should reveal only after pronunciation completes for the active question");
+assert.match(pageJs, /onComplete: \(\) => this\.scheduleReviewRevealAfterPlayback\(wordId, key\)/, "review meaning should start its reveal timer only after pronunciation completes for the active question");
 const reviewRevealBody = pageJs.match(/scheduleReviewAnswerReveal\(view\) \{([\s\S]*?)\n  \},/)?.[1] || "";
 assert.doesNotMatch(reviewRevealBody, /setTimeout/, "review meaning should not use a fixed timer that can beat audio playback");
 assert.match(pageJs, /onCanplay\(safePlay\)/, "audio should wait for canplay before auto-playing");
@@ -81,6 +81,8 @@ assert.match(pageJs, /this\.configureAudioPlayback\(\(\) => this\.startInnerAudi
 assert.match(pageJs, /showAudioCompletionThenRender/, "audio completion should show notice before switching views");
 assert.match(pageJs, /audioCompletionNotice/, "audio completion notice should stay on the audio page");
 assert.match(pageJs, /audioCompletionHint/, "mixed-review hints should be shown before the mixed card appears");
+assert.match(pageJs, /buildCompletionTransition/, "completion notices should be built through one transition helper");
+assert.match(pageJs, /speak\(event\)[\s\S]*restartStudyPlayback[\s\S]*retryReviewQuestion[\s\S]*markAudioUnfamiliar/, "focus-page speaker taps should use reveal-safe replay handlers");
 assert.match(pageJs, /lastPrecheckNoticeKey = precheckNotice\.key/, "audio completion should suppress duplicate precheck notices");
 assert.match(pageJs, /this\.data && this\.data\.view === view/, "back navigation should not return to the same logical view");
 assert.match(pageJs, /canReturnToPrecheck/, "back navigation should validate whether precheck is still a valid learning state");
@@ -125,7 +127,7 @@ assert.doesNotMatch(audioTemplate, /听英文，说出词性和中文释义/, "a
 assert.match(audioTemplate, /class="speaker-tile focus-speaker"/, "audio meaning should center a compact replay target");
 assert.match(audioTemplate, /catchtap="rememberAudio">记住了/, "audio meaning should keep one primary next action");
 assert.match(pageJs, /const REVEAL_DELAY_MS = 2000/, "focus recall should reveal after two seconds");
-assert.match(pageJs, /markAudioUnfamiliar\(\)[\s\S]*audioAnswerVisible: false[\s\S]*scheduleAudioAnswerReveal\(VIEWS\.AUDIO_MEANING\)/, "audio retry should hide the meaning and restart the reveal timer");
+assert.match(pageJs, /markAudioUnfamiliar\(\)[\s\S]*audioAnswerVisible: false[\s\S]*playAudioMeaningAndReveal/, "audio retry should hide the meaning and replay before restarting the reveal timer");
 const meaningRecallTemplate = pageWxml.slice(
   pageWxml.indexOf('<view wx:elif="{{view == \'meaning-recall\'}}"'),
   pageWxml.indexOf('<view wx:elif="{{view == \'wrong-book\'}}"')
@@ -168,10 +170,15 @@ assert.match(pageWxml, /aiLabel/, "AI fallback content should have a light stude
 assert.doesNotMatch(pageWxml, /translationSource/, "student-facing template should not expose internal translation audit fields");
 assert.match(pageWxml, /focusPauseVisible/, "focus mode should provide a pause panel");
 assert.match(pageWxml, /bindlongpress="openPausePanel"/, "focus mode should use long press for pause instead of persistent navigation");
+assert.match(pageWxml, /wx:if="{{audioCompletionNotice}}"/, "completion notices should have a global transition overlay");
 
 const appJs = await readFile("miniprogram/app.js", "utf8");
 assert.match(appJs, /obeyMuteSwitch: false/);
-assert.match(appJs, /success: finish/, "audio option setup should call back before playback starts");
+assert.match(appJs, /isDevtoolsRuntime/, "DevTools should skip native audio option setup to avoid SDK timeout noise");
+assert.match(appJs, /fallbackTimer = setTimeout\(complete, 120\)/, "audio option setup should not block playback if the native callback times out");
+assert.match(appJs, /success: complete/, "successful native audio setup should still release playback");
+assert.match(appJs, /fail: complete/, "failed native audio setup should still release playback");
+assert.doesNotMatch(appJs, /success: finish/, "audio option setup should not depend on a raw native callback before playback starts");
 
 const pageWxss = await readFile("miniprogram/pages/index/index.wxss", "utf8");
 assert.doesNotMatch(pageWxss, /\.audio-view\s*\{[^}]*justify-content:\s*center/s, "audio meaning page should keep the same top-down layout height as review pages");

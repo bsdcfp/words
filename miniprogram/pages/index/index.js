@@ -55,6 +55,17 @@ const NAVIGATION_TITLES = {
   [VIEWS.DAILY_REPORT]: "今日完成"
 };
 
+function isDevtoolsRuntime() {
+  if (typeof wx === "undefined") return false;
+  try {
+    if (typeof wx.getDeviceInfo === "function") return wx.getDeviceInfo().platform === "devtools";
+    if (typeof wx.getSystemInfoSync === "function") return wx.getSystemInfoSync().platform === "devtools";
+  } catch (error) {
+    // Keep the real-device audio option path if runtime detection is unavailable.
+  }
+  return false;
+}
+
 Page({
   data: {
     view: VIEWS.HOME,
@@ -339,48 +350,23 @@ Page({
   },
 
   answerGroupReview(event) {
-    const question = flow.getCurrentGroupReviewQuestion(this.state);
-    if (!question || question.answered) return;
-    this.cancelPagePlayback();
-    this.clearFocusMissTimer();
-    const result = flow.answerGroupReviewQuestion(this.state, event.currentTarget.dataset.value);
-    if (result.isCorrect) {
-      this.clearReviewRevealTimer();
-      this.advanceGroupReview();
-      return;
-    }
-    this.saveAndRender(VIEWS.GROUP_REVIEW);
+    this.answerReviewChoice("group", event.currentTarget.dataset.value);
   },
 
   rememberGroupReview() {
-    const question = flow.getCurrentGroupReviewQuestion(this.state);
-    if (!question || question.answered) return;
-    this.cancelPagePlayback();
-    this.clearReviewRevealTimer();
-    this.clearFocusMissTimer();
-    flow.answerGroupReviewQuestion(this.state, question.options[0]);
-    this.advanceGroupReview();
+    this.rememberReviewQuestion("group");
   },
 
   markGroupReviewUnfamiliar() {
-    const question = flow.getCurrentGroupReviewQuestion(this.state);
-    if (!question || question.answered) return;
-    this.clearFocusMissTimer();
-    this.setData({ reviewAnswerVisible: false });
-    this.playReviewAudioAndReveal(question.wordId);
+    this.retryReviewQuestion("group");
   },
 
   nextGroupReview() {
-    this.advanceGroupReview();
+    this.advanceReviewQuestion("group");
   },
 
   advanceGroupReview() {
-    const phase = flow.moveToNextGroupReviewQuestion(this.state);
-    if (phase === "audio-meaning") {
-      this.finishReview();
-      return;
-    }
-    this.saveAndRender(VIEWS.GROUP_REVIEW);
+    this.advanceReviewQuestion("group");
   },
 
   answerAudio(event) {
@@ -398,13 +384,7 @@ Page({
   },
 
   rememberAudio() {
-    const question = flow.getCurrentAudioQuestion(this.state);
-    if (!question || question.answered) return;
-    this.cancelPagePlayback();
-    this.clearFocusMissTimer();
-    flow.answerAudioQuestion(this.state, question.options[0]);
-    const phase = flow.moveToNextAudioQuestion(this.state);
-    this.advanceAfterAudioPhase(phase);
+    this.rememberAudioQuestion();
   },
 
   markAudioUnfamiliar() {
@@ -412,8 +392,7 @@ Page({
     if (!question || question.answered) return;
     this.clearFocusMissTimer();
     this.setData({ audioAnswerVisible: false });
-    this.playWordAudio(question.wordId, { playbackKey: this.playbackKeyFor(VIEWS.AUDIO_MEANING, question.wordId) });
-    this.scheduleAudioAnswerReveal(VIEWS.AUDIO_MEANING);
+    this.playAudioMeaningAndReveal(question.wordId, this.playbackKeyFor(VIEWS.AUDIO_MEANING, question.wordId));
   },
 
   nextAudio() {
@@ -441,7 +420,27 @@ Page({
     this.saveAndRender(VIEWS.AUDIO_MEANING);
   },
 
+  rememberAudioQuestion() {
+    const question = flow.getCurrentAudioQuestion(this.state);
+    if (!question || question.answered) return;
+    this.cancelPagePlayback();
+    this.clearFocusMissTimer();
+    flow.answerAudioQuestion(this.state, question.options[0]);
+    const phase = flow.moveToNextAudioQuestion(this.state);
+    this.advanceAfterAudioPhase(phase);
+  },
+
   rememberMeaningRecall() {
+    this.rememberRecallQuestion();
+  },
+
+  retryMeaningRecall() {
+    this.clearFocusMissTimer();
+    this.setData({ recallAnswerVisible: false });
+    this.scheduleMeaningRecallReveal(VIEWS.MEANING_RECALL);
+  },
+
+  rememberRecallQuestion() {
     const question = flow.getCurrentMeaningRecallQuestion(this.state);
     if (!question || question.answered) return;
     this.clearRecallRevealTimer();
@@ -449,12 +448,6 @@ Page({
     flow.answerMeaningRecallQuestion(this.state);
     const phase = flow.moveToNextMeaningRecallQuestion(this.state);
     this.advanceAfterMeaningRecallPhase(phase);
-  },
-
-  retryMeaningRecall() {
-    this.clearFocusMissTimer();
-    this.setData({ recallAnswerVisible: false });
-    this.scheduleMeaningRecallReveal(VIEWS.MEANING_RECALL);
   },
 
   advanceAfterMeaningRecallPhase(phase) {
@@ -478,26 +471,22 @@ Page({
   },
 
   showAudioCompletionThenRender(nextView) {
-    if (nextView !== VIEWS.DAILY_REPORT) {
-      const precheckNotice = buildPrecheckNoticeData(this.state);
-      if (precheckNotice) this.lastPrecheckNoticeKey = precheckNotice.key;
-      this.clearAutoPlayTimer();
-      this.stopCurrentAudio();
-      this.saveAndRender(nextView, { track: false });
-      return;
-    }
-    const mixedNotice = buildMixedTransitionData(this.state);
-    const notice = nextView === VIEWS.GROUP_REVIEW && mixedNotice
-      ? mixedNotice.title
-      : this.state.daily.groupFeedback || "本组完成，重新选下一组";
-    const hint = nextView === VIEWS.GROUP_REVIEW && mixedNotice ? mixedNotice.hint : "";
+    const transition = this.buildCompletionTransition(nextView);
     const precheckNotice = buildPrecheckNoticeData(this.state);
     if (precheckNotice) this.lastPrecheckNoticeKey = precheckNotice.key;
     saveState(this.state);
     this.clearAutoPlayTimer();
+    this.clearReviewRevealTimer();
+    this.clearAudioRevealTimer();
+    this.clearRecallRevealTimer();
+    this.clearFocusMissTimer();
     this.stopCurrentAudio();
+    if (!transition.notice) {
+      this.saveAndRender(nextView, { track: false });
+      return;
+    }
     this.clearAudioCompletionTimer();
-    this.setData({ audioCompletionNotice: notice, audioCompletionHint: hint });
+    this.setData({ audioCompletionNotice: transition.notice, audioCompletionHint: transition.hint });
     this.audioCompletionTimer = setTimeout(() => {
       this.audioCompletionTimer = null;
       this.setData({ audioCompletionNotice: "", audioCompletionHint: "" });
@@ -505,56 +494,112 @@ Page({
     }, NOTICE_DURATION_MS);
   },
 
-  answerMixed(event) {
-    const question = flow.getCurrentMixedReviewQuestion(this.state);
+  buildCompletionTransition(nextView) {
+    const mixedNotice = buildMixedTransitionData(this.state);
+    if (nextView === VIEWS.GROUP_REVIEW && mixedNotice) {
+      return { notice: mixedNotice.title, hint: mixedNotice.hint || "" };
+    }
+    const feedback = this.state.daily && this.state.daily.groupFeedback;
+    if (feedback) return { notice: feedback, hint: "" };
+    if (nextView === VIEWS.DAILY_REPORT) return { notice: "今日 List 已完成", hint: "" };
+    return { notice: "", hint: "" };
+  },
+
+  currentReviewKind() {
+    return this.state.daily && this.state.daily.reviewPhase === "mixed" ? "mixed" : "group";
+  },
+
+  getReviewQuestion(kind = this.currentReviewKind()) {
+    return kind === "mixed"
+      ? flow.getCurrentMixedReviewQuestion(this.state)
+      : flow.getCurrentGroupReviewQuestion(this.state);
+  },
+
+  answerReviewQuestion(kind, value) {
+    return kind === "mixed"
+      ? flow.answerMixedReviewQuestion(this.state, value)
+      : flow.answerGroupReviewQuestion(this.state, value);
+  },
+
+  moveToNextReviewQuestion(kind) {
+    return kind === "mixed"
+      ? flow.moveToNextMixedReviewQuestion(this.state)
+      : flow.moveToNextGroupReviewQuestion(this.state);
+  },
+
+  answerReviewChoice(kind, value) {
+    const question = this.getReviewQuestion(kind);
     if (!question || question.answered) return;
     this.cancelPagePlayback();
     this.clearFocusMissTimer();
-    const result = flow.answerMixedReviewQuestion(this.state, event.currentTarget.dataset.value);
+    const result = this.answerReviewQuestion(kind, value);
     if (result.isCorrect) {
-      const phase = flow.moveToNextMixedReviewQuestion(this.state);
-      if (phase === "complete") {
-        const next = flow.completeMixedReview(this.state);
-        this.renderAfterMixedReview(next);
-        return;
-      }
-      this.saveAndRender(VIEWS.GROUP_REVIEW);
+      this.clearReviewRevealTimer();
+      this.advanceReviewQuestion(kind);
       return;
     }
     this.saveAndRender(VIEWS.GROUP_REVIEW);
   },
 
-  rememberMixedReview() {
-    const question = flow.getCurrentMixedReviewQuestion(this.state);
+  rememberReviewQuestion(kind) {
+    const question = this.getReviewQuestion(kind);
     if (!question || question.answered) return;
     this.cancelPagePlayback();
+    this.clearReviewRevealTimer();
     this.clearFocusMissTimer();
-    flow.answerMixedReviewQuestion(this.state, question.options[0]);
-    const phase = flow.moveToNextMixedReviewQuestion(this.state);
-    if (phase === "complete") {
-      const next = flow.completeMixedReview(this.state);
-      this.renderAfterMixedReview(next);
-      return;
-    }
-    this.saveAndRender(VIEWS.GROUP_REVIEW);
+    this.answerReviewQuestion(kind, question.options[0]);
+    this.advanceReviewQuestion(kind);
   },
 
-  markMixedUnfamiliar() {
-    const question = flow.getCurrentMixedReviewQuestion(this.state);
+  retryReviewQuestion(kind = this.currentReviewKind()) {
+    const question = this.getReviewQuestion(kind);
     if (!question || question.answered) return;
+    this.clearReviewRevealTimer();
     this.clearFocusMissTimer();
     this.setData({ reviewAnswerVisible: false });
     this.playReviewAudioAndReveal(question.wordId);
   },
 
-  nextMixed() {
-    const phase = flow.moveToNextMixedReviewQuestion(this.state);
+  advanceReviewQuestion(kind) {
+    const phase = this.moveToNextReviewQuestion(kind);
+    if (kind === "mixed") {
+      this.advanceAfterMixedPhase(phase);
+      return;
+    }
+    this.advanceAfterGroupReviewPhase(phase);
+  },
+
+  advanceAfterGroupReviewPhase(phase) {
+    if (phase === "audio-meaning") {
+      this.finishReview();
+      return;
+    }
+    this.saveAndRender(VIEWS.GROUP_REVIEW);
+  },
+
+  advanceAfterMixedPhase(phase) {
     if (phase === "complete") {
       const next = flow.completeMixedReview(this.state);
       this.renderAfterMixedReview(next);
       return;
     }
     this.saveAndRender(VIEWS.GROUP_REVIEW);
+  },
+
+  answerMixed(event) {
+    this.answerReviewChoice("mixed", event.currentTarget.dataset.value);
+  },
+
+  rememberMixedReview() {
+    this.rememberReviewQuestion("mixed");
+  },
+
+  markMixedUnfamiliar() {
+    this.retryReviewQuestion("mixed");
+  },
+
+  nextMixed() {
+    this.advanceReviewQuestion("mixed");
   },
 
   finishMixedReview() {
@@ -580,6 +625,19 @@ Page({
 
   speak(event) {
     this.clearAutoPlayTimer();
+    const view = this.data.view;
+    if (view === VIEWS.WORD_STUDY) {
+      this.restartStudyPlayback();
+      return;
+    }
+    if (view === VIEWS.GROUP_REVIEW) {
+      this.retryReviewQuestion();
+      return;
+    }
+    if (view === VIEWS.AUDIO_MEANING) {
+      this.markAudioUnfamiliar();
+      return;
+    }
     this.playWordAudio(event.currentTarget.dataset.wordId);
   },
 
@@ -590,13 +648,7 @@ Page({
       return;
     }
     if (view === VIEWS.GROUP_REVIEW) {
-      const question = this.state.daily.reviewPhase === "mixed"
-        ? flow.getCurrentMixedReviewQuestion(this.state)
-        : flow.getCurrentGroupReviewQuestion(this.state);
-      if (!question || question.answered) return;
-      this.clearFocusMissTimer();
-      this.setData({ reviewAnswerVisible: false });
-      this.playReviewAudioAndReveal(question.wordId);
+      this.retryReviewQuestion();
       return;
     }
     if (view === VIEWS.AUDIO_MEANING) {
@@ -763,13 +815,11 @@ Page({
   },
 
   revealCurrentReviewAnswer(wordId, playbackKey) {
-    if (playbackKey && this.activePlaybackKey !== playbackKey) return;
-    const question = this.state.daily.reviewPhase === "mixed"
-      ? flow.getCurrentMixedReviewQuestion(this.state)
-      : flow.getCurrentGroupReviewQuestion(this.state);
-    if (!question || question.answered || question.wordId !== wordId) return;
-    this.setData({ reviewAnswerVisible: true });
-    this.scheduleFocusMiss(VIEWS.GROUP_REVIEW, wordId);
+    this.revealFocusAnswer(VIEWS.GROUP_REVIEW, wordId, playbackKey);
+  },
+
+  scheduleReviewRevealAfterPlayback(wordId, playbackKey) {
+    this.scheduleFocusReveal(VIEWS.GROUP_REVIEW, wordId, playbackKey);
   },
 
   playReviewAudioAndReveal(wordId, playbackKey) {
@@ -777,46 +827,87 @@ Page({
     this.activePlaybackKey = key;
     this.playWordAudio(wordId, {
       playbackKey: key,
-      onComplete: () => this.revealCurrentReviewAnswer(wordId, key)
+      onComplete: () => this.scheduleReviewRevealAfterPlayback(wordId, key)
     });
   },
 
   scheduleReviewAnswerReveal(view) {
-    this.clearReviewRevealTimer();
     if (view !== VIEWS.GROUP_REVIEW) return;
-    const question = this.state.daily.reviewPhase === "mixed"
-      ? flow.getCurrentMixedReviewQuestion(this.state)
-      : flow.getCurrentGroupReviewQuestion(this.state);
+    const question = this.getFocusQuestion(view);
     if (!question || question.answered) return;
     this.playReviewAudioAndReveal(question.wordId);
   },
 
   scheduleAudioAnswerReveal(view) {
-    this.clearAudioRevealTimer();
     if (view !== VIEWS.AUDIO_MEANING) return;
-    const question = flow.getCurrentAudioQuestion(this.state);
+    const question = this.getFocusQuestion(view);
     if (!question || question.answered) return;
-    this.audioRevealTimer = setTimeout(() => {
-      this.audioRevealTimer = null;
-      const current = flow.getCurrentAudioQuestion(this.state);
-      if (!current || current.answered || current.wordId !== question.wordId) return;
-      this.setData({ audioAnswerVisible: true });
-      this.scheduleFocusMiss(VIEWS.AUDIO_MEANING, question.wordId);
-    }, REVEAL_DELAY_MS);
+    this.scheduleFocusReveal(view, question.wordId);
+  },
+
+  playAudioMeaningAndReveal(wordId, playbackKey) {
+    const key = playbackKey || this.playbackKeyFor(VIEWS.AUDIO_MEANING, wordId);
+    this.activePlaybackKey = key;
+    this.clearAudioRevealTimer();
+    this.playWordAudio(wordId, {
+      playbackKey: key,
+      onComplete: () => this.scheduleAudioAnswerReveal(VIEWS.AUDIO_MEANING)
+    });
   },
 
   scheduleMeaningRecallReveal(view) {
-    this.clearRecallRevealTimer();
     if (view !== VIEWS.MEANING_RECALL) return;
-    const question = flow.getCurrentMeaningRecallQuestion(this.state);
+    const question = this.getFocusQuestion(view);
     if (!question || question.answered) return;
-    this.recallRevealTimer = setTimeout(() => {
-      this.recallRevealTimer = null;
-      const current = flow.getCurrentMeaningRecallQuestion(this.state);
-      if (!current || current.answered || current.wordId !== question.wordId) return;
-      this.setData({ recallAnswerVisible: true });
-      this.scheduleFocusMiss(VIEWS.MEANING_RECALL, question.wordId);
-    }, REVEAL_DELAY_MS);
+    this.scheduleFocusReveal(view, question.wordId);
+  },
+
+  getFocusQuestion(view) {
+    if (view === VIEWS.GROUP_REVIEW) return this.getReviewQuestion();
+    if (view === VIEWS.AUDIO_MEANING) return flow.getCurrentAudioQuestion(this.state);
+    if (view === VIEWS.MEANING_RECALL) return flow.getCurrentMeaningRecallQuestion(this.state);
+    return null;
+  },
+
+  clearRevealTimerFor(view) {
+    if (view === VIEWS.GROUP_REVIEW) this.clearReviewRevealTimer();
+    if (view === VIEWS.AUDIO_MEANING) this.clearAudioRevealTimer();
+    if (view === VIEWS.MEANING_RECALL) this.clearRecallRevealTimer();
+  },
+
+  setRevealTimerFor(view, callback) {
+    const timer = setTimeout(callback, REVEAL_DELAY_MS);
+    if (view === VIEWS.GROUP_REVIEW) this.reviewRevealTimer = timer;
+    if (view === VIEWS.AUDIO_MEANING) this.audioRevealTimer = timer;
+    if (view === VIEWS.MEANING_RECALL) this.recallRevealTimer = timer;
+  },
+
+  clearRevealTimerSlot(view) {
+    if (view === VIEWS.GROUP_REVIEW) this.reviewRevealTimer = null;
+    if (view === VIEWS.AUDIO_MEANING) this.audioRevealTimer = null;
+    if (view === VIEWS.MEANING_RECALL) this.recallRevealTimer = null;
+  },
+
+  setAnswerVisibleFor(view, visible) {
+    if (view === VIEWS.GROUP_REVIEW) this.setData({ reviewAnswerVisible: visible });
+    if (view === VIEWS.AUDIO_MEANING) this.setData({ audioAnswerVisible: visible });
+    if (view === VIEWS.MEANING_RECALL) this.setData({ recallAnswerVisible: visible });
+  },
+
+  revealFocusAnswer(view, wordId, playbackKey) {
+    if (playbackKey && this.activePlaybackKey !== playbackKey) return;
+    const question = this.getFocusQuestion(view);
+    if (!question || question.answered || question.wordId !== wordId) return;
+    this.setAnswerVisibleFor(view, true);
+    this.scheduleFocusMiss(view, wordId);
+  },
+
+  scheduleFocusReveal(view, wordId, playbackKey) {
+    this.clearRevealTimerFor(view);
+    this.setRevealTimerFor(view, () => {
+      this.clearRevealTimerSlot(view);
+      this.revealFocusAnswer(view, wordId, playbackKey);
+    });
   },
 
   scheduleFocusMiss(view, wordId) {
@@ -829,32 +920,25 @@ Page({
 
   handleFocusMiss(view, wordId) {
     if (this.data.view !== view) return;
+    const question = this.getFocusQuestion(view);
+    if (!question || question.answered || question.wordId !== wordId) return;
+    this.flashWrongEdge();
     if (view === VIEWS.GROUP_REVIEW) {
-      const isMixed = this.state.daily.reviewPhase === "mixed";
-      const question = isMixed ? flow.getCurrentMixedReviewQuestion(this.state) : flow.getCurrentGroupReviewQuestion(this.state);
-      if (!question || question.answered || question.wordId !== wordId) return;
-      this.flashWrongEdge();
-      if (isMixed) {
-        flow.answerMixedReviewQuestion(this.state, "__missed__");
+      const kind = this.currentReviewKind();
+      this.answerReviewQuestion(kind, "__missed__");
+      if (kind === "mixed") {
         this.advanceAfterMixedMiss();
         return;
       }
-      flow.answerGroupReviewQuestion(this.state, "__missed__");
       this.advanceAfterGroupMiss();
       return;
     }
     if (view === VIEWS.AUDIO_MEANING) {
-      const question = flow.getCurrentAudioQuestion(this.state);
-      if (!question || question.answered || question.wordId !== wordId) return;
-      this.flashWrongEdge();
       flow.answerAudioQuestion(this.state, "__missed__");
       this.advanceAfterAudioMiss();
       return;
     }
     if (view === VIEWS.MEANING_RECALL) {
-      const question = flow.getCurrentMeaningRecallQuestion(this.state);
-      if (!question || question.answered || question.wordId !== wordId) return;
-      this.flashWrongEdge();
       flow.missMeaningRecallQuestion(this.state);
       const phase = flow.moveToNextMeaningRecallQuestion(this.state);
       this.advanceAfterMeaningRecallPhase(phase);
@@ -998,7 +1082,6 @@ Page({
         this.startStudyPlaybackNow();
         return;
       }
-      this.scheduleAudioAnswerReveal(view);
       this.scheduleMeaningRecallReveal(view);
       this.scheduleAutoPlay(view, AUTO_PLAY_DELAY_MS);
     });
@@ -1012,6 +1095,7 @@ Page({
   },
 
   updateNavigationBar(view) {
+    if (isDevtoolsRuntime()) return;
     const isLight = this.state && this.state.user && this.state.user.settings && this.state.user.settings.learningTheme === "light";
     if (typeof wx.setNavigationBarColor === "function") {
       wx.setNavigationBarColor({
@@ -1025,6 +1109,7 @@ Page({
   },
 
   scrollPageToTop() {
+    if (isDevtoolsRuntime()) return;
     if (typeof wx.pageScrollTo !== "function") return;
     wx.pageScrollTo({ scrollTop: 0, duration: 0 });
   },
@@ -1099,6 +1184,10 @@ Page({
       }
       if (view === VIEWS.GROUP_REVIEW) {
         this.playReviewAudioAndReveal(wordId, key);
+        return;
+      }
+      if (view === VIEWS.AUDIO_MEANING) {
+        this.playAudioMeaningAndReveal(wordId, key);
         return;
       }
       this.playWordAudio(wordId, { playbackKey: key });
@@ -1362,12 +1451,26 @@ Page({
       return;
     }
     if (typeof wx !== "undefined" && typeof wx.setInnerAudioOption === "function") {
+      if (isDevtoolsRuntime()) {
+        markReady();
+        return;
+      }
+      let fallbackTimer = null;
+      const complete = () => {
+        if (this.audioPlaybackConfigured) return;
+        if (fallbackTimer) {
+          clearTimeout(fallbackTimer);
+          fallbackTimer = null;
+        }
+        markReady();
+      };
+      fallbackTimer = setTimeout(complete, 120);
       wx.setInnerAudioOption({
         mixWithOther: true,
         obeyMuteSwitch: false,
         speakerOn: true,
-        success: markReady,
-        fail: markReady
+        success: complete,
+        fail: complete
       });
       return;
     }

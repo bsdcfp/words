@@ -6,7 +6,17 @@ const reportPath = new URL("../docs/interaction-audit.md", import.meta.url);
 
 const wxml = await readFile(wxmlPath, "utf8");
 const js = await readFile(jsPath, "utf8");
+const auditAsyncBoundaries = new Set([
+  "startInnerAudio",
+  "startReadAlongWindow",
+  "continueAfterReadAlongWindow",
+  "scheduleAutoPlay",
+  "scheduleFocusReveal",
+  "scheduleFocusMiss",
+  "showAudioCompletionThenRender"
+]);
 const bindings = extractBindings(wxml);
+const pageMethods = extractMethodNames(js);
 const contractHandlers = [
   "markGroupReviewUnfamiliar",
   "markAudioUnfamiliar",
@@ -16,9 +26,15 @@ const contractHandlers = [
   "rememberMixedReview",
   "rememberMeaningRecall",
   "retryMeaningRecall",
-  "markStudy"
+  "markStudy",
+  "answerReviewQuestion",
+  "advanceReviewQuestion",
+  "rememberAudioQuestion",
+  "rememberRecallQuestion",
+  "rememberReviewQuestion",
+  "retryReviewQuestion"
 ];
-const uniqueHandlers = [...new Set(bindings.map((binding) => binding.handler).concat(contractHandlers))].sort();
+const uniqueHandlers = [...new Set(bindings.map((binding) => binding.handler).concat(contractHandlers).concat(pageMethods))].sort();
 const handlerBodies = Object.fromEntries(uniqueHandlers.map((handler) => [handler, extractMethodBody(js, handler)]));
 const audits = buildAudits(bindings, handlerBodies);
 const contractResults = checkContracts(handlerBodies);
@@ -81,11 +97,18 @@ function normaliseLabel(source) {
     .trim() || "(dynamic)";
 }
 
+function extractMethodNames(source) {
+  return [...source.matchAll(/\n\s{2}([A-Za-z_][A-Za-z0-9_]*)\s*\(/g)]
+    .map((match) => match[1]);
+}
+
 function extractMethodBody(source, methodName) {
-  const pattern = new RegExp(`\\n\\s*${escapeRegExp(methodName)}\\s*\\([^)]*\\)\\s*\\{`, "m");
+  const pattern = new RegExp(`\\n\\s*${escapeRegExp(methodName)}\\s*\\(`, "m");
   const match = pattern.exec(source);
   if (!match) return "";
-  const bodyStart = match.index + match[0].length;
+  const openBraceIndex = source.indexOf("{", match.index + match[0].length);
+  if (openBraceIndex < 0) return "";
+  const bodyStart = openBraceIndex + 1;
   let depth = 1;
   for (let index = bodyStart; index < source.length; index += 1) {
     if (source[index] === "{") depth += 1;
@@ -102,11 +125,29 @@ function escapeRegExp(value) {
 function buildAudits(bindings, bodies) {
   return bindings.map((binding) => {
     const body = bodies[binding.handler] || "";
+    const expandedBody = expandBindingBody(bodies, binding);
     return Object.assign({}, binding, {
-      effects: classifyEffects(body),
+      effects: classifyEffects(expandedBody || body),
       handlerFound: Boolean(body)
     });
   });
+}
+
+function expandBindingBody(bodies, binding) {
+  const immediateOptions = { skip: auditAsyncBoundaries };
+  if (binding.handler === "speak") {
+    if (binding.context === "word-study") return expandMethodBody(bodies, "restartStudyPlayback", new Set(), immediateOptions);
+    if (binding.context === "group-review") return expandMethodBody(bodies, "retryReviewQuestion", new Set(), immediateOptions);
+    if (binding.context === "audio-meaning") return expandMethodBody(bodies, "markAudioUnfamiliar", new Set(), immediateOptions);
+    return "playWordAudio";
+  }
+  if (binding.handler === "handleLearningSurfaceTap") {
+    if (binding.context === "word-study") return expandMethodBody(bodies, "restartStudyPlayback", new Set(), immediateOptions);
+    if (binding.context === "group-review") return expandMethodBody(bodies, "retryReviewQuestion", new Set(), immediateOptions);
+    if (binding.context === "audio-meaning") return expandMethodBody(bodies, "markAudioUnfamiliar", new Set(), immediateOptions);
+    if (binding.context === "meaning-recall") return expandMethodBody(bodies, "retryMeaningRecall", new Set(), immediateOptions);
+  }
+  return expandMethodBody(bodies, binding.handler, new Set(), immediateOptions);
 }
 
 function classifyEffects(body) {
@@ -114,7 +155,7 @@ function classifyEffects(body) {
   if (!body) return ["missing-handler"];
   if (body === "__empty__") return ["no-state-change"];
   if (/saveAndRender\(VIEWS\./.test(body)) effects.push("navigate/render");
-  if (/advanceAfterStudyWord|advanceGroupReview|advanceAfterAudioPhase|advanceAfterMeaningRecallPhase|renderAfterMixedReview|advanceMixedReview/.test(body)) effects.push("advance-flow");
+  if (/advanceAfterStudyWord|advanceGroupReview|advanceReviewQuestion|advanceAfterGroupReviewPhase|advanceAfterMixedPhase|advanceAfterAudioPhase|advanceAfterMeaningRecallPhase|renderAfterMixedReview|advanceMixedReview/.test(body)) effects.push("advance-flow");
   if (/answer(GroupReview|Audio|MixedReview|MeaningRecall)Question/.test(body)) effects.push("records-answer");
   if (/markStudyWord/.test(body)) effects.push("records-study");
   if (/playWordAudio|playReviewAudioAndReveal|playStudyAudio/.test(body)) effects.push("plays-audio");
@@ -125,40 +166,44 @@ function classifyEffects(body) {
 }
 
 function checkContracts(bodies) {
+  const expanded = (handler) => expandMethodBody(bodies, handler);
+  const immediate = (handler) => expandMethodBody(bodies, handler, new Set(), {
+    skip: new Set(["scheduleFocusMiss", "handleFocusMiss", "advanceAfterGroupMiss", "advanceAfterMixedMiss", "advanceAfterAudioMiss"])
+  });
   return [
     {
       name: "本组复习-再想想不应加入错词",
-      pass: !/answerGroupReviewQuestion/.test(bodies.markGroupReviewUnfamiliar || "") && /playReviewAudioAndReveal/.test(bodies.markGroupReviewUnfamiliar || ""),
+      pass: !/answerReviewQuestion|answerGroupReviewQuestion/.test(immediate("markGroupReviewUnfamiliar")) && /playReviewAudioAndReveal/.test(immediate("markGroupReviewUnfamiliar")),
       expected: "markGroupReviewUnfamiliar 只播放当前词并在播放后揭示，不调用 answerGroupReviewQuestion"
     },
     {
       name: "听音辨义-再想想不应加入错词",
-      pass: !/answerAudioQuestion/.test(bodies.markAudioUnfamiliar || "") && /playWordAudio/.test(bodies.markAudioUnfamiliar || ""),
+      pass: !/answerAudioQuestion/.test(immediate("markAudioUnfamiliar")) && /playAudioMeaningAndReveal|playWordAudio/.test(immediate("markAudioUnfamiliar")),
       expected: "markAudioUnfamiliar 只重播当前词，不调用 answerAudioQuestion"
     },
     {
       name: "本组复习-记住了应进入下一题",
-      pass: /answerGroupReviewQuestion/.test(bodies.rememberGroupReview || "") && /advanceGroupReview/.test(bodies.rememberGroupReview || ""),
+      pass: /rememberReviewQuestion\("group"\)|answerGroupReviewQuestion/.test(bodies.rememberGroupReview || "") && /answerReviewQuestion|answerGroupReviewQuestion/.test(expanded("rememberGroupReview")) && /advanceReviewQuestion|advanceGroupReview/.test(expanded("rememberGroupReview")),
       expected: "rememberGroupReview 记录正确答案并推进"
     },
     {
       name: "听音辨义-记住了应进入下一题",
-      pass: /answerAudioQuestion/.test(bodies.rememberAudio || "") && /advanceAfterAudioPhase/.test(bodies.rememberAudio || ""),
+      pass: /answerAudioQuestion/.test(expanded("rememberAudio")) && /advanceAfterAudioPhase/.test(expanded("rememberAudio")),
       expected: "rememberAudio 记录正确答案并推进"
     },
     {
       name: "混组复习-再想想不应加入错词",
-      pass: !/answerMixedReviewQuestion/.test(bodies.markMixedUnfamiliar || "") && /playReviewAudioAndReveal/.test(bodies.markMixedUnfamiliar || ""),
+      pass: !/answerReviewQuestion|answerMixedReviewQuestion/.test(immediate("markMixedUnfamiliar")) && /playReviewAudioAndReveal/.test(immediate("markMixedUnfamiliar")),
       expected: "markMixedUnfamiliar 只播放当前词并在播放后揭示，不调用 answerMixedReviewQuestion"
     },
     {
       name: "混组复习-记住了应进入下一题",
-      pass: /answerMixedReviewQuestion/.test(bodies.rememberMixedReview || "") && /moveToNextMixedReviewQuestion/.test(bodies.rememberMixedReview || ""),
+      pass: /rememberReviewQuestion\("mixed"\)|answerMixedReviewQuestion/.test(bodies.rememberMixedReview || "") && /answerReviewQuestion|answerMixedReviewQuestion/.test(expanded("rememberMixedReview")) && /advanceReviewQuestion|moveToNextMixedReviewQuestion/.test(expanded("rememberMixedReview")),
       expected: "rememberMixedReview 记录正确答案并推进"
     },
     {
       name: "看中文回忆英文-记住了应进入下一题",
-      pass: /answerMeaningRecallQuestion/.test(bodies.rememberMeaningRecall || "") && /moveToNextMeaningRecallQuestion/.test(bodies.rememberMeaningRecall || ""),
+      pass: /answerMeaningRecallQuestion/.test(expanded("rememberMeaningRecall")) && /moveToNextMeaningRecallQuestion/.test(expanded("rememberMeaningRecall")),
       expected: "rememberMeaningRecall 记录正确答案并推进"
     },
     {
@@ -170,8 +215,29 @@ function checkContracts(bodies) {
       name: "单词识记-再听听只重启当前轮",
       pass: /value < 3/.test(bodies.markStudy || "") && /restartStudyPlayback/.test(bodies.markStudy || ""),
       expected: "markStudy 的再听听分支不推进，只重启播放"
+    },
+    {
+      name: "焦点页喇叭不应绕过播放后揭示链路",
+      pass: /restartStudyPlayback/.test(expanded("speak")) && /retryReviewQuestion/.test(expanded("speak")) && /markAudioUnfamiliar/.test(expanded("speak")),
+      expected: "speak 在单词识记/复习/听音辨义中分别走对应的安全 replay handler"
+    },
+    {
+      name: "混组复习提示应在进入卡片前显示",
+      pass: /buildCompletionTransition/.test(expanded("showAudioCompletionThenRender")) && /nextView === VIEWS\.GROUP_REVIEW/.test(expanded("showAudioCompletionThenRender")) && /audioCompletionNotice/.test(expanded("showAudioCompletionThenRender")),
+      expected: "showAudioCompletionThenRender 对 GROUP_REVIEW 先设置提示，再延迟渲染目标页面"
     }
   ];
+}
+
+function expandMethodBody(bodies, methodName, seen = new Set(), options = {}) {
+  if (options.skip && options.skip.has(methodName)) return "";
+  if (seen.has(methodName)) return "";
+  seen.add(methodName);
+  const body = bodies[methodName] || "";
+  const calls = [...body.matchAll(/this\.([A-Za-z0-9_]+)\(/g)]
+    .map((match) => match[1])
+    .filter((name) => bodies[name]);
+  return [body].concat(calls.map((name) => expandMethodBody(bodies, name, seen, options))).join("\n");
 }
 
 function renderReport(bindings, audits, contracts) {
