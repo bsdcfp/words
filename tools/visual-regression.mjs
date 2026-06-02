@@ -106,7 +106,7 @@ async function capturePage(miniProgram, id, title) {
   console.log(`capturing ${id}`);
   const page = await withTimeout(
     miniProgram.reLaunch(`/pages/index/index?visual=${id}`),
-    15000,
+    30000,
     `render ${id}`
   );
   console.log(`rendered ${id}`);

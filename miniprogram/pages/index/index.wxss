@@ -6116,7 +6116,7 @@ page {
 }
 
 .learning-dark .tab-bar,
-.app-shell:not(.learning-light) .tab-bar {
+.app-shell.learning-dark .tab-bar {
   background: rgba(10, 22, 19, 0.96) !important;
 }
 
@@ -6264,21 +6264,17 @@ page {
   opacity: 0.5;
 }
 
-.app-shell:not(.learning-light) .home-view,
 .app-shell.learning-dark .home-view {
   background:
     radial-gradient(circle at 50% 18%, rgba(122, 191, 168, 0.12), transparent 36%),
     linear-gradient(180deg, #0b1a17, #0b1a17) !important;
 }
 
-.app-shell:not(.learning-light) .home-main-card,
 .app-shell.learning-dark .home-main-card,
-.app-shell:not(.learning-light) .home-action-card,
 .app-shell.learning-dark .home-action-card {
   box-shadow: none;
 }
 
-.app-shell:not(.learning-light) .home-progress-art view,
 .app-shell.learning-dark .home-progress-art view {
   border-color: rgba(122, 191, 168, 0.28);
   background:
@@ -6740,7 +6736,13 @@ page {
   pointer-events: none;
 }
 
-.home-view > *:not(.asset-landscape) {
+.home-topline,
+.home-welcome-panel,
+.asset-desk-scene,
+.home-main-card,
+.home-continue,
+.home-first-note,
+.home-action-card {
   position: relative;
   z-index: 2;
 }
@@ -6850,7 +6852,7 @@ page {
   left: 0;
   z-index: 0;
   height: 250rpx;
-  background-image: url("/assets/v2/backgrounds/light-bg-landscape-strip@3x.png");
+  background-image: url("../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png");
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: cover;
@@ -6860,8 +6862,8 @@ page {
 }
 
 .learning-dark.focus-flow::after,
-.app-shell:not(.learning-light) .focus-flow::after {
-  background-image: url("/assets/v2/backgrounds/dark-bg-landscape-strip@3x.png");
+.app-shell.learning-dark .focus-flow::after {
+  background-image: url("../../assets/v2/backgrounds/dark-bg-landscape-strip@3x.png");
   opacity: 0.34;
 }
 
@@ -6973,7 +6975,11 @@ page {
   pointer-events: none;
 }
 
-.celebration-panel > *:not(.asset-confetti):not(.asset-complete-glow) {
+.celebration-panel .report-ring,
+.celebration-panel .section-label,
+.celebration-panel .stats-grid,
+.celebration-panel .copy-card,
+.celebration-panel .primary-button {
   position: relative;
   z-index: 1;
 }
