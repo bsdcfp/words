@@ -1,0 +1,505 @@
+/* ===================================================
+   首页样式 — 05-home-normal 视觉规格
+   =================================================== */
+
+/* --------------------------------------------------
+   页面根节点
+   -------------------------------------------------- */
+.page-root {
+  position: relative;
+  min-height: 100vh;
+  background-color: #0B1A17;
+  background-color: var(--bg-primary, #0B1A17);
+  color: #FFF9EF;
+  color: var(--text-primary, #FFF9EF);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------
+   顶部渐变遮罩（氛围层）
+   -------------------------------------------------- */
+.top-gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 180rpx;
+  background: linear-gradient(180deg, #0B1A17 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* --------------------------------------------------
+   状态栏占位
+   -------------------------------------------------- */
+.status-bar-placeholder {
+  width: 100%;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+/* --------------------------------------------------
+   顶部导航栏
+   -------------------------------------------------- */
+.navbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  height: 88rpx;
+  padding: 0 40rpx;
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+}
+
+/* 左侧：书本图标 + 书名 + 箭头 */
+.navbar-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.navbar-left-hover {
+  opacity: 0.75;
+}
+
+.navbar-book-icon {
+  width: 56rpx;
+  height: 44rpx;
+  background-color: #24413E;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.navbar-book-icon-text {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: var(--text-label);
+}
+
+.navbar-book-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text-primary);
+  max-width: 300rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-arrow {
+  font-size: 26rpx;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+/* 右侧：连续打卡 */
+.navbar-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.streak-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.streak-label {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* --------------------------------------------------
+   内容滚动区
+   -------------------------------------------------- */
+.content-scroll {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+/* --------------------------------------------------
+   间距辅助类
+   -------------------------------------------------- */
+.gap-section {
+  height: 32rpx;
+}
+
+.gap-card {
+  height: 24rpx;
+}
+
+.gap-label {
+  height: 16rpx;
+}
+
+.gap-title {
+  height: 24rpx;
+}
+
+.gap-numbers {
+  height: 20rpx;
+}
+
+.gap-bar {
+  height: 16rpx;
+}
+
+/* --------------------------------------------------
+   卡片 — 通用
+   -------------------------------------------------- */
+.card {
+  width: 670rpx;
+  margin: 0 40rpx;
+  background-color: var(--bg-card);
+  border: 2rpx solid var(--border-card);
+  border-radius: var(--radius-card);
+  padding: 48rpx;
+  box-sizing: border-box;
+}
+
+/* --------------------------------------------------
+   标签通用
+   -------------------------------------------------- */
+.card-label {
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--text-label);
+}
+
+/* --------------------------------------------------
+   卡片 1：单词书进度
+   -------------------------------------------------- */
+
+/* 头部：书封面缩略图 + 标签 */
+.progress-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.book-cover-thumb {
+  width: 60rpx;
+  height: 80rpx;
+  background-color: #24413E;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.book-cover-thumb-text {
+  font-size: 20rpx;
+  font-weight: 600;
+  color: var(--text-label);
+}
+
+/* 书名 */
+.book-title {
+  display: block;
+  font-size: 44rpx;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+/* 进度数字行 */
+.progress-numbers {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.progress-number-main {
+  font-size: 34rpx;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.progress-number-sep {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.progress-number-total {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.progress-number-percent {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: var(--text-label);
+  margin-left: 16rpx;
+}
+
+/* 进度条 */
+.progress-track {
+  width: 100%;
+  height: 12rpx;
+  border-radius: 6rpx;
+  background-color: var(--progress-track);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 6rpx;
+  background-color: var(--progress-fill);
+  min-width: 4rpx;
+  transition: width 0.4s ease;
+}
+
+/* 里程碑旗帜 */
+.milestone-flags {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.milestone-flag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.milestone-flag-icon {
+  font-size: 28rpx;
+  opacity: 0.6;
+}
+
+/* --------------------------------------------------
+   卡片 2：今日目标
+   -------------------------------------------------- */
+
+/* 标签行 */
+.goal-label-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.goal-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  border: 2rpx solid var(--accent);
+  flex-shrink: 0;
+}
+
+/* 大数字行 */
+.goal-number-row {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 8rpx;
+  margin-top: 16rpx;
+}
+
+.goal-number-display {
+  font-size: 96rpx;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.05;
+}
+
+.goal-number-unit {
+  font-size: 40rpx;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+/* 旗帜进度 */
+.goal-flags {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 80rpx;
+  margin-top: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.goal-flag-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goal-flag-icon {
+  font-size: 32rpx;
+  line-height: 1;
+}
+
+.goal-flag-done .goal-flag-icon {
+  opacity: 1;
+}
+
+.goal-flag-pending .goal-flag-icon {
+  opacity: 0.3;
+}
+
+/* CTA 按钮 */
+.btn-cta {
+  width: 100%;
+  height: 88rpx;
+  background-color: var(--accent);
+  border-radius: var(--radius-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 16rpx 48rpx var(--accent-glow);
+}
+
+.btn-cta-hover {
+  opacity: 0.85;
+}
+
+.btn-cta-text {
+  font-size: 32rpx;
+  font-weight: 900;
+  color: #141413;
+}
+
+/* --------------------------------------------------
+   错词提示条
+   -------------------------------------------------- */
+.wrong-words-bar {
+  width: 670rpx;
+  height: 96rpx;
+  margin: 0 40rpx;
+  background-color: var(--bg-hint);
+  border: 2rpx solid var(--border-card);
+  border-radius: 28rpx;
+  padding: 0 32rpx;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.wrong-words-bar-hover {
+  opacity: 0.8;
+}
+
+.wrong-words-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.wrong-words-icon {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  border: 2rpx solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.wrong-words-icon-text {
+  font-size: 20rpx;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.wrong-words-text {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.wrong-words-hint {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--text-label);
+}
+
+/* --------------------------------------------------
+   内容底部留白（为 tab 栏留空）
+   -------------------------------------------------- */
+.content-bottom-spacer {
+  width: 100%;
+}
+
+/* --------------------------------------------------
+   底部 Tab 栏（fixed 定位）
+   -------------------------------------------------- */
+.tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: var(--bg-tabbar);
+  z-index: 100;
+}
+
+.tabbar-divider {
+  width: 100%;
+  height: 1rpx;
+  background-color: var(--border-divider);
+}
+
+.tabbar-inner {
+  display: flex;
+  flex-direction: row;
+  height: 120rpx;
+}
+
+/* Tab 项 */
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.tab-icon {
+  font-size: 36rpx;
+  line-height: 1;
+}
+
+.tab-label {
+  font-size: 20rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 选中态 */
+.tab-item-active .tab-icon,
+.tab-item-active .tab-label {
+  color: var(--tab-active);
+}
+
+/* 未选中态 */
+.tab-item-inactive .tab-icon,
+.tab-item-inactive .tab-label {
+  color: var(--tab-inactive);
+}

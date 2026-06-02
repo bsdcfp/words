@@ -1,0 +1,176 @@
+{
+  "version": "v2",
+  "generatedAt": "2026-06-02",
+  "generator": "imagegen built-in tool",
+  "styleSources": [
+    "docs/imagegen-prototype-design-spec.md",
+    "docs/design-outputs/page-references-v2-imagegen/"
+  ],
+  "notes": [
+    "Assets are generated from the existing Reference visual language, not cropped from page mockups.",
+    "Text, buttons, cards, arrows, progress dots, and dynamic data should be implemented with WXML/WXSS/SVG.",
+    "Transparent assets were generated on chroma-key backgrounds and processed locally with remove_chroma_key.py."
+  ],
+  "assets": [
+    {
+      "id": "light-bg-landscape-strip",
+      "category": "backgrounds",
+      "path": "backgrounds/light-bg-landscape-strip@3x.png",
+      "transparent": false,
+      "source": "Reference bottom watercolor landscape in light pages",
+      "usedBy": ["首页", "识记页", "回忆页", "听音页", "庆祝页"]
+    },
+    {
+      "id": "dark-bg-landscape-strip",
+      "category": "backgrounds",
+      "path": "backgrounds/dark-bg-landscape-strip@3x.png",
+      "transparent": false,
+      "source": "Reference dark focus-mode mountain landscape",
+      "usedBy": ["深色识记页", "深色回忆页", "深色听音页"]
+    },
+    {
+      "id": "light-illustration-vocabulary-book",
+      "category": "illustrations",
+      "path": "illustrations/light-illustration-vocabulary-book@3x.png",
+      "transparent": true,
+      "source": "Green vocabulary book in home/profile/celebration references",
+      "usedBy": ["首页", "我的页", "庆祝页", "测评结果页"]
+    },
+    {
+      "id": "shared-illustration-list-flag",
+      "category": "illustrations",
+      "path": "illustrations/shared-illustration-list-flag@3x.png",
+      "transparent": true,
+      "source": "List progress flags in home reference",
+      "usedBy": ["首页", "List 完成动画页", "庆祝页"]
+    },
+    {
+      "id": "shared-illustration-focus-badge",
+      "category": "illustrations",
+      "path": "illustrations/shared-illustration-focus-badge@3x.png",
+      "transparent": true,
+      "source": "Gold focus badge in celebration reference",
+      "usedBy": ["庆祝页", "测评结果页", "阶段测"]
+    },
+    {
+      "id": "shared-illustration-monthly-calendar",
+      "category": "illustrations",
+      "path": "illustrations/shared-illustration-monthly-calendar@3x.png",
+      "transparent": true,
+      "source": "Calendar/progress visuals in profile and monthly progress references",
+      "usedBy": ["我的页", "月度进展-阶段测入口页"]
+    },
+    {
+      "id": "shared-illustration-assessment-paper",
+      "category": "illustrations",
+      "path": "illustrations/shared-illustration-assessment-paper@3x.png",
+      "transparent": true,
+      "source": "Assessment paper visuals in entry/stage test references",
+      "usedBy": ["水平选择页", "入学测页", "阶段测"]
+    },
+    {
+      "id": "shared-illustration-study-desk-light",
+      "category": "illustrations",
+      "path": "illustrations/shared-illustration-study-desk-light@3x.png",
+      "transparent": false,
+      "source": "Light study-desk scene in new-user home reference",
+      "usedBy": ["浅色新用户首页"]
+    },
+    {
+      "id": "dark-illustration-study-desk",
+      "category": "illustrations",
+      "path": "illustrations/dark-illustration-study-desk@3x.png",
+      "transparent": false,
+      "source": "Dark desk/lamp scene in dark new-user and home references",
+      "usedBy": ["深色新用户首页", "深色首页-正常状态"]
+    },
+    {
+      "id": "shared-illustration-assessment-book-check",
+      "category": "illustrations",
+      "path": "illustrations/shared-illustration-assessment-book-check@3x.png",
+      "transparent": true,
+      "source": "Open book with completion check in assessment result reference",
+      "usedBy": ["测评结果页"]
+    },
+    {
+      "id": "shared-icon-wrong-words",
+      "category": "icons",
+      "path": "icons/shared-icon-wrong-words@3x.png",
+      "transparent": true,
+      "source": "Wrong-words review icon in home/profile references",
+      "usedBy": ["首页", "错词本页", "我的页"]
+    },
+    {
+      "id": "shared-icon-completion-check",
+      "category": "icons",
+      "path": "icons/shared-icon-completion-check@3x.png",
+      "transparent": true,
+      "source": "Circular completion check in celebration reference",
+      "usedBy": ["List 完成动画页", "庆祝页"]
+    },
+    {
+      "id": "shared-icon-sound-wave-round",
+      "category": "icons",
+      "path": "icons/shared-icon-sound-wave-round@3x.png",
+      "transparent": true,
+      "source": "Round sound-wave button in memorize/listening references",
+      "usedBy": ["识记页", "听音页", "词卡详情弹窗"]
+    },
+    {
+      "id": "shared-icon-listening-play",
+      "category": "icons",
+      "path": "icons/shared-icon-listening-play@3x.png",
+      "transparent": true,
+      "source": "Large center play control in listening reference",
+      "usedBy": ["听音页"]
+    },
+    {
+      "id": "shared-icon-open-book",
+      "category": "icons",
+      "path": "icons/shared-icon-open-book@3x.png",
+      "transparent": true,
+      "source": "Open-book learning stat icon in celebration/profile references",
+      "usedBy": ["首页", "我的页", "庆祝页"]
+    },
+    {
+      "id": "shared-icon-gold-star-token",
+      "category": "icons",
+      "path": "icons/shared-icon-gold-star-token@3x.png",
+      "transparent": true,
+      "source": "Gold star reward marker in celebration references",
+      "usedBy": ["庆祝页", "测评结果页", "积分展示"]
+    },
+    {
+      "id": "shared-icon-speaker",
+      "category": "icons",
+      "path": "icons/shared-icon-speaker@3x.png",
+      "transparent": true,
+      "source": "Pronunciation/speaker visual language in learning references",
+      "usedBy": ["识记页", "听音页", "词卡详情弹窗"]
+    },
+    {
+      "id": "shared-effect-laurel-confetti",
+      "category": "effects",
+      "path": "effects/shared-effect-laurel-confetti@3x.png",
+      "transparent": true,
+      "source": "Laurel and confetti decoration in celebration reference",
+      "usedBy": ["庆祝页", "List 完成动画页"]
+    },
+    {
+      "id": "shared-effect-list-complete-glow",
+      "category": "effects",
+      "path": "effects/shared-effect-list-complete-glow@3x.png",
+      "transparent": true,
+      "source": "Soft completion glow in List complete/celebration references",
+      "usedBy": ["List 完成动画页", "庆祝页"]
+    },
+    {
+      "id": "shared-effect-swipe-arrows",
+      "category": "effects",
+      "path": "effects/shared-effect-swipe-arrows@3x.png",
+      "transparent": true,
+      "source": "Up/down swipe gesture arrows in pre-learning scan reference",
+      "usedBy": ["训前检测页"]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150">
+  <defs>
+    <linearGradient id="cover" x1="35" y1="23" x2="112" y2="115" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9fc1ad"/>
+      <stop offset=".55" stop-color="#789f8d"/>
+      <stop offset="1" stop-color="#4f806d"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="37" y1="100" x2="128" y2="129" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff9ef"/>
+      <stop offset=".58" stop-color="#eadfc8"/>
+      <stop offset="1" stop-color="#d8c7a9"/>
+    </linearGradient>
+    <pattern id="grain" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 4h8M4 0v8" stroke="#fff9ef" stroke-width=".8" opacity=".15"/>
+    </pattern>
+  </defs>
+  <g transform="rotate(9 75 75)">
+    <path d="M37 24h70c9 0 16 7 16 16v72c0 7.7-6.3 14-14 14H37c-7.7 0-14-6.3-14-14V38c0-7.7 6.3-14 14-14Z" fill="#d7c4a2" opacity=".95"/>
+    <path d="M31 18h72c9 0 16 7 16 16v72c0 7.7-6.3 14-14 14H31c-7.7 0-14-6.3-14-14V32c0-7.7 6.3-14 14-14Z" fill="url(#cover)"/>
+    <path d="M31 18h72c9 0 16 7 16 16v72c0 7.7-6.3 14-14 14H31c-7.7 0-14-6.3-14-14V32c0-7.7 6.3-14 14-14Z" fill="url(#grain)"/>
+    <path d="M32 98h76c7.7 0 14 6.3 14 14s-6.3 14-14 14H32c-8.3 0-15-6.3-15-14s6.7-14 15-14Z" fill="url(#pages)"/>
+    <path d="M31 18h9v80h-9V18Z" fill="#426c5b" opacity=".66"/>
+    <path d="M40 106h62M40 115h58" stroke="#bda984" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    <path d="M41 98v28l10-8 10 8V98H41Z" fill="#d4935a" stroke="#b8743b" stroke-width="1.4" stroke-linejoin="round"/>
+    <path d="M60 50h35M60 64h24" stroke="#dceadf" stroke-width="5" stroke-linecap="round" opacity=".68"/>
+    <rect x="17" y="18" width="102" height="108" rx="14" fill="none" stroke="#2c2418" stroke-opacity=".16" stroke-width="3"/>
+  </g>
+</svg>

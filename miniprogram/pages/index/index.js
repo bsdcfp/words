@@ -1544,6 +1544,7 @@ function buildNextTaskText(state, todayLists, weakCount) {
 function buildPrimaryActionText(state, nextTask) {
   if (!hasSelectedWordLevel(state)) return "选择单词水平";
   if (state.daily && state.daily.completed) return "查看今日成果";
+  if (state.daily && state.daily.sessionCompletedWordIds && state.daily.sessionCompletedWordIds.length > 0) return "继续";
   if (nextTask && nextTask.includes("筛词")) return "继续筛词";
   if (nextTask && nextTask.includes("继续")) return "继续学习";
   return "开始今日学习";
@@ -2053,7 +2054,7 @@ function createVisualBaseState() {
   state.user.settings.dailyTargetListCount = 4;
   state.user.settings.listGroupCount = 12;
   state.user.settings.pronunciationLoopCount = 3;
-  state.user.streakDays = 4;
+  state.user.streakDays = 3;
   state.user.longestStreak = 9;
   state.user.checkins = buildVisualCheckins();
   return state;
@@ -2077,10 +2078,10 @@ function seedVisualProgress(state) {
   visualReferenceWords(120).forEach((word, index) => {
     state.userWordStates[word.id] = Object.assign(defaultVisualWordState(), {
       familiarity: index % 5 + 1,
-      wrongCount: index % 6 === 0 ? 1 : 0
+      wrongCount: index < 8 ? index % 3 + 1 : 0
     });
   });
-  state.daily.sessionCompletedWordIds = visualReferenceWords(36).map((word) => word.id);
+  state.daily.sessionCompletedWordIds = visualReferenceWords(27).map((word) => word.id);
 }
 
 function seedVisualWrongWords(state) {

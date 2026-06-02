@@ -2,6 +2,8 @@
 
 这些是逐页单独用 imagegen 生成的高清 Reference，不是从总看板裁切出来的图片。
 
+实现小程序时请以 `docs/imagegen-prototype-design-spec.md` 为准：这些 Reference 只用于页面视觉参考；按钮、卡片、进度、汉字、英文单词、音标和动态数据都应由 WXML/WXSS 渲染，背景图和复杂插画需要单独生成高清资产包。
+
 ## 浅色
 
 | # | 页面 | 文件 |

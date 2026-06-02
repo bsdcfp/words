@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 86">
+  <defs>
+    <linearGradient id="cover" x1="10" y1="7" x2="62" y2="69" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9fc1ad"/>
+      <stop offset=".58" stop-color="#6f9d88"/>
+      <stop offset="1" stop-color="#4f806d"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="17" y1="60" x2="68" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff9ef"/>
+      <stop offset=".55" stop-color="#eadfc8"/>
+      <stop offset="1" stop-color="#d8c7a9"/>
+    </linearGradient>
+    <pattern id="paperGrain" width="7" height="7" patternUnits="userSpaceOnUse">
+      <path d="M0 3.5h7M3.5 0v7" stroke="#fff9ef" stroke-width=".7" opacity=".15"/>
+    </pattern>
+  </defs>
+  <path d="M17 8h42c4.8 0 8.8 4 8.8 8.8v49.6c0 4.3-3.5 7.8-7.8 7.8H17c-4.4 0-8-3.6-8-8V16c0-4.4 3.6-8 8-8Z" fill="#dbc9aa"/>
+  <path d="M17 6h39c5.1 0 9.2 4.1 9.2 9.2v49.5c0 4.5-3.6 8.1-8.1 8.1H17c-4.4 0-8-3.6-8-8V14c0-4.4 3.6-8 8-8Z" fill="url(#cover)"/>
+  <path d="M17 6h39c5.1 0 9.2 4.1 9.2 9.2v49.5c0 4.5-3.6 8.1-8.1 8.1H17c-4.4 0-8-3.6-8-8V14c0-4.4 3.6-8 8-8Z" fill="url(#paperGrain)"/>
+  <path d="M17 62h43c3.9 0 7 3.1 7 7s-3.1 7-7 7H17c-4.4 0-8-3.1-8-7s3.6-7 8-7Z" fill="url(#pages)"/>
+  <path d="M18 6h6v56h-6V6Z" fill="#406d5b" opacity=".68"/>
+  <path d="M23 66h35M23 71h33" stroke="#bda984" stroke-width="2.2" stroke-linecap="round" opacity=".75"/>
+  <path d="M22 63v17l6.8-5 6.8 5V63H22Z" fill="#d4935a" stroke="#b8743b" stroke-width="1" stroke-linejoin="round"/>
+  <path d="M33 27h19M33 36h13" stroke="#dceadf" stroke-width="3.2" stroke-linecap="round" opacity=".72"/>
+  <path d="M30 18c2.5 1.4 4.8 1.4 7.2 0M48 52c2.5 1.4 4.8 1.4 7.2 0" stroke="#3c6b59" stroke-width="1.8" stroke-linecap="round" opacity=".36"/>
+  <rect x="9" y="6" width="56.2" height="70" rx="8.8" fill="none" stroke="#2c2418" stroke-opacity=".16" stroke-width="2"/>
+</svg>
