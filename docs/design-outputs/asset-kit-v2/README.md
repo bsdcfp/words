@@ -44,6 +44,7 @@
 | `illustrations/shared-illustration-study-desk-light@3x.png` | 浅色新用户首页上半段学习场景 |
 | `illustrations/dark-illustration-study-desk@3x.png` | 深色新用户首页/首页上半段学习场景 |
 | `illustrations/shared-illustration-assessment-book-check@3x.png` | 测评结果页顶部“打开书 + 完成勾”插画 |
+| `illustrations/precheck-today-book-stack@3x.png` | 训前检测页底部“今日待学”后的小书堆 |
 
 ## 图标
 
@@ -56,6 +57,7 @@
 | `icons/shared-icon-open-book@3x.png` | 新学单词、词库、学习数据 |
 | `icons/shared-icon-gold-star-token@3x.png` | 积分、奖励、星星统计 |
 | `icons/shared-icon-speaker@3x.png` | 发音、小型播放按钮 |
+| `icons/precheck-speaker-round@3x.png` | 训前检测词卡内的圆形喇叭按钮 |
 
 ## 效果
 
@@ -64,6 +66,10 @@
 | `effects/shared-effect-laurel-confetti@3x.png` | 庆祝页顶部装饰、完成反馈 |
 | `effects/shared-effect-list-complete-glow@3x.png` | List 完成光效、徽章背后氛围 |
 | `effects/shared-effect-swipe-arrows@3x.png` | 训前检测页上滑/下滑方向提示 |
+| `effects/precheck-arrow-up@3x.png` | 训前检测词卡内上滑箭头 |
+| `effects/precheck-arrow-down@3x.png` | 训前检测词卡内下滑箭头 |
+| `effects/precheck-scan-bars-top@3x.png` | 训前检测词卡上方三条柔光动势杠 |
+| `effects/precheck-scan-bars-bottom@3x.png` | 训前检测词卡下方三条柔光动势杠 |
 
 ## 使用边界
 

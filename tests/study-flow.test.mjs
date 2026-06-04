@@ -67,8 +67,12 @@ const assessmentState = structuredClone(defaultState);
 startAssessment(assessmentState, "assessment-critical-required");
 assert.equal(assessmentState.assessment.questions.length, 18, "assessment should start with an 18-question first phase");
 assert.ok(
-  assessmentState.assessment.questions.every((question) => question.options.length === 2 && question.options.includes(question.answer) && question.options.includes("不认识")),
-  "assessment questions should only include the original meaning plus unknown"
+  assessmentState.assessment.questions.every((question) =>
+    question.options.length === 4 &&
+    question.options.includes(question.answer) &&
+    !question.options.includes("不认识") &&
+    new Set(question.options).size === 4),
+  "assessment questions should offer four distinct meaning choices including the correct one"
 );
 assert.deepEqual(
   ["foundation", "required", "selective"].map((layer) => assessmentState.assessment.questions.filter((question) => question.layer === layer).length),

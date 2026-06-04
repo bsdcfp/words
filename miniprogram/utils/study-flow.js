@@ -63,6 +63,15 @@ function answerAssessmentQuestion(state, selected) {
     };
     state.user.learningStartLevel = state.assessment.result.startLevel;
     state.user.learningStartLevelLabel = state.assessment.result.startLevelLabel;
+    // The assessment ("不确定？做个测试") doubles as level selection: the only
+    // supported book is 高考 3500 (senior), so confirm it so "开始学习" can proceed.
+    if (state.user.wordLevelId !== "senior") {
+      state.user.wordLevelId = "senior";
+      state.user.wordLevelLabel = "高中";
+      state.user.levelId = "senior";
+      state.user.levelLabel = "高中";
+      state.user.level = "高中";
+    }
   }
 }
 
@@ -305,6 +314,50 @@ function moveToNextMeaningRecallQuestion(state) {
   }
   prepareCurrentMicroList(state);
   return "word-study";
+}
+
+/* ----- Standalone review sessions (错词复习 / 遗忘曲线复习) -----
+   These reuse the mixed-review question engine but run as their own session,
+   fully decoupled from the daily new-word flow (state.daily.*). They share the
+   mixed* slots only as the runtime queue and are flagged by state.reviewSession. */
+function getWrongReviewWordIds(state, limit = 9) {
+  return Object.keys(state.userWordStates || {})
+    .filter((wordId) => (state.userWordStates[wordId].wrongCount || 0) > 0)
+    .filter((wordId) => getWordById(wordId))
+    .sort((a, b) => (state.userWordStates[b].wrongCount || 0) - (state.userWordStates[a].wrongCount || 0))
+    .slice(0, limit);
+}
+
+function getDueReviewWordIds(state, limit = 9) {
+  const now = Date.now();
+  return Object.keys(state.userWordStates || {})
+    .filter((wordId) => isDueForReview(state.userWordStates[wordId]) && getWordById(wordId))
+    .sort((a, b) => {
+      const da = Date.parse(state.userWordStates[a].nextReviewAt || 0) || now;
+      const db = Date.parse(state.userWordStates[b].nextReviewAt || 0) || now;
+      return da - db;
+    })
+    .slice(0, limit);
+}
+
+function startReviewSession(state, kind, wordIds, label) {
+  const ids = uniqueIds(wordIds || []).filter((wordId) => getWordById(wordId));
+  state.reviewSession = { kind, label, total: ids.length };
+  state.daily.reviewPhase = "mixed";
+  state.daily.activeMixedReview = { label };
+  state.daily.mixedReviewWordIds = ids;
+  state.daily.mixedQuestions = ids.map((wordId) => createChoiceQuestion(wordId, "mixed-review", "visual"));
+  state.daily.mixedIndex = 0;
+  return ids.length;
+}
+
+function clearReviewSession(state) {
+  state.reviewSession = null;
+  state.daily.reviewPhase = "initial";
+  state.daily.activeMixedReview = null;
+  state.daily.mixedReviewWordIds = [];
+  state.daily.mixedQuestions = [];
+  state.daily.mixedIndex = 0;
 }
 
 function getCurrentMixedReviewQuestion(state) {
@@ -596,6 +649,23 @@ function prepareMixedReview(state) {
   state.daily.mixedIndex = 0;
 }
 
+// When the user raises 每日目标 after today's plan was already completed, reopen
+// the day so they can screen more words and continue. Keeps today's stats
+// (sessionCompletedWordIds / completedGroups) intact.
+function reopenDailyForTarget(state) {
+  if (!state.daily || !state.daily.startedAt) return false;
+  const targetGroups = dailyTargetMicroListCountFor(state);
+  if ((state.daily.completedGroups || []).length >= targetGroups) return false;
+  state.daily.dailyTargetListCount = dailyTargetListCountFor(state);
+  state.daily.dailyTargetWordCount = dailyTargetWordCountFor(state);
+  state.daily.listTargetGroupCount = targetGroups;
+  state.daily.completed = false;
+  state.daily.precheckCompleted = false;
+  state.daily.groupFeedback = "目标已上调，继续筛词学习";
+  refillPrecheckCandidateWordIds(state);
+  return true;
+}
+
 function startNextRound(state) {
   let nextCandidateWordIds = buildCandidateWordIds(state, state.daily.sessionCompletedWordIds || []);
   if (!nextCandidateWordIds.length) {
@@ -694,10 +764,12 @@ function answerChoiceQuestion(state, question, selectedCn, type) {
   const word = getWordById(question.wordId);
   const isCorrect = word.cn.join("，") === selectedCn;
   const current = state.userWordStates[word.id] || defaultWordState();
+  // Unified pass/fail rule (product-mechanism-v2.md): a pass (记住了/已记住) clears
+  // the word from the 错词本; a fail adds it. Same logic for every review type.
   const answeredState = Object.assign({}, current, {
     familiarity: isCorrect ? Math.min(current.familiarity + 1, 5) : Math.max(current.familiarity - 1, 0),
     correctStreak: isCorrect ? current.correctStreak + 1 : 0,
-    wrongCount: isCorrect ? current.wrongCount : current.wrongCount + 1,
+    wrongCount: isCorrect ? 0 : current.wrongCount + 1,
     lastSeenAt: new Date().toISOString(),
     lastResult: isCorrect ? "correct" : "wrong"
   }, masteryPatch(current, type, question.mode, isCorrect));
@@ -884,14 +956,58 @@ function buildAssessmentQuestionsForLayer(layer, count, usedWordIds, seed) {
   });
 }
 
+let assessmentMeaningPool = null;
+
+function getAssessmentMeaningPool() {
+  if (assessmentMeaningPool) return assessmentMeaningPool;
+  const seen = {};
+  assessmentMeaningPool = [];
+  words.forEach((word) => {
+    const meaning = (word.cn || []).join("，");
+    if (meaning && !seen[meaning]) {
+      seen[meaning] = true;
+      assessmentMeaningPool.push(meaning);
+    }
+  });
+  return assessmentMeaningPool;
+}
+
+function pickAssessmentDistractors(correct, word, count) {
+  const pool = getAssessmentMeaningPool();
+  const picks = [];
+  const used = { [correct]: true };
+  let cursor = hashText(`${word.id}:${word.sourceIndex}:distract`) % pool.length;
+  let guard = 0;
+  while (picks.length < count && guard < pool.length * 3) {
+    cursor = (cursor * 1103515245 + 12345) & 0x7fffffff;
+    const candidate = pool[cursor % pool.length];
+    if (candidate && !used[candidate]) {
+      used[candidate] = true;
+      picks.push(candidate);
+    }
+    guard += 1;
+  }
+  return picks;
+}
+
+function shuffleAssessmentOptions(options, seedText) {
+  return options
+    .map((value, index) => ({ value, rank: hashText(`${seedText}:${index}:${value}`) }))
+    .sort((a, b) => a.rank - b.rank)
+    .map((item) => item.value);
+}
+
 function createAssessmentQuestion(word, layer, index) {
   const correct = word.cn.join("，");
+  const distractors = pickAssessmentDistractors(correct, word, 3);
+  const options = shuffleAssessmentOptions([correct].concat(distractors), `${word.id}:opt`);
   return {
     id: `vocab_${layer}_${word.id}`,
     word: word.word,
+    ipa: word.ipa || "",
     sourceWordId: word.id,
     layer,
-    options: [correct, "不认识"],
+    options,
     answer: correct
   };
 }
@@ -1071,7 +1187,12 @@ module.exports = {
   prepareAudioQuestions,
   prepareMeaningRecallQuestions,
   refillPrecheckCandidateWordIds,
+  reopenDailyForTarget,
   startAssessment,
   startDailyLearning,
+  startReviewSession,
+  clearReviewSession,
+  getWrongReviewWordIds,
+  getDueReviewWordIds,
   togglePrecheckWord
 };

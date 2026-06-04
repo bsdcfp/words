@@ -27,6 +27,7 @@ const READ_ALONG_DURATION_MS = 1200;
 const READ_ALONG_REPLAY_DELAY_MS = 0;
 const READ_ALONG_VOICE_THRESHOLD = 500;
 const REVEAL_DELAY_MS = 2000;
+const REVIEW_CONFIRM_PAUSE_MS = 500;
 const AUTO_MISS_AFTER_REVEAL_MS = 3000;
 const WRONG_EDGE_FEEDBACK_MS = 300;
 const PRECHECK_SWIPE_THRESHOLD = 92;
@@ -37,7 +38,8 @@ const WORD_LEVEL_OPTIONS = [
   { id: "senior", label: "高中", enabled: true, status: "已开放", startLevel: "required" },
   { id: "cet4", label: "大学四级", enabled: false, status: "暂未开放" },
   { id: "cet6", label: "大学六级", enabled: false, status: "暂未开放" },
-  { id: "postgraduate", label: "考研", enabled: false, status: "暂未开放" }
+  { id: "postgraduate", label: "考研", enabled: false, status: "暂未开放" },
+  { id: "ielts", label: "雅思", enabled: false, status: "暂未开放" }
 ];
 const NAVIGATION_TITLES = {
   [VIEWS.HOME]: "今日单词",
@@ -69,7 +71,6 @@ function isDevtoolsRuntime() {
 Page({
   data: {
     view: VIEWS.HOME,
-    state: null,
     home: {},
     profile: {},
     themeClass: "learning-light",
@@ -97,6 +98,7 @@ Page({
     focusPauseVisible: false,
     focusPause: {},
     focusEdgeFeedback: false,
+    wrongBookEditing: false,
     precheckSwipeClass: "",
     audioCompletionNotice: "",
     audioCompletionHint: "",
@@ -107,6 +109,8 @@ Page({
     try {
       this.viewHistory = [];
       this.state = loadState();
+      // Never auto-resume a standalone review session (错词/遗忘曲线) on launch.
+      if (this.state && this.state.reviewSession) flow.clearReviewSession(this.state);
       if (options.visual) {
         this.showVisualRegressionPage(options.visual);
         return;
@@ -116,7 +120,6 @@ Page({
       this.state = resetState();
       this.setData({
         view: VIEWS.HOME,
-        state: this.state,
         home: buildHomeData(this.state),
         bootError: error && error.message ? error.message : String(error)
       });
@@ -128,6 +131,7 @@ Page({
     this.clearAudioCompletionTimer();
     this.clearPrecheckNoticeTimer();
     this.clearReviewRevealTimer();
+    this.clearReviewAdvanceTimer();
     this.clearAudioRevealTimer();
     this.clearRecallRevealTimer();
     this.clearFocusMissTimer();
@@ -143,6 +147,14 @@ Page({
       this.saveAndRender(VIEWS.LEVEL_SELECT);
       return;
     }
+    flow.startAssessment(this.state);
+    this.saveAndRender(VIEWS.TEST);
+  },
+
+  takeLevelTest() {
+    // Entry from the level-select page itself: the assessment decides the level,
+    // so start it directly instead of bouncing back to level selection.
+    this.pendingAfterLevelSelect = "";
     flow.startAssessment(this.state);
     this.saveAndRender(VIEWS.TEST);
   },
@@ -548,7 +560,21 @@ Page({
     this.clearReviewRevealTimer();
     this.clearFocusMissTimer();
     this.answerReviewQuestion(kind, question.options[0]);
-    this.advanceReviewQuestion(kind);
+    // Show the meaning so the user can verify they remembered correctly,
+    // hold briefly, then move on.
+    this.setData({ reviewAnswerVisible: true });
+    this.clearReviewAdvanceTimer();
+    this.reviewAdvanceTimer = setTimeout(() => {
+      this.reviewAdvanceTimer = null;
+      if (this.data.view !== VIEWS.GROUP_REVIEW) return;
+      this.advanceReviewQuestion(kind);
+    }, REVIEW_CONFIRM_PAUSE_MS);
+  },
+
+  clearReviewAdvanceTimer() {
+    if (!this.reviewAdvanceTimer) return;
+    clearTimeout(this.reviewAdvanceTimer);
+    this.reviewAdvanceTimer = null;
   },
 
   retryReviewQuestion(kind = this.currentReviewKind()) {
@@ -579,6 +605,18 @@ Page({
 
   advanceAfterMixedPhase(phase) {
     if (phase === "complete") {
+      if (this.reviewSessionKind) {
+        // Standalone review session (错词/遗忘曲线): clear it and return to the
+        // entry, never advancing the daily new-word flow or the celebration page.
+        const kind = this.reviewSessionKind;
+        this.reviewSessionKind = "";
+        flow.clearReviewSession(this.state);
+        if (typeof wx !== "undefined" && typeof wx.showToast === "function") {
+          wx.showToast({ title: "复习完成", icon: "success" });
+        }
+        this.saveAndRender(kind === "wrong" ? VIEWS.WRONG_BOOK : VIEWS.HOME, { track: false });
+        return;
+      }
       const next = flow.completeMixedReview(this.state);
       this.renderAfterMixedReview(next);
       return;
@@ -603,8 +641,7 @@ Page({
   },
 
   finishMixedReview() {
-    const next = flow.completeMixedReview(this.state);
-    this.renderAfterMixedReview(next);
+    this.advanceAfterMixedPhase("complete");
   },
 
   renderAfterMixedReview(next) {
@@ -952,12 +989,7 @@ Page({
   advanceAfterMixedMiss() {
     setTimeout(() => {
       const phase = flow.moveToNextMixedReviewQuestion(this.state);
-      if (phase === "complete") {
-        const next = flow.completeMixedReview(this.state);
-        this.renderAfterMixedReview(next);
-        return;
-      }
-      this.saveAndRender(VIEWS.GROUP_REVIEW);
+      this.advanceAfterMixedPhase(phase);
     }, 1000);
   },
 
@@ -979,7 +1011,54 @@ Page({
   },
 
   openWrongBook() {
+    this.setData({ wrongBookEditing: false });
     this.saveAndRender(VIEWS.WRONG_BOOK);
+  },
+
+  toggleWrongBookEdit() {
+    this.setData({ wrongBookEditing: !this.data.wrongBookEditing });
+  },
+
+  // Flow 2 of 3: 错词复习 — mix ALL wrong words into one review session.
+  startWrongReview() {
+    this.beginReviewSession("wrong");
+  },
+
+  // Flow 3 of 3: 遗忘曲线复习 — review words that are due by the SRS schedule.
+  startForgettingReview() {
+    this.beginReviewSession("forgetting");
+  },
+
+  beginReviewSession(kind) {
+    if (!hasSelectedWordLevel(this.state)) {
+      this.saveAndRender(VIEWS.LEVEL_SELECT);
+      return;
+    }
+    const wordIds = kind === "wrong"
+      ? flow.getWrongReviewWordIds(this.state, 9)
+      : flow.getDueReviewWordIds(this.state, 9);
+    if (!wordIds.length) {
+      if (typeof wx !== "undefined" && typeof wx.showToast === "function") {
+        wx.showToast({ title: kind === "wrong" ? "暂无错词" : "暂无到期复习", icon: "none" });
+      }
+      return;
+    }
+    const daily = this.state.daily || {};
+    if (daily.startedAt && !daily.completed && !this.reviewSessionKind) {
+      // A daily new-word session is mid-flight; don't corrupt it — continue it.
+      this.startDailyLearning();
+      return;
+    }
+    this.reviewSessionKind = kind;
+    flow.startReviewSession(this.state, kind, wordIds, kind === "wrong" ? "错词复习" : "遗忘曲线复习");
+    this.saveAndRender(VIEWS.GROUP_REVIEW);
+  },
+
+  removeWrongWord(event) {
+    const wordId = event.currentTarget.dataset.wordId;
+    const wordState = this.state.userWordStates[wordId];
+    if (wordState) wordState.wrongCount = 0;
+    this.saveAndRender(VIEWS.WRONG_BOOK, { track: false });
   },
 
   resetData() {
@@ -1012,6 +1091,12 @@ Page({
     if (!this.state.user.settings) this.state.user.settings = {};
     this.state.user.settings.dailyTargetListCount = count;
     this.state.user.settings.listGroupCount = count * 3;
+    // Raising the goal after today's plan finished reopens the day so the
+    // user can keep learning (stats are kept; more words get screened in).
+    const daily = this.state.daily || {};
+    if (daily.completed && daily.startedAt && isSameLocalDay(daily.startedAt)) {
+      flow.reopenDailyForTarget(this.state);
+    }
     this.saveAndRender(VIEWS.PROFILE, { track: false });
   },
 
@@ -1038,7 +1123,9 @@ Page({
   render(view, options = {}) {
     const state = this.state;
     this.rememberCurrentView(view, options);
-    const patch = { view, state, themeClass: learningThemeClassFor(state), studyTransition: false };
+    // Note: the full app state object stays on `this.state` only — putting it
+    // into setData shipped ~1MB (3500 word states) to the view layer per render.
+    const patch = { view, themeClass: learningThemeClassFor(state), studyTransition: false };
     this.updateNavigationBar(view);
     patch.focusPauseVisible = false;
     if (view === VIEWS.HOME) patch.home = buildHomeData(state);
@@ -1096,11 +1183,10 @@ Page({
 
   updateNavigationBar(view) {
     if (isDevtoolsRuntime()) return;
-    const isLight = this.state && this.state.user && this.state.user.settings && this.state.user.settings.learningTheme === "light";
     if (typeof wx.setNavigationBarColor === "function") {
       wx.setNavigationBarColor({
-        frontColor: isLight ? "#000000" : "#ffffff",
-        backgroundColor: isLight ? "#f8f5ec" : "#071216"
+        frontColor: "#000000",
+        backgroundColor: "#fcf9f3"
       });
     }
     if (typeof wx.setNavigationBarTitle === "function") {
@@ -1366,6 +1452,16 @@ Page({
 
   startReadAlongWindow(wordId) {
     if (!wordId) return;
+    if (isDevtoolsRuntime()) {
+      // DevTools recordings use a different file format (debug-only) and emit a
+      // console notice; skip the microphone window there but keep the loop pace.
+      this.currentReadAlongWordId = wordId;
+      this.readAlongTimer = setTimeout(() => {
+        this.readAlongTimer = null;
+        this.continueAfterReadAlongWindow();
+      }, READ_ALONG_DURATION_MS);
+      return;
+    }
     const recorder = this.prepareRecorder();
     if (!recorder) {
       this.continueAfterReadAlongWindow();
@@ -1645,7 +1741,7 @@ function buildNextTaskText(state, todayLists, weakCount) {
 }
 
 function buildPrimaryActionText(state, nextTask) {
-  if (!hasSelectedWordLevel(state)) return "选择单词水平";
+  if (!hasSelectedWordLevel(state)) return "选择学习水平";
   if (state.daily && state.daily.completed) return "查看今日成果";
   if (state.daily && state.daily.sessionCompletedWordIds && state.daily.sessionCompletedWordIds.length > 0) return "继续";
   if (nextTask && nextTask.includes("筛词")) return "继续筛词";
@@ -1747,7 +1843,8 @@ function buildLevelSelectData(state) {
     currentLevel: state.user.wordLevelLabel || "未选择",
     options: WORD_LEVEL_OPTIONS.map((option) => Object.assign({}, option, {
       selected: option.id === currentId,
-      iconClass: `icon-level-${option.id}`
+      iconClass: `icon-level-${option.id}`,
+      iconSrc: `../../assets/icons/levels/${option.id}.svg`
     }))
   };
 }
@@ -1760,32 +1857,42 @@ function buildTestData(state) {
   const question = flow.getCurrentTestQuestion(state);
   const answered = state.assessment.answers.length;
   const correct = state.assessment.answers.filter((answer) => answer.isCorrect).length;
-  const total = state.assessment.questions && state.assessment.questions.length ? state.assessment.questions.length : 36;
+  const total = 36;
+  const current = Math.min(answered + 1, total);
   return {
     question,
-    progress: `${Math.min(answered + 1, total)}/${total}`,
+    current,
+    total,
+    percent: Math.round((current / total) * 100),
+    progress: `${current}/${total}`,
     correct,
     wrong: answered - correct,
     remain: total - answered,
-    options: question ? question.options.filter((option) => option !== "不认识") : []
+    options: question
+      ? question.options
+          .filter((option) => option !== "不认识")
+          .map((option, index) => ({ value: option, label: "ABCD"[index] || "", text: option }))
+      : []
   };
 }
 
 function buildTestResultData(state) {
   const result = state.assessment.result || {};
   const range = result.vocabularyRange || {};
-  const layerStats = result.layerStats || {};
+  const lower = range.lower;
+  const upper = range.upper;
+  let vocabulary = result.vocabulary || "未测";
+  if (typeof lower === "number" && typeof upper === "number") {
+    vocabulary = lower >= upper ? `${lower}+` : `${lower}–${upper}`;
+  }
+  const accuracy = typeof result.accuracy === "number" ? result.accuracy : 0;
+  const encouragement = accuracy >= 80
+    ? "信心不错，持续学习会更准"
+    : (accuracy >= 50 ? "基础不错，按计划学就好" : "从基础稳稳开始，会越来越好");
   return Object.assign({}, result, {
-    vocabulary: result.vocabulary || (range.lower ? `${range.lower}-${range.upper}` : "未测"),
-    calibrationText: "初测估计，学习 3 天后会自动校准",
-    layerSummary: ["foundation", "required", "selective"]
-      .map((layer) => {
-        const stats = layerStats[layer];
-        if (!stats) return "";
-        return `${stats.label} ${stats.accuracy}%`;
-      })
-      .filter(Boolean)
-      .join(" · ")
+    vocabulary,
+    startLevelLabel: result.startLevelLabel || "高中必修词",
+    encouragement
   });
 }
 
@@ -1917,13 +2024,28 @@ function buildMeaningRecallData(state) {
   };
 }
 
+const MAX_PROGRESS_DOTS = 9;
+
 function buildProgressDots(current, total, phase) {
   const count = Math.max(0, Number(total || 0));
   const active = Math.max(1, Number(current || 1));
-  return Array.from({ length: count }, (_, index) => ({
-    key: `${phase}-${index}`,
-    className: index + 1 < active ? "done" : (index + 1 === active ? "current" : "todo")
-  }));
+  // Cap the row at MAX_PROGRESS_DOTS as a sliding window centred on the current
+  // dot; as you progress, the left-most dots drop off. The row stays centred.
+  let start = 0;
+  let end = count;
+  if (count > MAX_PROGRESS_DOTS) {
+    const half = Math.floor(MAX_PROGRESS_DOTS / 2);
+    start = Math.min(Math.max(active - 1 - half, 0), count - MAX_PROGRESS_DOTS);
+    end = start + MAX_PROGRESS_DOTS;
+  }
+  const dots = [];
+  for (let index = start; index < end; index += 1) {
+    dots.push({
+      key: `${phase}-${index}`,
+      className: index + 1 < active ? "done" : (index + 1 === active ? "current" : "todo")
+    });
+  }
+  return dots;
 }
 
 function buildFocusPauseData(state) {
@@ -1935,8 +2057,9 @@ function buildFocusPauseData(state) {
   };
 }
 
-function learningThemeClassFor(state) {
-  return state.user?.settings?.learningTheme === "light" ? "learning-light" : "learning-dark";
+function learningThemeClassFor() {
+  // Light-only V2 UI: learning pages always render the light theme.
+  return "learning-light";
 }
 
 function buildGroupContext(state) {
@@ -1959,15 +2082,35 @@ function buildWrongBookData(state) {
     .map((entry) => ({ word: flow.getWordById(entry[0]), wordState: entry[1] }))
     .filter((item) => item.word)
     .sort((a, b) => b.wordState.wrongCount - a.wordState.wrongCount)
-    .map((item) => Object.assign({}, decorateWord(item.word, state), { wrongCount: item.wordState.wrongCount }));
-  return { words, count: words.length };
+    .map((item) => Object.assign({}, decorateWord(item.word, state), {
+      wrongCount: item.wordState.wrongCount,
+      memorized: item.wordState.lastResult === "correct"
+    }));
+  const daily = state.daily || {};
+  const emptyActionText = daily.completed
+    ? "查看今日成果"
+    : (daily.startedAt ? "继续今日学习" : "开始今日学习");
+  return { words, count: words.length, emptyActionText };
 }
 
 function buildReportData(state) {
   const report = state.lastReport || buildDailyReport(state, require("../../data/words").words);
+  const wordStates = objectValues(state.userWordStates);
+  const totalLearned = wordStates.filter((wordState) => wordState.familiarity > 0).length;
+  const displayTotal = Math.max(wordDatasetMeta.total || 3500, 3500);
   return Object.assign({}, report, {
     weakWordText: report.weakWords.length ? report.weakWords.map((word) => word.word).join("、") : "本轮没有新增错词",
-    badgeText: state.user.badges.length ? state.user.badges.join("、") : "暂无"
+    badgeText: state.user.badges.length ? state.user.badges.join("、") : "暂无",
+    todayLists: Math.max(1, Math.floor((state.daily.sessionCompletedWordIds || []).length / 9)),
+    doneWords: (state.daily.sessionCompletedWordIds || []).length,
+    doneHours: Math.max(0.1, Math.round((Math.max(3, (state.daily.sessionCompletedWordIds || []).length * 2) / 60) * 10) / 10),
+    streakDays: state.user.streakDays || 1,
+    totalLearned,
+    displayTotal,
+    progressPercent: Math.min(100, Math.round((totalLearned / Math.max(displayTotal, 1)) * 100)),
+    bookTitle: "高考课标 3500",
+    badgeName: "专注之星",
+    badgePoints: 120
   });
 }
 

@@ -93,6 +93,14 @@
       "usedBy": ["测评结果页"]
     },
     {
+      "id": "precheck-today-book-stack",
+      "category": "illustrations",
+      "path": "illustrations/precheck-today-book-stack@3x.png",
+      "transparent": true,
+      "source": "Small book stack after the 今日待学 label in the pre-learning scan reference",
+      "usedBy": ["训前检测页"]
+    },
+    {
       "id": "shared-icon-wrong-words",
       "category": "icons",
       "path": "icons/shared-icon-wrong-words@3x.png",
@@ -149,6 +157,14 @@
       "usedBy": ["识记页", "听音页", "词卡详情弹窗"]
     },
     {
+      "id": "precheck-speaker-round",
+      "category": "icons",
+      "path": "icons/precheck-speaker-round@3x.png",
+      "transparent": true,
+      "source": "Small round speaker button inside the pre-learning scan word card",
+      "usedBy": ["训前检测页"]
+    },
+    {
       "id": "shared-effect-laurel-confetti",
       "category": "effects",
       "path": "effects/shared-effect-laurel-confetti@3x.png",
@@ -170,6 +186,38 @@
       "path": "effects/shared-effect-swipe-arrows@3x.png",
       "transparent": true,
       "source": "Up/down swipe gesture arrows in pre-learning scan reference",
+      "usedBy": ["训前检测页"]
+    },
+    {
+      "id": "precheck-arrow-up",
+      "category": "effects",
+      "path": "effects/precheck-arrow-up@3x.png",
+      "transparent": true,
+      "source": "Sage-green up-swipe arrow inside the pre-learning scan word card",
+      "usedBy": ["训前检测页"]
+    },
+    {
+      "id": "precheck-arrow-down",
+      "category": "effects",
+      "path": "effects/precheck-arrow-down@3x.png",
+      "transparent": true,
+      "source": "Amber down-swipe arrow inside the pre-learning scan word card",
+      "usedBy": ["训前检测页"]
+    },
+    {
+      "id": "precheck-scan-bars-top",
+      "category": "effects",
+      "path": "effects/precheck-scan-bars-top@3x.png",
+      "transparent": true,
+      "source": "Three sage-green scan motion bars above the pre-learning scan word card",
+      "usedBy": ["训前检测页"]
+    },
+    {
+      "id": "precheck-scan-bars-bottom",
+      "category": "effects",
+      "path": "effects/precheck-scan-bars-bottom@3x.png",
+      "transparent": true,
+      "source": "Three amber scan motion bars below the pre-learning scan word card",
       "usedBy": ["训前检测页"]
     }
   ]

@@ -4,10 +4,10 @@
   ],
   "window": {
     "navigationBarTitleText": "今日单词",
-    "navigationBarBackgroundColor": "#f8f5ec",
+    "navigationBarBackgroundColor": "#fcf9f3",
     "navigationBarTextStyle": "black",
     "navigationStyle": "default",
-    "backgroundColor": "#f8f5ec"
+    "backgroundColor": "#fcf9f3"
   },
   "sitemapLocation": "sitemap.json"
 }

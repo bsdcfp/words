@@ -12,7 +12,6 @@
         <view class="ui-icon icon-chevron"></view>
       </view>
       <view class="home-streak"><view class="streak-dot"></view><text>连续 {{home.streakDays}} 天</text></view>
-      <view class="home-avatar" bindtap="openProfile" hover-class="home-link-pressed"><image class="home-icon avatar-icon" src="../../assets/icons/user.svg" mode="aspectFit" /></view>
     </view>
     <view wx:else class="home-welcome-panel">
       <text class="home-welcome-title">欢迎！</text>
@@ -22,9 +21,15 @@
     <image wx:if="{{!home.hasSelectedLevel}}" class="asset-desk-scene light-desk-scene" src="../../assets/v2/illustrations/shared-illustration-study-desk-light@3x.png" mode="aspectFit" />
     <view wx:if="{{home.hasSelectedLevel}}" class="home-main-card home-normal-card">
       <view class="home-card-section">
-        <view class="section-title-row"><image class="home-icon section-icon" src="../../assets/v2/illustrations/shared-illustration-list-flag@3x.png" mode="aspectFit" /><text class="section-label">今日目标</text></view>
-        <view class="target-line"><text class="target-number">{{home.planCount}}</text><text class="target-unit">个 List</text></view>
-        <view class="flag-row"><image wx:for="{{home.planFlags}}" wx:key="*this" class="home-icon home-flag-image icon-flag {{item}}" src="{{item == 'done' ? '../../assets/icons/flag-done.svg' : '../../assets/icons/flag-todo.svg'}}" mode="aspectFit" /></view>
+        <view class="goal-row">
+          <view class="goal-left">
+            <view class="section-title-row"><image class="home-icon section-icon" src="../../assets/v2/illustrations/shared-illustration-list-flag@3x.png" mode="aspectFit" /><text class="section-label">今日目标</text></view>
+            <view class="target-line"><text class="target-number">{{home.planCount}}</text><text class="target-unit">个 List</text></view>
+          </view>
+          <view class="goal-flags">
+            <image wx:for="{{home.planFlags}}" wx:key="*this" class="home-icon home-flag-image icon-flag {{item}}" src="{{item == 'done' ? '../../assets/icons/flag-done.svg' : '../../assets/icons/flag-todo.svg'}}" mode="aspectFit" />
+          </view>
+        </view>
       </view>
       <view class="home-divider"></view>
       <view class="home-card-section progress-section">
@@ -51,7 +56,7 @@
       </view>
       <view class="progress-track"><view style="width: 0%;"></view></view>
     </view>
-    <view class="primary-button home-continue {{home.hasSelectedLevel ? '' : 'first-run-cta'}}" bindtap="startDailyLearning" hover-class="home-cta-pressed">{{home.primaryActionText}}</view>
+    <view class="primary-button home-continue {{home.hasSelectedLevel ? '' : 'first-run-cta'}}" bindtap="startDailyLearning" hover-class="home-cta-pressed"><text>{{home.primaryActionText}}</text><view wx:if="{{!home.hasSelectedLevel}}" class="ui-icon icon-chevron cta-chevron"></view></view>
     <view wx:if="{{!home.hasSelectedLevel}}" class="home-first-note" bindtap="openProfile"><text>选择后可随时在【我的】中更改</text></view>
     <view wx:if="{{home.hasSelectedLevel}}" class="home-action-card" bindtap="openWrongBook" hover-class="action-entry-pressed">
       <image class="home-icon card-icon card-icon-image" src="../../assets/v2/icons/shared-icon-wrong-words@3x.png" mode="aspectFit" />
@@ -99,14 +104,6 @@
       <view class="card-row"><text class="card-title">跟读循环</text><text class="muted">当前 {{profile.pronunciationLoopLabel}}</text></view>
       <view class="level-options inline-options">
         <view wx:for="{{profile.pronunciationLoopOptions}}" wx:key="value" class="level-option compact enabled {{item.selected ? 'selected' : ''}}" data-count="{{item.value}}" bindtap="setPronunciationLoopCount">
-          <text>{{item.label}}</text>
-        </view>
-      </view>
-    </view>
-    <view class="profile-card">
-      <view class="card-row"><text class="card-title">学习页主题</text><text class="muted">默认 {{profile.learningThemeLabel}}</text></view>
-      <view class="level-options inline-options">
-        <view wx:for="{{profile.learningThemeOptions}}" wx:key="value" class="level-option compact enabled {{item.selected ? 'selected' : ''}}" data-theme="{{item.value}}" bindtap="setLearningTheme">
           <text>{{item.label}}</text>
         </view>
       </view>
@@ -178,117 +175,137 @@
   </view>
 
   <view wx:elif="{{view == 'level-select'}}" class="view level-view sticky-view">
-    <view class="topbar compact level-topbar"><view class="icon-button ghost-back" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">你现在是</text><view class="text-link skip-link" bindtap="skipLevelSelect">跳过</view></view>
-    <view class="level-panel">
-      <image class="asset-panel-illustration level-illustration" src="../../assets/v2/illustrations/shared-illustration-assessment-paper@3x.png" mode="aspectFit" />
+    <view class="level-skip text-link" bindtap="skipLevelSelect">跳过</view>
+    <view class="level-heading">
+      <text class="level-main-title">你现在是</text>
       <text class="level-subtitle">选择一个适合的起点</text>
-      <view class="ornament-line"></view>
-      <view class="level-options single">
-        <view wx:for="{{levelSelect.options}}" wx:key="id" wx:for-item="option" class="level-option {{option.enabled ? 'enabled' : 'disabled'}} {{option.selected ? 'selected' : ''}}" hover-class="{{option.enabled ? 'level-option-pressed' : 'none'}}" data-level-id="{{option.id}}" data-level-label="{{option.label}}" data-start-level="{{option.startLevel}}" data-enabled="{{option.enabled}}" bindtap="selectLevel">
-          <view class="ui-icon level-kind {{option.iconClass}}"></view>
-          <view>
-            <text class="level-option-label">{{option.label}}</text>
-            <text class="level-option-status">{{option.status}}</text>
-          </view>
-          <view wx:if="{{option.selected}}" class="level-check"><view class="ui-icon icon-check"></view></view>
-        </view>
-      </view>
-      <view class="level-test-link" bindtap="startTest"><text>不确定？做个测试</text><view class="ui-icon icon-chevron"></view></view>
     </view>
+    <view class="level-options single">
+      <view wx:for="{{levelSelect.options}}" wx:key="id" wx:for-item="option" class="level-option {{option.enabled ? 'enabled' : 'disabled'}} {{option.selected ? 'selected' : ''}}" hover-class="{{option.enabled ? 'level-option-pressed' : 'none'}}" data-level-id="{{option.id}}" data-level-label="{{option.label}}" data-start-level="{{option.startLevel}}" data-enabled="{{option.enabled}}" bindtap="selectLevel">
+        <image class="level-icon" src="{{option.iconSrc}}" mode="aspectFit" />
+        <text class="level-option-label">{{option.label}}</text>
+        <view wx:if="{{option.selected}}" class="level-check"><view class="ui-icon icon-check"></view></view>
+      </view>
+    </view>
+    <view class="level-test-link" bindtap="takeLevelTest"><text>不确定？做个测试</text><view class="ui-icon icon-chevron"></view></view>
+    <image class="asset-landscape level-landscape" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
   </view>
 
   <view wx:elif="{{view == 'test'}}" class="view sticky-view test-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="progress-label">{{test.progress}}</text></view>
-    <view class="question-panel">
-      <image class="asset-panel-illustration test-illustration" src="../../assets/v2/illustrations/shared-illustration-assessment-paper@3x.png" mode="aspectFit" />
-      <text class="section-label">词汇量测试</text>
-      <text class="test-word">{{test.question.word}}</text>
-      <text class="muted">下面只选释义，不确定时点“不认识”</text>
-      <view class="option-stack">
-        <view wx:for="{{test.options}}" wx:key="*this" class="option-card test-option" hover-class="test-option-pressed" data-value="{{item}}" bindtap="answerTest">{{item}}</view>
-      </view>
-      <view class="secondary-button unknown-button" data-value="不认识" bindtap="answerTest">我不认识</view>
+    <view class="assess-topbar">
+      <view class="icon-button compact assess-back" bindtap="goBack"><view class="ui-icon icon-back"></view></view>
+      <view class="assess-count"><text class="assess-progress-current">{{test.current}}</text><text class="assess-progress-total"> / {{test.total}}</text></view>
     </view>
-    <view class="counter-bar"><text class="pill green">{{test.correct}}</text><text class="pill red">{{test.wrong}}</text><text class="pill blue">{{test.remain}}</text></view>
+    <view class="assess-progress-track"><view class="assess-progress-fill" style="width: {{test.percent}}%"></view></view>
+    <text class="assess-prompt">请选择最符合的中文释义</text>
+    <text class="assess-word">{{test.question.word}}</text>
+    <text wx:if="{{test.question.ipa}}" class="assess-ipa">{{test.question.ipa}}</text>
+    <view class="assess-stack">
+      <view wx:for="{{test.options}}" wx:key="value" class="assess-option" hover-class="assess-option-pressed" data-value="{{item.value}}" bindtap="answerTest">
+        <view class="assess-letter">{{item.label}}</view>
+        <text class="assess-text">{{item.text}}</text>
+      </view>
+      <view class="assess-option assess-unknown" hover-class="assess-option-pressed" data-value="不认识" bindtap="answerTest">
+        <text class="assess-text">不认识</text>
+      </view>
+    </view>
   </view>
 
   <view wx:elif="{{view == 'test-result'}}" class="view sticky-view test-result-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">测评结果</text></view>
-    <view class="result-panel">
-      <image class="asset-result-illustration" src="../../assets/v2/illustrations/shared-illustration-assessment-book-check@3x.png" mode="aspectFit" />
-      <text class="section-label">现实掌握词汇</text>
-      <text class="vocab-number">{{testResult.vocabulary}}</text>
-      <view class="copy-card"><text class="card-title">{{testResult.stage}}</text><text>{{testResult.calibrationText}}</text><text>正确率 {{testResult.accuracy}}%，不认识 {{testResult.unknown}} 个，误选 {{testResult.wrongChoice}} 个。{{testResult.advice}}</text></view>
-      <view class="copy-card"><text class="card-title">分层表现</text><text>{{testResult.layerSummary}}</text></view>
-      <view class="primary-button" bindtap="goHome">返回首页</view>
+    <view class="result-hero">
+      <image class="result-confetti" src="../../assets/v2/effects/shared-effect-laurel-confetti@3x.png" mode="aspectFit" />
+      <image class="result-book-check" src="../../assets/v2/illustrations/shared-illustration-assessment-book-check@3x.png" mode="aspectFit" />
     </view>
+    <text class="result-title">测评完成！</text>
+    <view class="result-panel">
+      <text class="result-cap">你的词汇量范围约为</text>
+      <text class="result-range">{{testResult.vocabulary}}</text>
+      <view class="result-divider"></view>
+      <text class="result-note">初测估计，后续会结合真实学习表现校准</text>
+      <view class="result-advice-card">
+        <view class="result-advice-icon"><image src="../../assets/v2/icons/shared-icon-open-book@3x.png" mode="aspectFit" /></view>
+        <view class="result-advice-copy">
+          <text class="result-advice-label">建议</text>
+          <text class="result-advice-text">建议从<text class="result-advice-hl">{{testResult.startLevelLabel}}</text>开始</text>
+        </view>
+      </view>
+      <view class="result-encourage-card">
+        <view class="result-spark">✦</view>
+        <text class="result-encourage-text">{{testResult.encouragement}}</text>
+      </view>
+    </view>
+    <view class="primary-button result-start" bindtap="startDailyLearning" hover-class="home-cta-pressed">开始学习</view>
+    <view class="result-relevel" bindtap="openLevelSelect"><text>重新选择水平</text><view class="ui-icon icon-chevron"></view></view>
+    <image class="asset-landscape level-landscape" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
   </view>
 
   <view wx:elif="{{view == 'precheck'}}" class="view precheck-view">
-    <view class="precheck-title">训前检测</view>
-    <image class="asset-swipe-arrows" src="../../assets/v2/effects/shared-effect-swipe-arrows@3x.png" mode="aspectFit" />
-    <block wx:for="{{precheck.candidates}}" wx:key="id" wx:for-index="idx">
-      <view
-        wx:if="{{idx == 0}}"
-        class="precheck-stage-card {{precheckSwipeClass}}"
-        data-word-id="{{item.id}}"
-        catchtouchstart="handlePrecheckTouchStart"
-        catchtouchmove="handlePrecheckTouchMove"
-        catchtouchend="handlePrecheckTouchEnd"
-        catchtouchcancel="handlePrecheckTouchCancel"
-      >
-        <text class="precheck-word">{{item.word}}</text>
-        <view class="precheck-audio-dot" data-word-id="{{item.id}}" catchtap="speak"><image src="../../assets/v2/icons/shared-icon-speaker@3x.png" mode="aspectFit" /></view>
-        <view class="precheck-hints">
-          <view class="precheck-hint known" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck"><text>↑</text><text>上滑认识</text></view>
-          <view class="precheck-hint unfamiliar" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck"><text>↓</text><text>下滑不熟</text></view>
+    <view class="precheck-title-row"><image class="precheck-leaf" src="../../assets/icons/leaf-sprig.svg" mode="aspectFit" /><text class="precheck-title">训前检测</text><image class="precheck-leaf right" src="../../assets/icons/leaf-sprig.svg" mode="aspectFit" /></view>
+    <image class="precheck-ripple precheck-ripple-top" src="../../assets/v2/effects/precheck-scan-bars-top@3x.png" mode="aspectFit" />
+    <view class="precheck-deck">
+      <block wx:for="{{precheck.candidates}}" wx:key="id" wx:for-index="idx">
+        <view
+          wx:if="{{idx == 0}}"
+          class="precheck-stage-card {{precheckSwipeClass}}"
+          data-word-id="{{item.id}}"
+          catchtouchstart="handlePrecheckTouchStart"
+          catchtouchmove="handlePrecheckTouchMove"
+          catchtouchend="handlePrecheckTouchEnd"
+          catchtouchcancel="handlePrecheckTouchCancel"
+        >
+          <text class="precheck-word">{{item.word}}</text>
+          <view class="precheck-audio-dot" data-word-id="{{item.id}}" catchtap="speak"><image class="precheck-speaker-img" src="../../assets/v2/icons/precheck-speaker-round@3x.png" mode="aspectFit" /></view>
+          <view class="precheck-hints">
+            <view class="precheck-hint known" data-word-id="{{item.id}}" data-value="known" bindtap="markPrecheck">
+              <image class="precheck-arrow-img arrow-up" src="../../assets/v2/effects/precheck-arrow-up@3x.png" mode="aspectFit" />
+              <text class="precheck-hint-sub">认识</text>
+            </view>
+            <view class="precheck-hint-divider"></view>
+            <view class="precheck-hint unfamiliar" data-word-id="{{item.id}}" data-value="unfamiliar" bindtap="markPrecheck">
+              <image class="precheck-arrow-img arrow-down" src="../../assets/v2/effects/precheck-arrow-down@3x.png" mode="aspectFit" />
+              <text class="precheck-hint-sub">不熟</text>
+            </view>
+          </view>
         </view>
-      </view>
-    </block>
-    <view class="precheck-bottom-status">
-      <text class="precheck-status-main">{{precheck.progressText}}</text>
-      <text class="precheck-status-sub">今日待学</text>
+      </block>
     </view>
+    <image class="precheck-ripple precheck-ripple-bottom" src="../../assets/v2/effects/precheck-scan-bars-bottom@3x.png" mode="aspectFit" />
+    <view class="precheck-bottom-status">
+      <view class="precheck-status-left"><text class="precheck-status-label">已筛出</text><text class="precheck-status-num">{{precheck.selectedCount}}</text><text class="precheck-status-total">/ {{precheck.targetCount}}</text></view>
+      <view class="precheck-status-right"><text class="precheck-status-sub">今日待学</text><image class="precheck-status-book" src="../../assets/v2/illustrations/precheck-today-book-stack@3x.png" mode="aspectFit" /></view>
+    </view>
+    <image class="asset-landscape precheck-landscape" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
     <view wx:if="{{precheckNotice}}" class="transition-mask notice-mask">
       <view class="transition-card"><text>{{precheckNotice}}</text></view>
     </view>
   </view>
 
-  <view wx:elif="{{view == 'word-study'}}" class="view study-view learning-view focus-flow {{study.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel">
-    <view class="focus-pause-handle" catchtap="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+  <view wx:elif="{{view == 'word-study'}}" class="view study-view learning-view focus-flow {{study.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap">
+    <view class="focus-pause-handle" catchlongpress="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
     <view class="focus-progress" catchtap="noop"><view wx:for="{{study.progressDots}}" wx:key="key" class="focus-dot {{item.className}}"></view></view>
     <view wx:if="{{study.word}}" class="focus-card study-focus-card spec-study-card">
       <text class="study-word">{{study.word.syllables}}</text>
       <text class="ipa">{{study.word.ipa}}</text>
       <view class="sound-orb small read-pulse {{readAlongStatus ? 'active' : ''}}" data-word-id="{{study.word.id}}" catchtap="speak"><image class="asset-sound-icon" src="../../assets/v2/icons/shared-icon-sound-wave-round@3x.png" mode="aspectFit" /></view>
       <text class="meaning"><text>{{study.word.pos}}</text>{{study.word.meaningText}}</text>
-      <text class="study-hint">{{readAlongStatus || '轻点再听'}}</text>
+      <text class="study-hint">轻点再听</text>
     </view>
+    <image class="asset-landscape focus-landscape" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
     <view wx:if="{{study.word}}" class="focus-actions"><view class="primary-button focus-primary" data-value="3" catchtap="markStudy">记住了</view></view>
   </view>
 
-  <view wx:elif="{{view == 'group-review'}}" class="view learning-view focus-flow {{review.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel">
-    <view class="focus-pause-handle" catchtap="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+  <view wx:elif="{{view == 'group-review'}}" class="view learn-spread learning-view focus-flow {{review.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap">
+    <view class="focus-pause-handle" catchlongpress="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
     <view class="focus-progress" catchtap="noop"><view wx:for="{{review.progressDots}}" wx:key="key" class="focus-dot {{item.className}} {{review.isMixed ? 'mixed' : 'review'}}"></view></view>
-    <view wx:if="{{!review.isMixed}}" class="review-stack focus-stack">
-      <view wx:if="{{review.word}}" class="focus-card review-focus-card">
-        <text class="test-word">{{review.word.word}}</text>
-        <text class="ipa">{{review.word.ipa}}</text>
-        <view class="sound-orb small" data-word-id="{{review.word.id}}" catchtap="speak"><image class="asset-sound-icon" src="../../assets/v2/icons/shared-icon-sound-wave-round@3x.png" mode="aspectFit" /></view>
-        <text wx:if="{{!(reviewAnswerVisible || review.question.answered)}}" class="study-hint">⏱ 2 秒后揭示</text>
-        <view wx:if="{{reviewAnswerVisible || review.question.answered}}" class="reveal-card">
-          <view wx:for="{{review.question.options}}" wx:key="value" class="focus-reveal {{item.statusClass}}"><text class="option-line"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text></view>
-        </view>
-      </view>
-    </view>
-    <view wx:else class="focus-card audio-panel audio-minimal">
+    <view wx:if="{{review.word}}" class="focus-card review-focus-card">
       <text class="test-word">{{review.word.word}}</text>
       <text class="ipa">{{review.word.ipa}}</text>
       <view class="sound-orb small" data-word-id="{{review.word.id}}" catchtap="speak"><image class="asset-sound-icon" src="../../assets/v2/icons/shared-icon-sound-wave-round@3x.png" mode="aspectFit" /></view>
       <text wx:if="{{!(reviewAnswerVisible || review.question.answered)}}" class="study-hint">⏱ 2 秒后揭示</text>
-      <view wx:if="{{reviewAnswerVisible || review.question.answered}}" class="reveal-card">
-        <view wx:for="{{review.question.options}}" wx:key="value" class="focus-reveal {{item.statusClass}}"><text class="option-line"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text></view>
-      </view>
+    </view>
+    <image class="asset-landscape learn-landscape-band" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
+    <view wx:if="{{review.word && (reviewAnswerVisible || review.question.answered)}}" class="reveal-sheet revealed">
+      <view class="reveal-sheet-meaning"><text class="option-line"><text class="option-pos">{{review.word.pos}}</text>{{review.word.meaningText}}</text></view>
     </view>
     <view class="focus-actions">
       <view wx:if="{{review.isMixed}}" class="primary-button focus-primary" catchtap="rememberMixedReview">记住了</view>
@@ -296,26 +313,27 @@
     </view>
   </view>
 
-  <view wx:elif="{{view == 'audio-meaning'}}" class="view audio-view learning-view focus-flow {{audio.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel">
-    <view class="focus-pause-handle" catchtap="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+  <view wx:elif="{{view == 'audio-meaning'}}" class="view audio-view learn-spread learning-view focus-flow {{audio.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap">
+    <view class="focus-pause-handle" catchlongpress="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
     <view class="focus-progress" catchtap="noop"><view wx:for="{{audio.progressDots}}" wx:key="key" class="focus-dot {{item.className}} audio"></view></view>
     <view class="focus-card audio-focus-card">
       <view class="speaker-tile focus-speaker" data-word-id="{{audio.word.id}}" catchtap="speak"><image class="asset-listening-icon" src="../../assets/v2/icons/shared-icon-listening-play@3x.png" mode="aspectFit" /></view>
       <text class="audio-playing-text">正在播放…</text>
-      <text class="study-hint">听发音，回忆中文释义</text>
-      <view wx:if="{{audioAnswerVisible || audio.question.answered}}" class="reveal-card audio-answer-reveal">
-        <view wx:for="{{audio.question.options}}" wx:key="value" class="focus-reveal {{item.statusClass}}">
-          <text class="option-line"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text>
-        </view>
+      <text class="study-hint">听录音，回忆中文释义</text>
+    </view>
+    <image class="asset-landscape learn-landscape-band" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
+    <view wx:if="{{audioAnswerVisible || audio.question.answered}}" class="reveal-sheet revealed">
+      <view class="reveal-sheet-meaning">
+        <text class="option-line"><text class="option-pos">{{audio.word.pos}}</text>{{audio.word.meaningText}}</text>
       </view>
-      <view wx:else class="reveal-card ghost"><text>⏱ 2 秒后显示释义</text></view>
     </view>
     <view class="focus-actions"><view class="primary-button focus-primary" catchtap="rememberAudio">记住了</view></view>
+    <view class="audio-bottom-hint"><view class="audio-hint-bulb"></view><text>提示将在 2 秒后显示</text></view>
   </view>
 
-  <view wx:elif="{{view == 'meaning-recall'}}" class="view audio-view learning-view focus-flow {{recall.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel">
+  <view wx:elif="{{view == 'meaning-recall'}}" class="view audio-view learning-view focus-flow {{recall.themeClass}} {{focusEdgeFeedback ? 'edge-wrong' : ''}}" bindtap="handleLearningSurfaceTap">
     <view class="focus-topbar" catchtap="noop"><view class="icon-button focus-back" catchtap="goBack"><view class="ui-icon icon-back"></view></view><text>中文回忆英文</text></view>
-    <view class="focus-pause-handle" catchtap="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+    <view class="focus-pause-handle" catchlongpress="openPausePanel"><text>Ⅱ</text><text>长按侧边暂停</text></view>
     <view class="focus-progress" catchtap="noop"><view wx:for="{{recall.progressDots}}" wx:key="key" class="focus-dot {{item.className}} recall"></view></view>
     <view wx:if="{{recall.word}}" class="focus-card audio-panel audio-minimal meaning-recall-card">
       <view class="meaning-recall-prompt">
@@ -330,27 +348,85 @@
   </view>
 
   <view wx:elif="{{view == 'wrong-book'}}" class="view sticky-view wrong-book-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">错词本</text></view>
-    <view class="review-summary asset-summary"><image src="../../assets/v2/icons/shared-icon-wrong-words@3x.png" mode="aspectFit" /><text class="summary-title">{{wrongBook.count}} 个词</text><text class="summary-subtitle">优先复盘听音辨义和混组复习里的错词</text></view>
-    <view class="review-stack">
-      <view wx:for="{{wrongBook.words}}" wx:key="id" class="review-card detail-entry" hover-class="review-card-pressed" data-word-id="{{item.id}}" bindtap="openDetail"><view class="review-copy"><text class="card-title">{{item.word}}</text><text class="review-ipa">{{item.ipa}}</text><text class="muted">{{item.meaningText}} · 错 {{item.wrongCount}} 次</text></view><view class="sound-mini" data-word-id="{{item.id}}" catchtap="speak"><image src="../../assets/v2/icons/shared-icon-speaker@3x.png" mode="aspectFit" /><text>播放</text></view></view>
-      <view wx:if="{{!wrongBook.count}}" class="empty-state"><text>当前没有错词。</text><view class="primary-button" bindtap="startDailyLearning">开始今日学习</view></view>
+    <view class="topbar compact wrongbook-topbar">
+      <view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view>
+      <text class="page-title">错词本</text>
+      <view class="text-link wrongbook-edit" bindtap="toggleWrongBookEdit">{{wrongBookEditing ? '完成' : '编辑'}}</view>
+    </view>
+    <view class="wrongbook-summary">
+      <view class="wrongbook-summary-top">
+        <image class="wrongbook-icon" src="../../assets/v2/icons/shared-icon-wrong-words@3x.png" mode="aspectFit" />
+        <view class="wrongbook-summary-copy">
+          <text class="wrongbook-title">{{wrongBook.count}} 个错词待复习</text>
+          <text class="wrongbook-subtitle">优先复习当前 List 的词</text>
+        </view>
+      </view>
+      <view class="wrongbook-start" bindtap="startWrongReview" hover-class="home-cta-pressed">开始复习</view>
+    </view>
+    <view class="wrongbook-note"><image class="wrongbook-note-leaf" src="../../assets/icons/leaf-sprig.svg" mode="aspectFit" /><text>错词会随复习自动清除，不影响学习进度</text></view>
+    <view class="review-stack wrongbook-list">
+      <view wx:for="{{wrongBook.words}}" wx:key="id" class="wrongbook-row" hover-class="review-card-pressed" data-word-id="{{item.id}}" bindtap="openDetail">
+        <text class="wrongbook-word">{{item.word}}</text>
+        <text class="wrongbook-meaning"><text class="option-pos">{{item.pos}}</text>{{item.meaningText}}</text>
+        <view wx:if="{{wrongBookEditing}}" class="wrongbook-pill remove" data-word-id="{{item.id}}" catchtap="removeWrongWord">移除</view>
+        <view wx:elif="{{item.memorized}}" class="wrongbook-pill done">已记住</view>
+        <view wx:else class="wrongbook-pill todo"><text>待复习</text><view class="ui-icon icon-chevron"></view></view>
+      </view>
+      <view wx:if="{{!wrongBook.count}}" class="empty-state"><text>当前没有错词。</text><view class="primary-button" bindtap="startDailyLearning">{{wrongBook.emptyActionText}}</view></view>
+    </view>
+    <view wx:if="{{wrongBook.count}}" class="wrongbook-foot">
+      <view class="wrongbook-foot-icon"><image src="../../assets/icons/leaf-sprig.svg" mode="aspectFit" /></view>
+      <view class="wrongbook-foot-copy">
+        <text class="wrongbook-foot-title">坚持复习，记得更牢</text>
+        <text class="wrongbook-foot-sub">复习时答对即「记住」，自动移出错词本</text>
+      </view>
     </view>
   </view>
 
   <view wx:elif="{{view == 'daily-report'}}" class="view sticky-view celebration-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">今日完成</text></view>
-    <view class="report-panel celebration-panel">
-      <image class="asset-confetti" src="../../assets/v2/effects/shared-effect-laurel-confetti@3x.png" mode="aspectFit" />
-      <image class="asset-complete-glow" src="../../assets/v2/effects/shared-effect-list-complete-glow@3x.png" mode="aspectFit" />
-      <view class="report-ring"><image src="../../assets/v2/icons/shared-icon-completion-check@3x.png" mode="aspectFit" /><text>{{report.accuracy}}%</text></view>
-      <text class="section-label">今日 List 已完成</text>
-      <view class="stats-grid"><view class="metric"><text class="metric-value">{{report.learnedCount}}</text><text class="metric-label">今日新词</text></view><view class="metric"><text class="metric-value">{{report.mixedReviewCount}}</text><text class="metric-label">混组复习</text></view><view class="metric"><text class="metric-value">{{report.audioCount}}</text><text class="metric-label">听音题</text></view></view>
-      <view class="copy-card"><text class="card-title">下次复习</text><text>{{report.nextReview}} 优先复盘错词和即将遗忘词。</text></view>
-      <view class="copy-card"><text class="card-title">薄弱词</text><text>{{report.weakWordText}}</text></view>
-      <view class="copy-card"><text class="card-title">建议</text><text>{{report.summary}}</text></view>
-      <view class="primary-button" bindtap="goHome">回到首页</view>
+    <view class="celebrate-head">
+      <image class="celebrate-confetti" src="../../assets/v2/effects/shared-effect-laurel-confetti@3x.png" mode="aspectFit" />
+      <view class="celebrate-title-row">
+        <image class="celebrate-check-inline" src="../../assets/v2/icons/shared-icon-completion-check@3x.png" mode="aspectFit" />
+        <text class="celebrate-title">今日目标完成</text>
+      </view>
+      <text class="celebrate-subtitle">太棒了，今天的 List 都完成了</text>
+      <view class="celebrate-underline"></view>
     </view>
+    <view class="celebrate-stats">
+      <view class="celebrate-stat">
+        <view class="celebrate-stat-head"><image src="../../assets/icons/flag-done.svg" mode="aspectFit" /><text>今日学习</text></view>
+        <view class="celebrate-stat-num"><text class="celebrate-num">{{report.todayLists}}</text><text class="celebrate-unit">List</text><text class="celebrate-num">{{report.doneWords}}</text><text class="celebrate-unit">词</text></view>
+      </view>
+      <view class="celebrate-stat">
+        <view class="celebrate-stat-head"><image src="../../assets/v2/icons/shared-icon-open-book@3x.png" mode="aspectFit" /><text>累计学完</text></view>
+        <view class="celebrate-stat-num"><text class="celebrate-num">{{report.totalLearned}}</text><text class="celebrate-unit">词</text></view>
+      </view>
+      <view class="celebrate-stat">
+        <view class="celebrate-stat-head"><image src="../../assets/v2/illustrations/shared-illustration-monthly-calendar@3x.png" mode="aspectFit" /><text>学习时长</text></view>
+        <view class="celebrate-stat-num"><text class="celebrate-num">{{report.doneHours}}</text><text class="celebrate-unit">小时</text></view>
+      </view>
+    </view>
+    <view class="celebrate-book">
+      <image class="celebrate-book-art" src="../../assets/v2/illustrations/vocabulary-book-hardcover@3x.png" mode="aspectFit" />
+      <view class="celebrate-book-copy">
+        <text class="celebrate-book-title">{{report.bookTitle}}</text>
+        <view class="progress-number-row celebrate-progress-row"><text class="progress-large">{{report.totalLearned}}</text><text>/ {{report.displayTotal}}</text><text class="celebrate-percent">{{report.progressPercent}}%</text></view>
+        <view class="progress-track"><view style="width: {{report.progressPercent}}%;"></view></view>
+      </view>
+    </view>
+    <view class="celebrate-badge">
+      <image class="celebrate-badge-art" src="../../assets/v2/illustrations/shared-illustration-focus-badge@3x.png" mode="aspectFit" />
+      <view class="celebrate-badge-copy">
+        <text class="celebrate-badge-label">获得徽章</text>
+        <text class="celebrate-badge-name">{{report.badgeName}}</text>
+        <view class="celebrate-points"><image src="../../assets/v2/icons/shared-icon-gold-star-token@3x.png" mode="aspectFit" /><text>+{{report.badgePoints}} 积分</text></view>
+      </view>
+    </view>
+    <view class="celebrate-outline-cta" bindtap="goHome" hover-class="action-entry-pressed">已完成 {{report.doneWords}} 词、{{report.doneHours}} 小时</view>
+    <view class="primary-button celebrate-filled-cta" bindtap="openWrongBook" hover-class="home-cta-pressed">错词复习</view>
+    <view class="celebrate-hint"><image class="celebrate-hint-leaf" src="../../assets/icons/leaf-sprig.svg" mode="aspectFit" /><text>坚持每天进步一点，词汇量终将奔赴远方。</text></view>
+    <image class="asset-landscape celebrate-landscape" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
   </view>
 
   <view wx:if="{{detail}}" class="modal-mask" bindtap="closeDetail">
@@ -397,7 +473,7 @@
       <text>单词</text>
     </view>
     <view class="tab-item" bindtap="openProfile">
-      <image class="home-icon tab-icon-image muted-tab-icon" src="../../assets/v2/illustrations/light-illustration-vocabulary-book@3x.png" mode="aspectFit" />
+      <image class="home-icon tab-icon-image muted-tab-icon" src="../../assets/icons/user.svg" mode="aspectFit" />
       <text>我的</text>
     </view>
   </view>
@@ -407,7 +483,7 @@
       <text>单词</text>
     </view>
     <view class="tab-item active" bindtap="openProfile">
-      <image class="home-icon tab-icon-image" src="../../assets/v2/illustrations/light-illustration-vocabulary-book@3x.png" mode="aspectFit" />
+      <image class="home-icon tab-icon-image" src="../../assets/icons/user.svg" mode="aspectFit" />
       <text>我的</text>
     </view>
   </view>

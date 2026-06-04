@@ -1,0 +1,3582 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>单词小程序 · 浅色 UI 预览</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Segoe UI",sans-serif;}
+body{margin:0;background:#ece6db;padding:28px 18px 60px;color:#2c2b26;}
+h1{font-size:20px;margin:0 0 4px;}
+.sub{color:#7d766a;font-size:13px;margin:0 0 24px;}
+.grid{display:flex;flex-wrap:wrap;gap:34px;justify-content:center;align-items:flex-start;}
+.phone-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.phone-label{font-size:13px;font-weight:700;color:#6b6459;}
+.frame{position:relative;width:375px;height:760px;border-radius:38px;overflow:hidden;
+  box-shadow:0 18px 50px rgba(80,60,30,0.18);border:8px solid #1d1c1a;background:#fcf9f3;
+  transform:translateZ(0);}
+.frame .view,.frame .precheck-view{min-height:100%;}
+.statusbar{position:absolute;top:0;left:0;right:0;height:34px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 22px;font-size:12px;font-weight:600;color:#2c2b26;z-index:50;pointer-events:none;}
+.frame .topbar{padding-top:34px!important;}
+.frame .home-view,.frame .profile-view{padding-top:44px!important;}
+.frame .level-view,.frame .test-view,.frame .test-result-view,.frame .month-progress-view,.frame .wrong-book-view,.frame .celebration-view{padding-top:40px!important;}
+.frame .focus-progress{margin-top:44px!important;}
+.frame .precheck-title{top:44px!important;}
+.frame .precheck-view{height:744px!important;padding-top:42px!important;}
+.frame .learn-spread{height:744px!important;padding-top:42px!important;}
+.frame .learn-landscape-band{width:calc(100% + 68px)!important;margin-left:-34px!important;}
+.frame .asset-swipe-arrows{top:80px!important;}
+/* element tag display defaults (WXML tags rendered as unknown HTML elements) */
+view{display:block;}
+text{display:inline;}
+image,img{display:block;}
+/* ---- ported WXSS (rpx->px) ---- */
+/* V2 light UI — aligned to page-references-v2-imagegen/light.
+   Palette: warm paper background, amber/gold primary button,
+   muted sage-green accents & numbers, soft white cards, serif headwords. */
+
+page,
+view,
+text,
+image {
+  box-sizing: border-box;
+}
+
+/* ---------- Design tokens ---------- */
+.app-shell {
+  min-height: 100vh;
+  color: #2c2b26;
+  background:
+    radial-gradient(circle at 16% 4%, rgba(120, 168, 150, 0.08), transparent 30%),
+    radial-gradient(circle at 88% 14%, rgba(232, 166, 76, 0.07), transparent 28%),
+    linear-gradient(180deg, #fcf9f3 0%, #f7f2e8 56%, #f2ecdf 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
+}
+
+.view {
+  position: relative;
+  /* each page is its own stacking context so landscapes can sit at z -1:
+     above the page background, below every component */
+  z-index: 0;
+  min-height: 100vh;
+  padding: 18px 18px 84px;
+  overflow: hidden;
+}
+
+.sticky-view {
+  overflow: visible;
+}
+
+.muted {
+  display: block;
+  color: #9b9488;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.section-label {
+  display: block;
+  color: #4d8478;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.card-title {
+  display: block;
+  color: #2c2b26;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.strong {
+  font-weight: 800;
+}
+
+/* serif headwords to match reference typography */
+.serif,
+.study-word,
+.test-word,
+.detail-word,
+.precheck-word {
+  font-family: "Georgia", "Times New Roman", "Songti SC", serif;
+}
+
+/* ---------- Buttons ---------- */
+.primary-button,
+.secondary-button {
+  min-height: 46px;
+  border-radius: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 17px;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.primary-button {
+  color: #fffaf0;
+  background: linear-gradient(180deg, #edb45f 0%, #e29a36 100%);
+  box-shadow: 0 8px 16px rgba(224, 154, 52, 0.28);
+}
+
+.secondary-button {
+  color: #4d8478;
+  background: #fffdf9;
+  border: 1px solid rgba(77, 132, 120, 0.26);
+}
+
+.home-cta-pressed,
+.action-entry-pressed,
+.level-option-pressed,
+.test-option-pressed,
+.review-card-pressed {
+  opacity: 0.9;
+  transform: scale(0.985);
+}
+
+/* ---------- Line icons ---------- */
+.ui-icon {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.icon-chevron::before {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  top: 4.5px;
+  left: 4px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.icon-back::before {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  top: 3.5px;
+  left: 5.5px;
+  border-left: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.icon-close::before,
+.icon-close::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 2px;
+  top: 8px;
+  left: 2px;
+  border-radius: 499.5px;
+  background: currentColor;
+}
+
+.icon-close::before {
+  transform: rotate(45deg);
+}
+
+.icon-close::after {
+  transform: rotate(-45deg);
+}
+
+.icon-check::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 5.5px;
+  top: 4px;
+  left: 3.5px;
+  border-left: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(-45deg);
+}
+
+.icon-calendar::before,
+.icon-bell::before,
+.icon-settings::before,
+.icon-level::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 5px;
+  border: 2px solid currentColor;
+}
+
+.home-icon,
+.asset-row-icon,
+.asset-sound-icon,
+.asset-listening-icon {
+  display: block;
+}
+
+/* ---------- Home ---------- */
+.home-view {
+  padding-bottom: 100px;
+}
+
+/* one unified top capsule: book entry on the left, streak chip on the right */
+.home-topline {
+  position: relative;
+  z-index: 2;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 5px 4px 6px;
+  border-radius: 499.5px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 11px rgba(122, 98, 60, 0.08);
+}
+
+.home-book-select {
+  flex: 1;
+  min-height: 30px;
+  gap: 6px;
+  display: flex;
+  align-items: center;
+  color: #2c2b26;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.home-book-select .ui-icon,
+.entry-arrow {
+  color: #b6ae9f;
+}
+
+.book-cover-mini {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.book-cover-image {
+  width: 20px;
+  height: 20px;
+}
+
+/* streak pill — warm orange */
+.home-streak {
+  min-height: 30px;
+  padding: 0 11px;
+  gap: 5px;
+  border-radius: 499.5px;
+  display: flex;
+  align-items: center;
+  color: #d97b34;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(223, 131, 60, 0.12);
+}
+
+.streak-dot {
+  position: relative;
+  width: 8px;
+  height: 9px;
+  border-radius: 50% 50% 50% 50% / 65% 65% 40% 40%;
+  background: linear-gradient(180deg, #f0a64a, #df6f2c);
+  transform: rotate(-8deg);
+}
+
+/* first-run welcome */
+.home-welcome-panel {
+  position: relative;
+  z-index: 2;
+  padding: 18px 3px 0;
+  text-align: center;
+}
+
+.home-welcome-title,
+.home-welcome-subtitle {
+  display: block;
+  letter-spacing: -0.02em;
+}
+
+.home-welcome-title {
+  color: #22211e;
+  font-size: 42px;
+  font-weight: 800;
+}
+
+.home-welcome-subtitle {
+  margin-top: 5px;
+  color: #45433f;
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.home-welcome-mark {
+  width: 46px;
+  height: 4px;
+  margin: 9px auto 0;
+  border-radius: 499.5px;
+  background: #5a8c7d;
+}
+
+/* full-bleed desk illustration */
+.asset-desk-scene {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: 250px;
+  margin: 12px -18px 0;
+  border-radius: 0;
+}
+
+/* shared card surface */
+.home-main-card,
+.profile-card,
+.month-panel,
+.level-panel,
+.question-panel,
+.result-panel,
+.review-card,
+.report-panel,
+.detail-card,
+.focus-pause-card {
+  position: relative;
+  z-index: 2;
+  border-radius: 18px;
+  background: #fffdf9;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 20px rgba(122, 98, 60, 0.1);
+}
+
+.home-main-card {
+  margin-top: 14px;
+  padding: 18px;
+}
+
+.home-normal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.home-card-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-title-row,
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.section-icon,
+.card-icon-image {
+  width: 20px;
+  height: 20px;
+}
+
+.target-line {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.target-number,
+.progress-large,
+.vocab-number {
+  color: #3f7e70;
+  font-size: 38px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.target-unit {
+  color: #6b6459;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* 今日目标: label + count on the left, flags on the right (wrap into rows) */
+.goal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.goal-left {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.goal-flags {
+  flex: 0 1 auto;
+  max-width: 150px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.icon-flag {
+  width: 28px;
+  height: 28px;
+}
+
+.home-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(77, 132, 120, 0.16), transparent);
+}
+
+.home-progress-body {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.home-progress-copy {
+  flex: 1;
+}
+
+.progress-number-row {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  color: #6b6459;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.progress-number-row .progress-large {
+  font-size: 32px;
+}
+
+.progress-track {
+  width: 100%;
+  height: 7px;
+  margin-top: 11px;
+  overflow: hidden;
+  border-radius: 499.5px;
+  background: rgba(77, 132, 120, 0.14);
+}
+
+.progress-track view {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4d8478, #6fa893);
+}
+
+.home-progress-art {
+  width: 75px;
+  height: 71px;
+}
+
+.first-run-panel {
+  margin-top: 5px;
+}
+
+.first-run-book-name {
+  display: block;
+  margin-top: 11px;
+  color: #2c2b26;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.first-run-progress-row {
+  margin-top: 9px;
+}
+
+.first-run-progress-row text:last-child {
+  margin-left: auto;
+}
+
+.first-run-book-name + .first-run-progress-row {
+  margin-top: 11px;
+}
+
+.cta-chevron {
+  margin-left: 5px;
+  color: #fffaf0;
+}
+
+.home-continue {
+  position: relative;
+  z-index: 3;
+  margin-top: 16px;
+}
+
+.first-run-cta {
+  margin-top: 17px;
+}
+
+.home-first-note {
+  position: relative;
+  z-index: 2;
+  margin-top: 10px;
+  text-align: center;
+  color: #9b9488;
+  font-size: 12px;
+}
+
+/* error/review entry card */
+.home-action-card {
+  position: relative;
+  z-index: 2;
+  min-height: 54px;
+  margin-top: 11px;
+  padding: 11px 13px;
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  column-gap: 9px;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.08);
+  box-shadow: 0 6px 15px rgba(122, 98, 60, 0.08);
+}
+
+.home-action-title {
+  color: #2c2b26;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.home-action-subtitle {
+  grid-column: 2;
+  color: #9b9488;
+  font-size: 11.5px;
+}
+
+.card-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* bottom ink-wash landscape strip */
+.asset-landscape {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 58px;
+  width: 100%;
+  height: 150px;
+  /* background layer: above the page colour, below all components,
+     takes no layout height */
+  z-index: -1;
+  opacity: 0.85;
+  pointer-events: none;
+  /* fade the top edge so the landscape blends into the page (no hard seam) */
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 1) 36%);
+  mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 1) 36%);
+}
+
+/* ---------- Flat bottom tab bar ---------- */
+.bottom-tab-bar {
+  position: fixed;
+  z-index: 20;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 55px;
+  padding: 5px 0 calc(constant(safe-area-inset-bottom));
+  padding-bottom: calc(env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: rgba(255, 253, 249, 0.96);
+  border-top: 1px solid rgba(122, 98, 60, 0.1);
+  box-shadow: 0 -3px 12px rgba(122, 98, 60, 0.06);
+}
+
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 5px 0;
+  color: #a8a193;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.tab-item.active {
+  color: #3f7e70;
+}
+
+.tab-icon-image {
+  width: 22px;
+  height: 22px;
+}
+
+.muted-tab-icon {
+  opacity: 0.5;
+  filter: grayscale(0.35);
+}
+
+/* ---------- Top bars ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  min-height: 44px;
+  margin: 0 -18px 11px;
+  padding: 4px 12px;
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 7px;
+  /* opaque, same tone as the page background so scrolled content
+     never shows through behind the title; spans the full width */
+  background: #fcf9f3;
+}
+
+/* seamless cover above the stuck bar: hides the sliver of content that can
+   peek out between the viewport top and the sticky bar */
+.topbar::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 44px;
+  background: #fcf9f3;
+}
+
+.topbar.compact {
+  grid-template-columns: 36px 1fr auto;
+}
+
+.page-title,
+.progress-label {
+  color: #2c2b26;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #5a544a;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.82);
+}
+
+.icon-button.compact {
+  width: 29px;
+  height: 29px;
+  border-radius: 9px;
+}
+
+/* ---------- Profile ---------- */
+.profile-view {
+  padding-bottom: 100px;
+}
+
+.profile-toolbar-spacer {
+  width: 36px;
+}
+
+.profile-toolbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #8a8478;
+}
+
+.profile-hero {
+  padding: 14px;
+  border-radius: 18px;
+  display: grid;
+  grid-template-columns: 66px 1fr auto;
+  gap: 11px;
+  align-items: center;
+  background: #fffdf9;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 20px rgba(122, 98, 60, 0.1);
+}
+
+.profile-book-art,
+.asset-card-illustration {
+  width: 66px;
+  height: 66px;
+}
+
+.profile-book {
+  display: block;
+  margin: 4px 0;
+  color: #2c2b26;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.level-pill,
+.pill {
+  border-radius: 499.5px;
+  padding: 6px 9px;
+  color: #3f7e70;
+  background: rgba(77, 132, 120, 0.12);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.profile-grid,
+.stats-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+
+.profile-grid view,
+.stats-grid .metric {
+  min-height: 60px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.07);
+}
+
+.metric-value {
+  color: #3f7e70;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.metric-label {
+  margin-top: 3px;
+  color: #9b9488;
+  font-size: 11px;
+}
+
+.profile-card,
+.profile-list,
+.month-panel {
+  margin-top: 12px;
+  padding: 14px;
+}
+
+.profile-card .card-row,
+.month-panel .card-row {
+  justify-content: space-between;
+}
+
+.inline-options {
+  margin-top: 9px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.level-options.single {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.level-option {
+  min-height: 52px;
+  border-radius: 14px;
+  padding: 10px 11px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.1);
+}
+
+.level-option.compact {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 499.5px;
+}
+
+.level-option.enabled {
+  color: #2c2b26;
+}
+
+.level-option.disabled {
+  color: #b6ae9f;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.level-option.selected {
+  border-color: #4d8478;
+  background: rgba(77, 132, 120, 0.1);
+}
+
+.level-option-label {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.level-option-status {
+  display: block;
+  margin-top: 3px;
+  color: #9b9488;
+  font-size: 11px;
+}
+
+.level-kind,
+.level-check {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  color: #4d8478;
+  background: rgba(77, 132, 120, 0.12);
+}
+
+.level-check {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-card,
+.action-entry,
+.list-button,
+.profile-test-entry {
+  position: relative;
+}
+
+.profile-test-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.profile-test-entry,
+.list-button {
+  min-height: 56px;
+  border-radius: 14px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  gap: 7px;
+  align-items: center;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.1);
+}
+
+.entry-title {
+  color: #2c2b26;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.entry-meta {
+  color: #9b9488;
+  font-size: 11px;
+}
+
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.week-row,
+.month-calendar {
+  margin-top: 10px;
+}
+
+.week-row {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.week-dot {
+  min-height: 39px;
+  border-radius: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #9b9488;
+  background: rgba(77, 132, 120, 0.06);
+  font-size: 10px;
+}
+
+.week-dot.active {
+  color: #fffaf0;
+  background: #4d8478;
+}
+
+.week-summary {
+  margin-top: 8px;
+}
+
+/* ---------- Month progress ---------- */
+.month-hero-panel,
+.question-panel,
+.result-panel {
+  padding: 17px;
+}
+
+.asset-month-illustration,
+.asset-panel-illustration,
+.asset-result-illustration {
+  display: block;
+  width: 92px;
+  height: 78px;
+  margin: 0 auto 6px;
+}
+
+.month-picker,
+.month-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.month-title {
+  color: #2c2b26;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.month-picker-action,
+.level-test-link {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #4d8478;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.month-switch {
+  margin-top: 10px;
+  color: #9b9488;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.month-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.month-weekday {
+  text-align: center;
+  color: #b6ae9f;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.month-day {
+  min-height: 40px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #6b6459;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.month-day.blank {
+  opacity: 0;
+}
+
+.month-day.active {
+  color: #fffaf0;
+  background: #4d8478;
+}
+
+.month-day-meta {
+  margin-top: 1px;
+  font-size: 9px;
+}
+
+.trend-bars {
+  height: 80px;
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  align-items: end;
+  gap: 6px;
+}
+
+.trend-bar {
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  color: #b6ae9f;
+  font-size: 9px;
+}
+
+.trend-bar view {
+  width: 13px;
+  border-radius: 499.5px;
+  background: linear-gradient(180deg, #6fa893, #4d8478);
+}
+
+.stage-test-copy {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+
+.asset-row-icon {
+  width: 25px;
+  height: 25px;
+}
+
+.asset-row-icon.large {
+  width: 54px;
+  height: 54px;
+}
+
+.stage-skill-row {
+  margin: 12px 0;
+  display: flex;
+  gap: 5px;
+}
+
+.stage-skill-row text {
+  flex: 1;
+  text-align: center;
+  border-radius: 499.5px;
+  padding: 6px 2px;
+  color: #4d8478;
+  background: rgba(77, 132, 120, 0.1);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.stage-note {
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* ---------- Level / test / result ---------- */
+.level-view,
+.test-view,
+.test-result-view,
+.wrong-book-view,
+.celebration-view,
+.month-progress-view {
+  padding-top: 11px;
+}
+
+.level-topbar {
+  grid-template-columns: 36px 1fr 44px;
+}
+
+.text-link,
+.skip-link {
+  color: #9b9488;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.level-panel {
+  padding: 16px;
+}
+
+.level-subtitle {
+  display: block;
+  text-align: center;
+  color: #2c2b26;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.ornament-line {
+  width: 55px;
+  height: 4px;
+  margin: 9px auto 14px;
+  border-radius: 499.5px;
+  background: #e2a13c;
+}
+
+.question-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.test-word,
+.detail-word,
+.study-word {
+  display: block;
+  color: #2c2b26;
+  font-size: 39px;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  word-break: break-word;
+}
+
+.option-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.option-card,
+.test-option {
+  min-height: 46px;
+  border-radius: 13px;
+  padding: 12px 14px;
+  color: #2c2b26;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.1);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.unknown-button {
+  margin-top: 2px;
+}
+
+.counter-bar {
+  margin-top: 11px;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pill.green {
+  color: #3f7e70;
+}
+
+.pill.red {
+  color: #d06a4a;
+  background: rgba(208, 106, 74, 0.1);
+}
+
+.pill.blue {
+  color: #4d8478;
+}
+
+.result-panel {
+  text-align: center;
+}
+
+.vocab-number {
+  display: block;
+  margin: 6px 0 11px;
+  color: #3f7e70;
+  font-size: 50px;
+}
+
+.vocab-number.compact {
+  margin: 0;
+  font-size: 24px;
+}
+
+.copy-card,
+.usage-card,
+.memory-image {
+  margin-top: 9px;
+  border-radius: 13px;
+  padding: 12px;
+  text-align: left;
+  color: #5a544a;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(122, 98, 60, 0.08);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* ---------- Pre-learning scan ---------- */
+.precheck-view {
+  min-height: 100vh;
+  padding: 16px 16px 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 16%, rgba(232, 166, 76, 0.1), transparent 30%),
+    linear-gradient(180deg, #fcf9f3, #f2ecdf);
+}
+
+.precheck-title {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  color: #2c2b26;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.asset-swipe-arrows {
+  position: absolute;
+  top: 70px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  opacity: 0.8;
+}
+
+.precheck-stage-card {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fffdf9;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 32px rgba(122, 98, 60, 0.16);
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.precheck-stage-card.exit-known {
+  opacity: 0;
+  transform: translateY(-80px) scale(0.94) rotate(-4deg);
+}
+
+.precheck-stage-card.exit-unfamiliar {
+  opacity: 0;
+  transform: translateY(80px) scale(0.94) rotate(4deg);
+}
+
+.precheck-word {
+  max-width: 310px;
+  color: #2c2b26;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+  word-break: break-word;
+}
+
+.precheck-audio-dot {
+  width: 40px;
+  height: 40px;
+  margin-top: 17px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(77, 132, 120, 0.1);
+}
+
+.precheck-audio-dot image {
+  width: 25px;
+  height: 25px;
+}
+
+.precheck-hints {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 15px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+
+.precheck-hint {
+  min-height: 44px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #9b9488;
+  background: rgba(77, 132, 120, 0.08);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.precheck-hint.known {
+  color: #3f7e70;
+}
+
+.precheck-hint.unfamiliar {
+  color: #d97b34;
+  background: rgba(223, 131, 60, 0.1);
+}
+
+.precheck-bottom-status {
+  position: fixed;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  min-height: 48px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  color: #fffaf0;
+  background: #4d8478;
+  box-shadow: 0 8px 20px rgba(77, 132, 120, 0.24);
+}
+
+.precheck-status-main {
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.precheck-status-sub {
+  font-size: 12px;
+  opacity: 0.82;
+}
+
+/* ---------- Learning (focus flow) ---------- */
+.learning-view {
+  min-height: 100vh;
+  padding: 18px 17px 22px;
+  overflow: hidden;
+}
+
+.focus-flow,
+.learning-view.learning-light,
+.learning-view.learning-dark {
+  color: #2c2b26;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(120, 168, 150, 0.08), transparent 28%),
+    linear-gradient(180deg, #fcf9f3 0%, #f7f2e8 50%, #f2ecdf 100%);
+}
+
+.focus-pause-handle {
+  position: fixed;
+  z-index: 16;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 17px;
+  min-height: 160px;
+  border-radius: 0 8px 8px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: rgba(44, 43, 38, 0.42);
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 10px;
+}
+
+.focus-progress {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.focus-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(77, 132, 120, 0.18);
+}
+
+.focus-dot.done {
+  background: #4d8478;
+}
+
+.focus-dot.current {
+  background: #4d8478;
+  box-shadow: 0 0 0 4px rgba(77, 132, 120, 0.14);
+}
+
+.focus-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  min-height: 320px;
+  margin-top: 42px;
+  border-radius: 26px;
+  padding: 28px 19px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+/* bottom ink-wash landscape for the focus learning pages: background layer */
+.focus-landscape {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 270px;
+  opacity: 0.92;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.study-focus-card {
+  min-height: 380px;
+}
+
+.review-focus-card,
+.audio-focus-card {
+  min-height: 260px;
+}
+
+.audio-minimal {
+  min-height: 260px;
+}
+
+.audio-panel {
+  margin-top: 42px;
+}
+
+.audio-view {
+  display: block;
+}
+
+.study-word {
+  color: inherit;
+  font-size: 48px;
+}
+
+.ipa {
+  display: block;
+  margin-top: 11px;
+  color: #9b9488;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.meaning {
+  display: block;
+  margin-top: 15px;
+  color: #2c2b26;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.meaning text,
+.option-pos {
+  margin-right: 5px;
+  color: #4d8478;
+  font-weight: 800;
+}
+
+/* sound orb — soft round sage button */
+.sound-orb,
+.speaker-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(77, 132, 120, 0.1);
+  border: 1px solid rgba(77, 132, 120, 0.16);
+}
+
+.sound-orb.small {
+  width: 92px;
+  height: 92px;
+  margin-top: 20px;
+}
+
+.asset-sound-icon {
+  width: 59px;
+  height: 59px;
+}
+
+.read-pulse.active {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.study-hint {
+  display: block;
+  margin-top: 13px;
+  color: #9b9488;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.focus-actions {
+  position: fixed;
+  z-index: 15;
+  left: 17px;
+  right: 17px;
+  bottom: 20px;
+}
+
+.focus-primary {
+  min-height: 58px;
+  border-radius: 499.5px;
+}
+
+.focus-stack,
+.review-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.reveal-card {
+  width: 100%;
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.reveal-card.ghost {
+  min-height: 58px;
+  border-radius: 13px;
+  align-items: center;
+  justify-content: center;
+  color: #b6ae9f;
+  background: rgba(77, 132, 120, 0.06);
+  font-size: 12px;
+}
+
+.focus-reveal {
+  min-height: 44px;
+  border-radius: 13px;
+  padding: 11px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2c2b26;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.1);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.focus-reveal.correct,
+.focus-reveal.is-correct {
+  border-color: rgba(77, 132, 120, 0.4);
+  background: rgba(77, 132, 120, 0.1);
+}
+
+.focus-reveal.wrong {
+  border-color: rgba(208, 106, 74, 0.4);
+  background: rgba(208, 106, 74, 0.08);
+}
+
+.focus-reveal.muted-card {
+  opacity: 0.55;
+}
+
+.option-line {
+  display: block;
+  line-height: 1.25;
+}
+
+.speaker-tile.focus-speaker {
+  width: 115px;
+  height: 115px;
+  margin-bottom: 15px;
+  background: radial-gradient(circle, #ffffff 0%, rgba(77, 132, 120, 0.1) 100%);
+  /* concentric ripple rings like the listening reference */
+  box-shadow:
+    0 0 0 7px rgba(77, 132, 120, 0.06),
+    0 0 0 17px rgba(77, 132, 120, 0.04),
+    0 0 0 29px rgba(77, 132, 120, 0.025),
+    0 9px 22px rgba(77, 132, 120, 0.16);
+}
+
+.asset-listening-icon {
+  width: 94px;
+  height: 94px;
+}
+
+.audio-playing-text {
+  color: #2c2b26;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.audio-answer-reveal {
+  margin-top: 16px;
+}
+
+/* listening reveal sheet (Reference 11) */
+.reveal-sheet {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px 15px 15px;
+  border-radius: 16px;
+  background: rgba(255, 253, 249, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8px 20px rgba(122, 98, 60, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reveal-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reveal-sheet-title {
+  display: flex;
+  align-items: center;
+  color: #9b9488;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.reveal-sheet-title::before,
+.reveal-sheet-title::after {
+  content: "";
+  width: 24px;
+  height: 1px;
+  margin: 0 8px;
+  background: rgba(122, 98, 60, 0.2);
+}
+
+.reveal-sheet-arrow {
+  width: 10px;
+  height: 10px;
+  margin: 7px 0 0;
+  border-right: 1.5px solid #b6ae9f;
+  border-bottom: 1.5px solid #b6ae9f;
+  transform: rotate(45deg);
+}
+
+.reveal-sheet-meaning {
+  margin-top: 0;
+  color: #2c2b26;
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.reveal-sheet.revealed .reveal-sheet-arrow {
+  opacity: 0.4;
+}
+
+/* listening page: spread content vertically (orb up top, reveal sheet near button) */
+/* shared "spread" learning layout: orb up top, landscape centred, meaning sheet
+   fixed above the button. Used by both 听音辨义 and 识记. */
+.learn-spread {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  box-sizing: border-box;
+  /* bottom padding reserves the fixed button (96 + 116 + ~10px gap) */
+  padding: 18px 17px 116px;
+  overflow: hidden;
+}
+
+.learn-spread .focus-progress {
+  flex: 0 0 auto;
+}
+
+.learn-spread .focus-card {
+  flex: 0 0 auto;
+  min-height: auto;
+  margin-top: 45px;
+}
+
+/* landscape: background layer anchored in the lower-middle, below the text and
+   above the reveal-sheet area. Out of flow — takes no layout height and never
+   moves when the reveal sheet appears. */
+.learn-spread .learn-landscape-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 190px;
+  width: 100%;
+  height: 150px;
+  margin: 0;
+  opacity: 0.9;
+  z-index: -1;
+}
+
+/* meaning sheet: fixed just above the button and OUT of flow, layered above the
+   landscape. Because it is out of flow, the landscape (background) does not move
+   when the meaning appears after 2s — the flow stays uninterrupted. */
+.learn-spread .reveal-sheet {
+  position: fixed;
+  left: 17px;
+  right: 17px;
+  bottom: 116px;
+  width: auto;
+  margin: 0;
+  z-index: 4;
+}
+
+.learn-spread .focus-actions {
+  bottom: 48px;
+}
+
+.audio-bottom-hint {
+  position: fixed;
+  z-index: 15;
+  left: 0;
+  right: 0;
+  bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #b6ae9f;
+  font-size: 12px;
+}
+
+.audio-hint-bulb {
+  width: 11px;
+  height: 11px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  border: 1px solid #c7bfae;
+}
+
+.meaning-recall-prompt {
+  width: 100%;
+  border-radius: 15px;
+  padding: 15px;
+  color: #2c2b26;
+  background: rgba(77, 132, 120, 0.1);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.meaning-word-reveal {
+  width: 100%;
+  min-height: 90px;
+  margin-top: 14px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+.recall-placeholder {
+  color: #9b9488;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.focus-topbar {
+  display: none;
+}
+
+/* ---------- Wrong-book ---------- */
+.wrong-book-view .review-summary,
+.asset-summary {
+  min-height: 75px;
+  border-radius: 16px;
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  column-gap: 9px;
+  align-items: center;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.1);
+  box-shadow: 0 7px 18px rgba(122, 98, 60, 0.08);
+}
+
+.asset-summary image {
+  grid-row: span 2;
+  width: 44px;
+  height: 44px;
+}
+
+.summary-title {
+  color: #2c2b26;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.summary-subtitle {
+  color: #9b9488;
+  font-size: 12px;
+}
+
+.wrong-book-view .review-stack {
+  margin-top: 11px;
+}
+
+.review-card {
+  min-height: 69px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 9px;
+  align-items: center;
+}
+
+.review-copy text {
+  display: block;
+}
+
+.review-ipa {
+  display: block;
+  margin-top: 3px;
+  color: #9b9488;
+  font-size: 12px;
+}
+
+.sound-mini {
+  min-width: 54px;
+  height: 38px;
+  border-radius: 499.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #4d8478;
+  background: rgba(77, 132, 120, 0.1);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.sound-mini image {
+  width: 20px;
+  height: 20px;
+}
+
+.empty-state {
+  min-height: 140px;
+  border-radius: 18px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  color: #9b9488;
+  background: rgba(255, 255, 255, 0.66);
+}
+
+/* ---------- Celebration / report ---------- */
+.celebration-view {
+  text-align: center;
+}
+
+.celebration-panel {
+  padding: 22px 17px;
+}
+
+.asset-confetti,
+.asset-complete-glow {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 150px;
+  height: 90px;
+  transform: translateX(-50%);
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.asset-complete-glow {
+  top: 35px;
+  opacity: 0.5;
+}
+
+.report-ring {
+  position: relative;
+  z-index: 2;
+  width: 105px;
+  height: 105px;
+  margin: 22px auto 14px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fffdf9;
+  box-shadow: 0 8px 22px rgba(122, 98, 60, 0.12);
+}
+
+.report-ring image {
+  width: 42px;
+  height: 42px;
+}
+
+.report-ring text {
+  margin-top: 4px;
+  color: #3f7e70;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+/* ---------- Modals & transitions ---------- */
+.modal-mask,
+.transition-mask {
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  padding: 22px 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(44, 43, 38, 0.4);
+}
+
+.detail-card {
+  width: 100%;
+  max-height: 86vh;
+  overflow-y: auto;
+  padding: 19px;
+}
+
+.detail-card .close {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+}
+
+.detail-word {
+  margin-top: 9px;
+}
+
+.memory-image {
+  background: linear-gradient(135deg, rgba(77, 132, 120, 0.1), rgba(232, 166, 76, 0.1));
+}
+
+.usage-section {
+  margin-top: 8px;
+}
+
+.usage-title {
+  display: block;
+  color: #4d8478;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.usage-chip {
+  margin-top: 5px;
+  border-radius: 10px;
+  padding: 7px 9px;
+  background: rgba(77, 132, 120, 0.08);
+}
+
+.usage-chip text,
+.usage-example-en,
+.usage-example-cn,
+.usage-ai-label {
+  display: block;
+  color: #5a544a;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.usage-example-en {
+  margin-top: 5px;
+  font-weight: 700;
+}
+
+.usage-example-cn,
+.usage-ai-label {
+  margin-top: 4px;
+  color: #9b9488;
+}
+
+.focus-pause-mask {
+  align-items: flex-end;
+}
+
+.focus-pause-card {
+  width: 100%;
+  padding: 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pause-count {
+  display: block;
+  margin-bottom: 5px;
+  text-align: center;
+  color: #2c2b26;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.notice-mask {
+  background: rgba(44, 43, 38, 0.22);
+}
+
+.transition-card {
+  min-width: 260px;
+  max-width: 320px;
+  border-radius: 15px;
+  padding: 17px 19px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+  color: #2c2b26;
+  background: #fffdf9;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 10px 25px rgba(122, 98, 60, 0.16);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.transition-hint {
+  color: #9b9488;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.boot-error-card {
+  border-radius: 15px;
+  padding: 14px;
+  background: #fff7eb;
+  border: 1px solid rgba(208, 106, 74, 0.16);
+}
+
+/* ---------- Assessment result (Reference 04) ---------- */
+.test-result-view {
+  position: relative;
+  min-height: 100vh;
+  padding: 18px 20px 40px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.result-hero {
+  position: relative;
+  height: 150px;
+  margin-top: 4px;
+}
+
+.result-confetti {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 280px;
+  height: 150px;
+  transform: translateX(-50%);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.result-book-check {
+  position: absolute;
+  left: 50%;
+  top: 14px;
+  width: 150px;
+  height: 120px;
+  transform: translateX(-50%);
+}
+
+.result-title {
+  display: block;
+  margin-top: 3px;
+  color: #22211e;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.test-result-view .result-panel {
+  margin-top: 17px;
+  padding: 22px 18px;
+  text-align: center;
+}
+
+.result-cap {
+  display: block;
+  color: #8a8478;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.result-range {
+  display: block;
+  margin-top: 8px;
+  color: #3f7e70;
+  font-size: 46px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.result-divider {
+  height: 1px;
+  margin: 15px 0 12px;
+  background: repeating-linear-gradient(90deg, rgba(122, 98, 60, 0.22) 0, rgba(122, 98, 60, 0.22) 6px, transparent 6px, transparent 12px);
+}
+
+.result-note {
+  display: block;
+  color: #8a8478;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.result-advice-card {
+  margin-top: 15px;
+  padding: 13px 14px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  text-align: left;
+  background: rgba(77, 132, 120, 0.1);
+  border: 1px solid rgba(77, 132, 120, 0.16);
+}
+
+.result-advice-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.result-advice-icon image {
+  width: 24px;
+  height: 24px;
+}
+
+.result-advice-label {
+  display: block;
+  color: #4d8478;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.result-advice-text {
+  display: block;
+  margin-top: 2px;
+  color: #2c2b26;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.result-advice-hl {
+  color: #3f7e70;
+}
+
+.result-encourage-card {
+  margin-top: 9px;
+  padding: 12px 14px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  background: rgba(232, 166, 76, 0.12);
+  border: 1px solid rgba(232, 166, 76, 0.18);
+}
+
+.result-spark {
+  color: #e2a13c;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.result-encourage-text {
+  color: #6b6459;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.result-start {
+  position: relative;
+  z-index: 2;
+  margin-top: 20px;
+  min-height: 50px;
+  color: #fffaf0;
+  background: linear-gradient(180deg, #5f9181 0%, #3f6f60 100%);
+  box-shadow: 0 8px 17px rgba(63, 111, 96, 0.28);
+}
+
+.result-relevel {
+  position: relative;
+  z-index: 2;
+  width: fit-content;
+  margin: 14px auto 0;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: #3f7e70;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.result-relevel .ui-icon {
+  color: #3f7e70;
+}
+
+/* ---------- Vocabulary assessment (Reference 03) ---------- */
+.test-view {
+  position: relative;
+  min-height: 100vh;
+  padding: 20px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.assess-topbar {
+  position: relative;
+  width: 100%;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.assess-back {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  color: #2c2b26;
+}
+
+.assess-count {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.assess-progress-current {
+  color: #3f7e70;
+}
+
+.assess-progress-total {
+  color: #b6ae9f;
+}
+
+.assess-progress-track {
+  width: 100%;
+  height: 6px;
+  margin-top: 11px;
+  border-radius: 499.5px;
+  overflow: hidden;
+  background: rgba(122, 98, 60, 0.12);
+}
+
+.assess-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4d8478, #6fa893);
+  transition: width 240ms ease;
+}
+
+.assess-prompt {
+  margin-top: 28px;
+  color: #8a8478;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.assess-word {
+  margin-top: 20px;
+  color: #22211e;
+  font-size: 48px;
+  line-height: 1.1;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-align: center;
+  font-family: "Georgia", "Times New Roman", "Songti SC", serif;
+  word-break: break-word;
+}
+
+.assess-ipa {
+  margin-top: 9px;
+  color: #9b9488;
+  font-size: 17px;
+  text-align: center;
+}
+
+.assess-stack {
+  width: 100%;
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.assess-option {
+  min-height: 58px;
+  padding: 0 14px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  background: rgba(255, 253, 249, 0.66);
+  border: 1px solid rgba(122, 98, 60, 0.12);
+}
+
+.assess-option-pressed {
+  background: rgba(77, 132, 120, 0.12);
+  border-color: #4d8478;
+  transform: scale(0.99);
+}
+
+.assess-letter {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b6459;
+  background: rgba(122, 98, 60, 0.08);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.assess-text {
+  color: #2c2b26;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.assess-unknown {
+  justify-content: center;
+}
+
+.assess-unknown .assess-text {
+  color: #8a8478;
+}
+
+/* ---------- Level select (Reference 02) ---------- */
+.level-view {
+  position: relative;
+  min-height: 100vh;
+  padding: 20px 18px 36px;
+  overflow: hidden;
+}
+
+.level-skip {
+  position: absolute;
+  z-index: 5;
+  top: 20px;
+  right: 20px;
+  color: #9b9488;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.level-heading {
+  margin-top: 46px;
+  text-align: center;
+}
+
+.level-main-title {
+  display: block;
+  color: #22211e;
+  font-size: 37px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.level-view .level-subtitle {
+  display: block;
+  margin-top: 7px;
+  color: #8a8478;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.level-view .level-options.single {
+  position: relative;
+  z-index: 2;
+  margin-top: 25px;
+  gap: 10px;
+}
+
+.level-view .level-option {
+  min-height: 62px;
+  padding: 0 15px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  background: rgba(255, 253, 249, 0.62);
+  border: 1px solid rgba(122, 98, 60, 0.12);
+}
+
+.level-icon {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+}
+
+.level-view .level-option-label {
+  font-size: 17px;
+  font-weight: 600;
+  color: #2c2b26;
+}
+
+.level-view .level-option.disabled {
+  background: rgba(255, 253, 249, 0.42);
+}
+
+.level-view .level-option.disabled .level-option-label {
+  color: #9e978a;
+}
+
+.level-view .level-option.disabled .level-icon {
+  opacity: 0.66;
+}
+
+.level-view .level-option.selected {
+  background: rgba(77, 132, 120, 0.12);
+  border-color: #4d8478;
+}
+
+.level-view .level-option.selected .level-option-label {
+  color: #2f6d61;
+}
+
+.level-view .level-check {
+  width: 24px;
+  height: 24px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #4d8478;
+  color: #fffaf0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.level-view .level-test-link {
+  position: relative;
+  z-index: 2;
+  width: fit-content;
+  margin: 24px auto 0;
+  padding-bottom: 5px;
+  justify-content: center;
+  color: #4d8478;
+  font-size: 13px;
+  font-weight: 700;
+  border-bottom: 1px dashed rgba(77, 132, 120, 0.45);
+}
+
+/* ambient landscape at the page bottom: background layer (z -1), no layout height */
+.level-landscape {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 150px;
+  opacity: 0.85;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.edge-wrong .focus-card {
+  animation: edgeShake 300ms ease;
+}
+
+@keyframes edgeShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-4px);
+  }
+  70% {
+    transform: translateX(4px);
+  }
+}
+
+/* ---------- Daily celebration (Reference 14) ---------- */
+.celebration-view {
+  /* page length follows the content — no dead bottom padding, no empty scroll.
+     z-index:0 creates a stacking context so the landscape can sit at z -1:
+     above the page background, below every component. */
+  position: relative;
+  z-index: 0;
+  padding-bottom: 20px;
+}
+
+.celebrate-head {
+  position: relative;
+  padding-top: 13px;
+}
+
+.celebrate-confetti {
+  position: absolute;
+  left: 50%;
+  top: -7px;
+  /* stretched wide so the laurel sprigs land beside the text, not behind it */
+  width: 380px;
+  height: 115px;
+  transform: translateX(-50%);
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.celebrate-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.celebrate-check-inline {
+  width: 38px;
+  height: 38px;
+}
+
+.celebrate-title {
+  color: #22211e;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.celebrate-subtitle {
+  display: block;
+  margin-top: 8px;
+  color: #6b6459;
+  font-size: 16px;
+}
+
+.celebrate-underline {
+  width: 75px;
+  height: 3px;
+  margin: 7px auto 0;
+  border-radius: 499.5px;
+  background: #4d8478;
+  opacity: 0.7;
+}
+
+.celebrate-stats {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.celebrate-stat {
+  padding: 12px 10px;
+  border-radius: 14px;
+  text-align: left;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.08);
+  box-shadow: 0 5px 13px rgba(122, 98, 60, 0.06);
+}
+
+.celebrate-stat-head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #6b6459;
+  font-size: 12px;
+}
+
+.celebrate-stat-head image {
+  width: 17px;
+  height: 17px;
+}
+
+.celebrate-stat-num {
+  margin-top: 9px;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.celebrate-num {
+  color: #3f7e70;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.celebrate-unit {
+  color: #9b9488;
+  font-size: 12px;
+}
+
+.celebrate-book {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.08);
+  box-shadow: 0 6px 15px rgba(122, 98, 60, 0.08);
+}
+
+.celebrate-book-art {
+  width: 60px;
+  height: 72px;
+  flex: 0 0 60px;
+}
+
+.celebrate-book-copy {
+  flex: 1;
+}
+
+.celebrate-book-title {
+  display: block;
+  color: #2c2b26;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.celebrate-progress-row {
+  margin-top: 7px;
+}
+
+.celebrate-percent {
+  margin-left: auto;
+  color: #3f7e70;
+  font-weight: 800;
+}
+
+.celebrate-badge {
+  margin-top: 12px;
+  padding: 15px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  background: rgba(232, 166, 76, 0.14);
+  border: 1px solid rgba(232, 166, 76, 0.2);
+}
+
+.celebrate-badge-art {
+  width: 90px;
+  height: 90px;
+  flex: 0 0 90px;
+}
+
+.celebrate-badge-label {
+  display: block;
+  color: #8a8478;
+  font-size: 13px;
+}
+
+.celebrate-badge-name {
+  display: block;
+  margin-top: 3px;
+  color: #2c2b26;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.celebrate-points {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 499.5px;
+  background: #fffdf9;
+  box-shadow: 0 4px 10px rgba(122, 98, 60, 0.08);
+}
+
+.celebrate-points image {
+  width: 17px;
+  height: 17px;
+}
+
+.celebrate-points text {
+  color: #c08a2e;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.celebrate-outline-cta {
+  margin-top: 20px;
+  min-height: 54px;
+  border-radius: 499.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3f7e70;
+  background: rgba(255, 253, 249, 0.8);
+  border: 1px solid rgba(77, 132, 120, 0.3);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.celebrate-filled-cta {
+  margin-top: 9px;
+  min-height: 52px;
+  border-radius: 499.5px;
+  font-size: 16px;
+}
+
+.celebrate-hint {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #9b9488;
+  font-size: 12.5px;
+}
+
+.celebrate-hint-leaf {
+  width: 16px;
+  height: 11px;
+}
+
+.celebrate-landscape {
+  /* background layer: above the page background, below all components,
+     anchored to the page bottom without adding scroll height */
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 150px;
+  z-index: -1;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ---------- Wrong-word book (Reference 13) ---------- */
+.wrongbook-topbar {
+  grid-template-columns: 36px 1fr 44px;
+}
+
+.wrongbook-edit {
+  text-align: right;
+  color: #4a443b;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.wrongbook-summary {
+  padding: 16px 15px 15px;
+  border-radius: 18px;
+  background: #fffdf9;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 20px rgba(122, 98, 60, 0.1);
+}
+
+.wrongbook-summary-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wrongbook-icon {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+}
+
+.wrongbook-title {
+  display: block;
+  color: #2c2b26;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.wrongbook-subtitle {
+  display: block;
+  margin-top: 4px;
+  color: #9b9488;
+  font-size: 13px;
+}
+
+.wrongbook-start {
+  min-height: 52px;
+  margin-top: 14px;
+  border-radius: 499.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fffaf0;
+  background: linear-gradient(180deg, #5f9181 0%, #3f6f60 100%);
+  box-shadow: 0 7px 15px rgba(63, 111, 96, 0.26);
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.wrongbook-note {
+  margin: 13px 3px 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8a8478;
+  font-size: 12.5px;
+}
+
+.wrongbook-note-leaf {
+  width: 17px;
+  height: 11px;
+}
+
+.wrongbook-list {
+  margin-top: 10px;
+}
+
+.wrongbook-row {
+  min-height: 64px;
+  padding: 12px 13px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fffdf9;
+  border: 1px solid rgba(122, 98, 60, 0.08);
+}
+
+.wrongbook-word {
+  flex: 0 0 auto;
+  min-width: 90px;
+  color: #2c2b26;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: "Georgia", "Times New Roman", "Songti SC", serif;
+}
+
+.wrongbook-meaning {
+  flex: 1;
+  color: #5a544a;
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wrongbook-pill {
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 0 11px;
+  border-radius: 499.5px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.wrongbook-pill.todo {
+  color: #3f7e70;
+  background: transparent;
+  border: 1px solid rgba(77, 132, 120, 0.4);
+}
+
+.wrongbook-pill.todo .ui-icon {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  color: #9bb3a5;
+}
+
+.wrongbook-pill.done {
+  color: #3f7e70;
+  background: rgba(77, 132, 120, 0.14);
+}
+
+.wrongbook-pill.remove {
+  color: #d06a4a;
+  background: rgba(208, 106, 74, 0.1);
+  border: 1px solid rgba(208, 106, 74, 0.3);
+}
+
+.wrongbook-foot {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 253, 249, 0.7);
+  border: 1px solid rgba(122, 98, 60, 0.08);
+}
+
+.wrongbook-foot-icon {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(77, 132, 120, 0.1);
+}
+
+.wrongbook-foot-icon image {
+  width: 22px;
+  height: 15px;
+}
+
+.wrongbook-foot-title {
+  display: block;
+  color: #2c2b26;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.wrongbook-foot-sub {
+  display: block;
+  margin-top: 3px;
+  color: #9b9488;
+  font-size: 12px;
+}
+
+/* ---------- Pre-learning scan (Reference 06) ---------- */
+/* fit-to-screen, no page scroll: fixed viewport height + flexible card */
+.precheck-view {
+  position: relative;
+  height: 100vh;
+  box-sizing: border-box;
+  padding: 16px 20px 103px;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+.precheck-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 3px;
+}
+
+.precheck-title {
+  position: static;
+  color: #2c2b26;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.precheck-leaf {
+  width: 23px;
+  height: 14px;
+}
+
+.precheck-leaf.right {
+  transform: scaleX(-1);
+}
+
+.precheck-ripple {
+  display: block;
+  margin: 0 auto;
+  width: 99px;
+  height: 60px;
+  opacity: 0.55;
+}
+
+.precheck-ripple-top {
+  margin-top: 8px;
+  margin-bottom: 24px;
+}
+
+.precheck-ripple-bottom {
+  position: relative;
+  z-index: 2;
+  margin-top: 24px;
+}
+
+.precheck-arrow-img {
+  width: 40px;
+  height: 78px;
+}
+
+.precheck-deck {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin-top: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.precheck-stage-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  border-radius: 24px;
+  background: #fdfaf3;
+  border: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow: 0 15px 35px rgba(122, 98, 60, 0.16);
+}
+
+.precheck-stage-card::before,
+.precheck-stage-card::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 2%;
+  right: 2%;
+  top: 7px;
+  bottom: -7px;
+  border-radius: 24px;
+  background: #fbf7ee;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 10px 24px rgba(122, 98, 60, 0.08);
+  transform: rotate(-2.6deg);
+  transform-origin: center;
+}
+
+.precheck-stage-card::after {
+  z-index: -2;
+  top: 12px;
+  bottom: -12px;
+  background: #f6f1e6;
+  transform: rotate(3.2deg);
+}
+
+.precheck-word {
+  margin-top: 20px;
+}
+
+.precheck-audio-dot {
+  width: 48px;
+  height: 48px;
+  margin-top: 22px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
+.precheck-speaker-img {
+  width: 32px;
+  height: 32px;
+}
+
+.precheck-hints {
+  position: static;
+  width: 100%;
+  margin-top: 38px;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.precheck-hint,
+.precheck-hint.known,
+.precheck-hint.unfamiliar {
+  flex: 1;
+  min-height: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  padding: 4px 0;
+}
+
+.precheck-arrow-img.arrow-up {
+  transform: rotate(10deg);
+}
+
+.precheck-arrow-img.arrow-down {
+  transform: rotate(10deg);
+}
+
+.precheck-hint-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 4px 0;
+  background: rgba(122, 98, 60, 0.14);
+}
+
+.precheck-arrow {
+  width: 5px;
+  height: 42px;
+  border-radius: 499.5px;
+  position: relative;
+}
+
+.precheck-arrow.up {
+  background: linear-gradient(180deg, #4d8478, #76a892);
+}
+
+.precheck-arrow.up::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-bottom: 13px solid #4d8478;
+}
+
+.precheck-arrow.down {
+  background: linear-gradient(180deg, #ecb05a, #d97b34);
+}
+
+.precheck-arrow.down::before {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 13px solid #d97b34;
+}
+
+.precheck-hint-main {
+  color: #2c2b26;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.precheck-hint.known .precheck-hint-main,
+.precheck-hint.known .precheck-hint-sub {
+  color: #3f7e70;
+}
+
+.precheck-hint.unfamiliar .precheck-hint-main,
+.precheck-hint.unfamiliar .precheck-hint-sub {
+  color: #d97b34;
+}
+
+.precheck-hint-sub {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.precheck-bottom-status {
+  z-index: 3;
+  min-height: 94px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 0;
+  align-items: center;
+  padding: 0 22px calc(env(safe-area-inset-bottom));
+  background: rgba(252, 249, 243, 0.94);
+  border-top: 1px solid rgba(122, 98, 60, 0.12);
+  box-shadow: none;
+  color: #2c2b26;
+}
+
+.precheck-status-left {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.precheck-status-label {
+  color: #6b6459;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.precheck-status-num {
+  color: #3f7e70;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.precheck-status-total {
+  color: #9b9488;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.precheck-status-right {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.precheck-status-sub {
+  color: #4a443b;
+  font-size: 16px;
+  font-weight: 700;
+  opacity: 1;
+}
+
+.precheck-status-book {
+  width: 58px;
+  height: 58px;
+}
+
+.precheck-landscape {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 192px;
+  opacity: 0.96;
+  pointer-events: none;
+  z-index: -1;
+}
+
+</style></head>
+<body>
+<h1>单词记忆小程序 · 浅色 UI 预览</h1>
+<p class="sub">直接由 miniprogram/pages/index/index.wxss 转换（rpx→px ÷2）渲染，与 page-references-v2-imagegen/light 对照。</p>
+<div class="grid">
+<div class="phone-wrap">
+  <div class="phone-label">01 新用户首页</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view home-view first-run-home">
+  <view class="home-welcome-panel">
+    <text class="home-welcome-title">欢迎！</text>
+    <text class="home-welcome-subtitle">先选择你的学习水平</text>
+    <view class="home-welcome-mark"></view>
+  </view>
+  <img class="asset-desk-scene" src="../../miniprogram/assets/v2/illustrations/shared-illustration-study-desk-light@3x.png"/>
+  <view class="home-main-card first-run-panel">
+    <view class="section-title-row"><img class="home-icon section-icon" src="../../miniprogram/assets/v2/icons/shared-icon-open-book@3x.png"/><text class="section-label">单词书进度</text></view>
+    <text class="first-run-book-name">高考课标 3500</text>
+    <view class="progress-number-row first-run-progress-row"><text class="progress-large serif">0</text><text>/ 3500</text><text>0%</text></view>
+    <view class="progress-track"><view style="width:0%"></view></view>
+  </view>
+  <view class="primary-button home-continue first-run-cta"><text>选择学习水平</text><view class="ui-icon icon-chevron cta-chevron"></view></view>
+  <view class="home-first-note"><text>选择后可随时在【我的】中更改</text></view>
+  <img class="asset-landscape" src="../../miniprogram/assets/v2/backgrounds/light-bg-landscape-strip@3x.png"/>
+  <view class="tab-bar bottom-tab-bar">
+    <view class="tab-item active"><img class="tab-icon-image" src="../../miniprogram/assets/v2/icons/shared-icon-open-book@3x.png"/><text>单词</text></view>
+    <view class="tab-item"><img class="tab-icon-image muted-tab-icon" src="../../miniprogram/assets/icons/user.svg"/><text>我的</text></view>
+  </view>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">05 首页-正常</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view home-view">
+  <view class="home-topline">
+    <view class="home-book-select"><view class="book-cover-mini"><img class="home-icon book-cover-image" src="../../miniprogram/assets/v2/icons/shared-icon-open-book@3x.png"/></view><text>高考课标 3500</text><view class="ui-icon icon-chevron"></view></view>
+    <view class="home-streak"><view class="streak-dot"></view><text>连续 3 天</text></view>
+  </view>
+  <view class="home-main-card home-normal-card">
+    <view class="home-card-section">
+      <view class="goal-row">
+        <view class="goal-left">
+          <view class="section-title-row"><img class="home-icon section-icon" src="../../miniprogram/assets/v2/illustrations/shared-illustration-list-flag@3x.png"/><text class="section-label">今日目标</text></view>
+          <view class="target-line"><text class="target-number serif">4</text><text class="target-unit">个 List</text></view>
+        </view>
+        <view class="goal-flags">
+          <img class="icon-flag" src="../../miniprogram/assets/icons/flag-done.svg"/><img class="icon-flag" src="../../miniprogram/assets/icons/flag-todo.svg"/><img class="icon-flag" src="../../miniprogram/assets/icons/flag-todo.svg"/><img class="icon-flag" src="../../miniprogram/assets/icons/flag-todo.svg"/>
+        </view>
+      </view>
+    </view>
+    <view class="home-divider"></view>
+    <view class="home-card-section">
+      <text class="section-label">单词书进度</text>
+      <view class="home-progress-body">
+        <view class="home-progress-copy">
+          <view class="progress-number-row"><text class="progress-large serif">120</text><text>/ 3500</text><text>3%</text></view>
+          <view class="progress-track"><view style="width:3%"></view></view>
+        </view>
+        <img class="home-progress-art" src="../../miniprogram/assets/v2/illustrations/light-illustration-vocabulary-book@3x.png"/>
+      </view>
+    </view>
+  </view>
+  <view class="primary-button home-continue">继续</view>
+  <view class="home-action-card">
+    <img class="home-icon card-icon card-icon-image" src="../../miniprogram/assets/v2/icons/shared-icon-wrong-words@3x.png"/>
+    <text class="home-action-title">8 个错词待复习</text>
+    <text class="home-action-subtitle">晚间入口已开启</text>
+    <view class="entry-arrow ui-icon icon-chevron"></view>
+  </view>
+  <img class="asset-landscape" src="../../miniprogram/assets/v2/backgrounds/light-bg-landscape-strip@3x.png"/>
+  <view class="tab-bar bottom-tab-bar">
+    <view class="tab-item active"><img class="tab-icon-image" src="../../miniprogram/assets/v2/icons/shared-icon-open-book@3x.png"/><text>单词</text></view>
+    <view class="tab-item"><img class="tab-icon-image muted-tab-icon" src="../../miniprogram/assets/icons/user.svg"/><text>我的</text></view>
+  </view>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">02 水平选择</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view level-view sticky-view">
+  <view class="level-skip text-link">跳过</view>
+  <view class="level-heading"><text class="level-main-title">你现在是</text><text class="level-subtitle">选择一个适合的起点</text></view>
+  <view class="level-options single">
+    <view class="level-option disabled"><img class="level-icon" src="../../miniprogram/assets/icons/levels/primary.svg"/><text class="level-option-label">小学</text></view><view class="level-option disabled"><img class="level-icon" src="../../miniprogram/assets/icons/levels/junior.svg"/><text class="level-option-label">初中</text></view><view class="level-option enabled selected"><img class="level-icon" src="../../miniprogram/assets/icons/levels/senior.svg"/><text class="level-option-label">高中</text><view class="level-check"><view class="ui-icon icon-check"></view></view></view><view class="level-option disabled"><img class="level-icon" src="../../miniprogram/assets/icons/levels/cet4.svg"/><text class="level-option-label">大学四级</text></view><view class="level-option disabled"><img class="level-icon" src="../../miniprogram/assets/icons/levels/cet6.svg"/><text class="level-option-label">大学六级</text></view><view class="level-option disabled"><img class="level-icon" src="../../miniprogram/assets/icons/levels/postgraduate.svg"/><text class="level-option-label">考研</text></view><view class="level-option disabled"><img class="level-icon" src="../../miniprogram/assets/icons/levels/ielts.svg"/><text class="level-option-label">雅思</text></view>
+  </view>
+  <view class="level-test-link"><text>不确定？做个测试</text><view class="ui-icon icon-chevron"></view></view>
+  <img class="asset-landscape level-landscape" src="../../miniprogram/assets/v2/backgrounds/light-bg-landscape-strip@3x.png"/>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">03 入学测</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view test-view sticky-view">
+  <view class="assess-topbar"><view class="icon-button compact assess-back"><view class="ui-icon icon-back"></view></view><view class="assess-count"><text class="assess-progress-current">12</text><text class="assess-progress-total"> / 36</text></view></view>
+  <view class="assess-progress-track"><view class="assess-progress-fill" style="width:33%"></view></view>
+  <text class="assess-prompt">请选择最符合的中文释义</text>
+  <text class="assess-word">abandon</text>
+  <text class="assess-ipa">/əˈbændən/</text>
+  <view class="assess-stack">
+    <view class="assess-option"><view class="assess-letter">A</view><text class="assess-text">放弃；抛弃</text></view>
+    <view class="assess-option assess-option-pressed"><view class="assess-letter">B</view><text class="assess-text">收获；收成</text></view>
+    <view class="assess-option"><view class="assess-letter">C</view><text class="assess-text">犹豫；迟疑</text></view>
+    <view class="assess-option"><view class="assess-letter">D</view><text class="assess-text">受益；好处</text></view>
+    <view class="assess-option assess-unknown"><text class="assess-text">不认识</text></view>
+  </view>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">04 测评结果</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view test-result-view sticky-view">
+  <view class="result-hero">
+    <img class="result-confetti" src="../../miniprogram/assets/v2/effects/shared-effect-laurel-confetti@3x.png"/>
+    <img class="result-book-check" src="../../miniprogram/assets/v2/illustrations/shared-illustration-assessment-book-check@3x.png"/>
+  </view>
+  <text class="result-title">测评完成！</text>
+  <view class="result-panel">
+    <text class="result-cap">你的词汇量范围约为</text>
+    <text class="result-range">1500–2100</text>
+    <view class="result-divider"></view>
+    <text class="result-note">初测估计，后续会结合真实学习表现校准</text>
+    <view class="result-advice-card"><view class="result-advice-icon"><img src="../../miniprogram/assets/v2/icons/shared-icon-open-book@3x.png"/></view><view class="result-advice-copy"><text class="result-advice-label">建议</text><text class="result-advice-text">建议从<text class="result-advice-hl">高中必修词</text>开始</text></view></view>
+    <view class="result-encourage-card"><view class="result-spark">✦</view><text class="result-encourage-text">信心不错，持续学习会更准</text></view>
+  </view>
+  <view class="primary-button result-start">开始学习</view>
+  <view class="result-relevel"><text>重新选择水平</text><view class="ui-icon icon-chevron"></view></view>
+  <img class="asset-landscape level-landscape" src="../../miniprogram/assets/v2/backgrounds/light-bg-landscape-strip@3x.png"/>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">07 识记页</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view study-view learning-view focus-flow learning-light">
+  <view class="focus-pause-handle"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+  <view class="focus-progress">
+    <view class="focus-dot done"></view><view class="focus-dot done"></view><view class="focus-dot done"></view><view class="focus-dot current"></view><view class="focus-dot todo"></view><view class="focus-dot todo"></view><view class="focus-dot todo"></view><view class="focus-dot todo"></view>
+  </view>
+  <view class="focus-card study-focus-card">
+    <text class="study-word serif">abandon</text>
+    <text class="ipa">/əˈbændən/</text>
+    <view class="sound-orb small"><img class="asset-sound-icon" src="../../miniprogram/assets/v2/icons/shared-icon-sound-wave-round@3x.png"/></view>
+    <text class="meaning"><text>v.</text>放弃；抛弃</text>
+    <text class="study-hint">轻点再听</text>
+  </view>
+  <img class="asset-landscape focus-landscape" src="../../miniprogram/assets/v2/backgrounds/light-bg-landscape-strip@3x.png"/>
+  <view class="focus-actions"><view class="primary-button focus-primary">记住了</view></view>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">11 听音页</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view audio-view learn-spread learning-view focus-flow learning-light">
+  <view class="focus-pause-handle"><text>Ⅱ</text><text>长按侧边暂停</text></view>
+  <view class="focus-progress"><view class="focus-dot done"></view><view class="focus-dot done"></view><view class="focus-dot done"></view><view class="focus-dot current"></view><view class="focus-dot todo"></view><view class="focus-dot todo"></view></view>
+  <view class="focus-card audio-focus-card">
+    <view class="speaker-tile focus-speaker"><img class="asset-listening-icon" src="../../miniprogram/assets/v2/icons/shared-icon-listening-play@3x.png"/></view>
+    <text class="audio-playing-text">正在播放…</text>
+    <text class="study-hint">听录音，回忆中文释义</text>
+  </view>
+  <img class="asset-landscape audio-landscape-band" src="../../miniprogram/assets/v2/backgrounds/light-bg-landscape-strip@3x.png"/>
+  <view class="reveal-sheet revealed">
+    <view class="reveal-sheet-meaning"><text class="option-line"><text class="option-pos">n.</text>收获；收成</text></view>
+  </view>
+  <view class="focus-actions"><view class="primary-button focus-primary">记住了</view></view>
+  <view class="audio-bottom-hint"><view class="audio-hint-bulb"></view><text>提示将在 2 秒后显示</text></view>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">14 庆祝页</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view sticky-view celebration-view">
+  <view class="celebrate-head">
+    <img class="celebrate-confetti" src="../../miniprogram/assets/v2/effects/shared-effect-laurel-confetti@3x.png"/>
+    <view class="celebrate-title-row"><img class="celebrate-check-inline" src="../../miniprogram/assets/v2/icons/shared-icon-completion-check@3x.png"/><text class="celebrate-title">今日目标完成</text></view>
+    <text class="celebrate-subtitle">太棒了，今天的 List 都完成了</text>
+    <view class="celebrate-underline"></view>
+  </view>
+  <view class="celebrate-stats">
+    <view class="celebrate-stat"><view class="celebrate-stat-head"><img src="../../miniprogram/assets/icons/flag-done.svg"/><text>今日学习</text></view><view class="celebrate-stat-num"><text class="celebrate-num">4</text><text class="celebrate-unit">List</text><text class="celebrate-num">80</text><text class="celebrate-unit">词</text></view></view>
+    <view class="celebrate-stat"><view class="celebrate-stat-head"><img src="../../miniprogram/assets/v2/icons/shared-icon-open-book@3x.png"/><text>累计学完</text></view><view class="celebrate-stat-num"><text class="celebrate-num">180</text><text class="celebrate-unit">词</text></view></view>
+    <view class="celebrate-stat"><view class="celebrate-stat-head"><img src="../../miniprogram/assets/v2/illustrations/shared-illustration-monthly-calendar@3x.png"/><text>学习时长</text></view><view class="celebrate-stat-num"><text class="celebrate-num">2.7</text><text class="celebrate-unit">小时</text></view></view>
+  </view>
+  <view class="celebrate-book">
+    <img class="celebrate-book-art" src="../../miniprogram/assets/v2/illustrations/vocabulary-book-hardcover@3x.png"/>
+    <view class="celebrate-book-copy">
+      <text class="celebrate-book-title">高考课标 3500</text>
+      <view class="progress-number-row celebrate-progress-row"><text class="progress-large">180</text><text>/ 3500</text><text class="celebrate-percent">5%</text></view>
+      <view class="progress-track"><view style="width:5%"></view></view>
+    </view>
+  </view>
+  <view class="celebrate-badge">
+    <img class="celebrate-badge-art" src="../../miniprogram/assets/v2/illustrations/shared-illustration-focus-badge@3x.png"/>
+    <view class="celebrate-badge-copy"><text class="celebrate-badge-label">获得徽章</text><text class="celebrate-badge-name">专注之星</text><view class="celebrate-points"><img src="../../miniprogram/assets/v2/icons/shared-icon-gold-star-token@3x.png"/><text>+120 积分</text></view></view>
+  </view>
+  <view class="celebrate-outline-cta">已完成 80 词、2.7 小时</view>
+  <view class="primary-button celebrate-filled-cta">错词复习</view>
+  <view class="celebrate-hint"><img class="celebrate-hint-leaf" src="../../miniprogram/assets/icons/leaf-sprig.svg"/><text>坚持每天进步一点，词汇量终将奔赴远方。</text></view>
+  <img class="asset-landscape celebrate-landscape" src="../../miniprogram/assets/v2/backgrounds/light-bg-landscape-strip@3x.png"/>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">13 错词本</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view sticky-view wrong-book-view">
+  <view class="topbar compact wrongbook-topbar"><view class="icon-button"><view class="ui-icon icon-back"></view></view><text class="page-title">错词本</text><view class="text-link wrongbook-edit">编辑</view></view>
+  <view class="wrongbook-summary">
+    <view class="wrongbook-summary-top">
+      <img class="wrongbook-icon" src="../../miniprogram/assets/v2/icons/shared-icon-wrong-words@3x.png"/>
+      <view class="wrongbook-summary-copy"><text class="wrongbook-title">8 个错词待复习</text><text class="wrongbook-subtitle">优先复习当前 List 的词</text></view>
+    </view>
+    <view class="wrongbook-start">开始复习</view>
+  </view>
+  <view class="wrongbook-note"><img class="wrongbook-note-leaf" src="../../miniprogram/assets/icons/leaf-sprig.svg"/><text>错词会随复习自动清除，不影响学习进度</text></view>
+  <view class="review-stack wrongbook-list">
+    <view class="wrongbook-row"><text class="wrongbook-word">abandon</text><text class="wrongbook-meaning"><text class="option-pos">v.</text>放弃；抛弃</text><view class="wrongbook-pill todo"><text>待复习</text><view class="ui-icon icon-chevron"></view></view></view><view class="wrongbook-row"><text class="wrongbook-word">hesitate</text><text class="wrongbook-meaning"><text class="option-pos">v.</text>犹豫；迟疑</text><view class="wrongbook-pill todo"><text>待复习</text><view class="ui-icon icon-chevron"></view></view></view><view class="wrongbook-row"><text class="wrongbook-word">benefit</text><text class="wrongbook-meaning"><text class="option-pos">n.</text>好处；益处</text><view class="wrongbook-pill done">已记住</view></view><view class="wrongbook-row"><text class="wrongbook-word">recover</text><text class="wrongbook-meaning"><text class="option-pos">v.</text>恢复；痊愈</text><view class="wrongbook-pill todo"><text>待复习</text><view class="ui-icon icon-chevron"></view></view></view><view class="wrongbook-row"><text class="wrongbook-word">ordinary</text><text class="wrongbook-meaning"><text class="option-pos">adj.</text>普通的</text><view class="wrongbook-pill done">已记住</view></view>
+  </view>
+  <view class="wrongbook-foot"><view class="wrongbook-foot-icon"><img src="../../miniprogram/assets/icons/leaf-sprig.svg"/></view><view class="wrongbook-foot-copy"><text class="wrongbook-foot-title">坚持复习，记得更牢</text><text class="wrongbook-foot-sub">已记住的词会自动从错词本移除</text></view></view>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">15 我的</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view profile-view">
+  <view class="topbar"><view class="profile-toolbar-spacer"></view><text class="page-title">我的</text><view class="profile-toolbar-icons"><view class="ui-icon icon-calendar"></view><view class="ui-icon icon-bell"></view><view class="icon-button compact"><view class="ui-icon icon-settings"></view></view></view></view>
+  <view class="profile-hero">
+    <view class="profile-book-art"><img class="asset-card-illustration" src="../../miniprogram/assets/v2/illustrations/light-illustration-vocabulary-book@3x.png"/></view>
+    <view><text class="section-label">当前词书</text><text class="profile-book">高考课标 3500</text><text class="muted">完整词库 3500 词</text></view>
+    <view class="level-pill">高中</view>
+  </view>
+  <view class="profile-grid"><view><text class="metric-value">80</text><text class="metric-label">今日已学</text></view><view><text class="metric-value">120</text><text class="metric-label">累计单词</text></view><view><text class="metric-value">12</text><text class="metric-label">今日分钟</text></view><view><text class="metric-value">3</text><text class="metric-label">连续天数</text></view></view>
+  <view class="profile-card"><view class="card-row"><text class="card-title">每日目标</text><text class="muted">当前 4 个 List / 36 词</text></view><view class="level-options inline-options"><view class="level-option compact enabled">1 List</view><view class="level-option compact enabled">2 List</view><view class="level-option compact enabled">3 List</view><view class="level-option compact enabled selected" style="border-color:#4d8478;background:rgba(77,132,120,0.1)">4 List</view></view></view>
+  <view class="profile-test-grid"><view class="profile-test-entry action-entry"><img class="asset-row-icon" src="../../miniprogram/assets/v2/illustrations/shared-illustration-assessment-paper@3x.png"/><text class="entry-title">入学测</text><text class="entry-meta">36 题</text><view class="entry-arrow ui-icon icon-chevron"></view></view><view class="profile-test-entry action-entry"><img class="asset-row-icon" src="../../miniprogram/assets/v2/illustrations/shared-illustration-focus-badge@3x.png"/><text class="entry-title">阶段测</text><text class="entry-meta">30 题</text><view class="entry-arrow ui-icon icon-chevron"></view></view></view>
+  <view class="tab-bar bottom-tab-bar"><view class="tab-item"><img class="tab-icon-image muted-tab-icon" src="../../miniprogram/assets/v2/icons/shared-icon-open-book@3x.png"/><text>单词</text></view><view class="tab-item active"><img class="tab-icon-image" src="../../miniprogram/assets/icons/user.svg"/><text>我的</text></view></view>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">06 训前检测</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="precheck-view">
+  <view class="precheck-title-row"><img class="precheck-leaf" src="../../miniprogram/assets/icons/leaf-sprig.svg"/><text class="precheck-title">训前检测</text><img class="precheck-leaf right" src="../../miniprogram/assets/icons/leaf-sprig.svg"/></view>
+  <img class="precheck-ripple precheck-ripple-top" src="../../miniprogram/assets/v2/effects/precheck-scan-bars-top@3x.png"/>
+  <view class="precheck-deck">
+    <view class="precheck-stage-card">
+      <text class="precheck-word serif">harvest</text>
+      <view class="precheck-audio-dot"><img class="precheck-speaker-img" src="../../miniprogram/assets/v2/icons/precheck-speaker-round@3x.png"/></view>
+      <view class="precheck-hints">
+        <view class="precheck-hint known"><img class="precheck-arrow-img arrow-up" src="../../miniprogram/assets/v2/effects/precheck-arrow-up@3x.png"/><text class="precheck-hint-sub">认识</text></view>
+        <view class="precheck-hint-divider"></view>
+        <view class="precheck-hint unfamiliar"><img class="precheck-arrow-img arrow-down" src="../../miniprogram/assets/v2/effects/precheck-arrow-down@3x.png"/><text class="precheck-hint-sub">不熟</text></view>
+      </view>
+    </view>
+  </view>
+  <img class="precheck-ripple precheck-ripple-bottom" src="../../miniprogram/assets/v2/effects/precheck-scan-bars-bottom@3x.png"/>
+  <view class="precheck-bottom-status"><view class="precheck-status-left"><text class="precheck-status-label">已筛出</text><text class="precheck-status-num">12</text><text class="precheck-status-total">/ 36</text></view><view class="precheck-status-right"><text class="precheck-status-sub">今日待学</text><img class="precheck-status-book" src="../../miniprogram/assets/v2/illustrations/precheck-today-book-stack@3x.png"/></view></view>
+  <img class="asset-landscape precheck-landscape" src="../../miniprogram/assets/v2/backgrounds/light-bg-landscape-strip@3x.png"/>
+</view>
+  </div>
+</div>
+<div class="phone-wrap">
+  <div class="phone-label">16 月度进展</div>
+  <div class="frame ">
+    <div class="statusbar"><span>9:41</span><span>● ▮ ▭</span></div>
+    
+<view class="view month-progress-view sticky-view">
+  <view class="topbar compact"><view class="icon-button"><view class="ui-icon icon-back"></view></view><text class="page-title">学习进展</text></view>
+  <view class="month-panel month-hero-panel">
+    <view class="month-picker"><text class="month-title">2024 年 5 月</text><view class="month-picker-action"><text>选择年月</text><view class="entry-arrow ui-icon icon-chevron"></view></view></view>
+    <view class="month-calendar"><text class="month-weekday">一</text><text class="month-weekday">二</text><text class="month-weekday">三</text><text class="month-weekday">四</text><text class="month-weekday">五</text><text class="month-weekday">六</text><text class="month-weekday">日</text><view class="month-day "><text>1</text></view><view class="month-day "><text>2</text></view><view class="month-day active"><text>3</text></view><view class="month-day "><text>4</text></view><view class="month-day "><text>5</text></view><view class="month-day active"><text>6</text></view><view class="month-day "><text>7</text></view><view class="month-day "><text>8</text></view><view class="month-day active"><text>9</text></view><view class="month-day "><text>10</text></view><view class="month-day "><text>11</text></view><view class="month-day "><text>12</text></view><view class="month-day active"><text>13</text></view><view class="month-day "><text>14</text></view><view class="month-day "><text>15</text></view><view class="month-day active"><text>16</text></view><view class="month-day "><text>17</text></view><view class="month-day "><text>18</text></view><view class="month-day active"><text>19</text></view><view class="month-day "><text>20</text></view><view class="month-day "><text>21</text></view><view class="month-day "><text>22</text></view><view class="month-day active"><text>23</text></view><view class="month-day "><text>24</text></view><view class="month-day "><text>25</text></view><view class="month-day "><text>26</text></view><view class="month-day "><text>27</text></view><view class="month-day "><text>28</text></view><view class="month-day "><text>29</text></view><view class="month-day "><text>30</text></view><view class="month-day "><text>31</text></view></view>
+  </view>
+  <view class="month-panel"><view class="card-row" style="justify-content:space-between"><text class="card-title">本月已学单词</text><text class="vocab-number compact">620</text></view><view class="trend-bars"><view class="trend-bar"><view style="height:30px"></view></view><view class="trend-bar"><view style="height:45px"></view></view><view class="trend-bar"><view style="height:60px"></view></view><view class="trend-bar"><view style="height:75px"></view></view><view class="trend-bar"><view style="height:90px"></view></view><view class="trend-bar"><view style="height:115px"></view></view></view></view>
+  <view class="month-panel stage-test-panel"><view class="stage-test-copy"><img class="asset-row-icon large" src="../../miniprogram/assets/v2/illustrations/shared-illustration-assessment-paper@3x.png"/><view><text class="card-title">阶段测</text><text class="vocab-number compact">30</text><text class="muted">全面检测已学词效果</text></view></view><view class="stage-skill-row"><text>看词辨义</text><text>听音辨义</text><text>中文回忆英文</text></view><view class="primary-button">开始阶段测</view></view>
+</view>
+  </div>
+</div></div>
+</body></html>

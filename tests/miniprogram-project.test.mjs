@@ -108,8 +108,8 @@ assert.doesNotMatch(pageWxml, /bindtap="toggleStudyAudio">播放/, "word study s
 assert.doesNotMatch(pageWxml, /data-value="1"[^>]*>再听听/, "word study should not reserve a fixed retry button");
 assert.match(pageWxml, /class="primary-button focus-primary" data-value="3" catchtap="markStudy">记住了/, "word study should keep one primary next action");
 assert.match(pageWxml, /pronunciationLoopOptions/, "profile should render playback loop options");
-assert.match(pageWxml, /learningThemeOptions/, "profile should render learning theme options");
-assert.match(pageWxml, /学习页主题/, "profile should let students switch learning page theme");
+assert.doesNotMatch(pageWxml, /learningThemeOptions/, "light-only V2 should not render a dark theme toggle");
+assert.doesNotMatch(pageWxml, /学习页主题/, "light-only V2 should not let students switch to a dark learning theme");
 assert.match(pageWxml, /word-study[\s\S]*learning-view[\s\S]*{{study\.themeClass}}/, "word study should apply the configured learning theme");
 assert.match(pageWxml, /group-review[\s\S]*learning-view[\s\S]*{{review\.themeClass}}/, "review should apply the configured learning theme");
 assert.match(pageWxml, /read-pulse/, "word study should show read-aloud state as a quiet pulse");
@@ -145,31 +145,27 @@ assert.match(pageWxml, /选择单词水平/, "level page should use the product 
 assert.match(pageWxml, /data-enabled="{{option\.enabled}}"/, "disabled vocabulary levels should not be tappable");
 assert.doesNotMatch(pageWxml, /先跳过/, "vocabulary level is required before assessment and should not be skipped");
 const groupReviewTemplate = pageWxml.slice(
-  pageWxml.indexOf('<view wx:if="{{!review.isMixed}}"'),
-  pageWxml.indexOf('<view wx:else class="focus-card audio-panel audio-minimal">')
+  pageWxml.indexOf("<view wx:elif=\"{{view == 'group-review'}}\""),
+  pageWxml.indexOf("<view wx:elif=\"{{view == 'audio-meaning'}}\"")
 );
-assert.match(groupReviewTemplate, /wx:if="{{reviewAnswerVisible \|\| review\.question\.answered}}"/, "group review should initially keep meaning hidden");
+assert.match(groupReviewTemplate, /wx:if="{{review\.word && \(reviewAnswerVisible \|\| review\.question\.answered\)}}"/, "group review should keep the meaning hidden until reveal");
+assert.match(groupReviewTemplate, /class="reveal-sheet revealed"/, "group review should reveal the meaning in the shared bottom sheet (same as listening)");
 assert.doesNotMatch(pageWxml, /{{review\.groupContext\.currentLabel}}/, "review should hide current group labels in focus mode");
 assert.doesNotMatch(pageWxml, /{{review\.groupContext\.mixedLabel}}/, "mixed review should hide source group labels in focus mode");
 assert.doesNotMatch(groupReviewTemplate, /bindtap="openDetail">看词卡/, "group review should not show a word-card button");
 assert.doesNotMatch(groupReviewTemplate, /bindtap="speak">播放/, "group review should not show a manual play button");
 assert.doesNotMatch(groupReviewTemplate, /bindtap="answerGroupReview"/, "group review should not use tappable choice options in focus mode");
-assert.match(groupReviewTemplate, /focus-reveal/, "group review should reveal the original meaning inline");
-const mixedReviewTemplate = pageWxml.slice(
-  pageWxml.indexOf('<view wx:else class="focus-card audio-panel audio-minimal">'),
-  pageWxml.indexOf('<view wx:elif="{{view == \'audio-meaning\'}}"')
-);
-assert.match(mixedReviewTemplate, /wx:if="{{reviewAnswerVisible \|\| review\.question\.answered}}"/, "mixed review should hide meaning until pronunciation completes");
-assert.doesNotMatch(mixedReviewTemplate, /audio-tools/, "mixed review should match group review without word-card or replay tools");
-assert.doesNotMatch(mixedReviewTemplate, /bindtap="answerMixed"/, "mixed review should not use tappable choice options in focus mode");
-assert.match(mixedReviewTemplate, /focus-reveal/, "mixed review should use the same reveal UI as group review");
+assert.doesNotMatch(groupReviewTemplate, /bindtap="answerMixed"/, "mixed review should not use tappable choice options in focus mode");
+assert.match(groupReviewTemplate, /catchtap="rememberGroupReview">记住了/, "group review keeps a single primary next action");
+assert.match(groupReviewTemplate, /catchtap="rememberMixedReview">记住了/, "mixed review shares the same template with its own next action");
 assert.doesNotMatch(pageWxml, /option-sub/, "review and audio meaning options should not split meanings into a second line");
 assert.doesNotMatch(pageWxml, /toggleStudyUsage/, "word study should not expose usage toggles in focus mode");
 assert.match(pageWxml, /搭配/, "usage content should show collocations before examples");
 assert.match(pageWxml, /aiLabel/, "AI fallback content should have a light student-facing label");
 assert.doesNotMatch(pageWxml, /translationSource/, "student-facing template should not expose internal translation audit fields");
 assert.match(pageWxml, /focusPauseVisible/, "focus mode should provide a pause panel");
-assert.match(pageWxml, /bindlongpress="openPausePanel"/, "focus mode should use long press for pause instead of persistent navigation");
+assert.match(pageWxml, /class="focus-pause-handle" catchlongpress="openPausePanel"/, "pause panel should only open on a long-press of the side handle (no accidental triggers)");
+assert.doesNotMatch(pageWxml, /bindtap="handleLearningSurfaceTap" bindlongpress="openPausePanel"/, "long-pressing anywhere on the learning surface should not open the pause panel");
 assert.match(pageWxml, /wx:if="{{audioCompletionNotice}}"/, "completion notices should have a global transition overlay");
 
 const appJs = await readFile("miniprogram/app.js", "utf8");
@@ -183,7 +179,7 @@ assert.doesNotMatch(appJs, /success: finish/, "audio option setup should not dep
 const pageWxss = await readFile("miniprogram/pages/index/index.wxss", "utf8");
 assert.doesNotMatch(pageWxss, /\.audio-view\s*\{[^}]*justify-content:\s*center/s, "audio meaning page should keep the same top-down layout height as review pages");
 assert.match(pageWxss, /\.audio-minimal\s*\{[^}]*min-height:\s*520rpx/s, "audio cards should keep a stable height");
-assert.match(pageWxss, /\.learning-view\.learning-dark\s*\{[\s\S]*#141413/, "learning pages should default to a dark focus theme");
-assert.match(pageWxss, /\.learning-dark \.primary-button\s*\{[\s\S]*#d97757/, "dark focus theme should keep the ember primary action");
+assert.doesNotMatch(pageWxss, /learning-dark[^{]*\{[\s\S]*#141413/, "light-only V2 should not ship a dark focus theme");
+assert.match(pageWxss, /\.primary-button\s*\{[\s\S]*#e29a36/, "primary action should use the warm amber/gold from the references");
 
 console.log("miniprogram project checks passed");
