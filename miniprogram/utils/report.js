@@ -56,6 +56,14 @@ function buildDailyReport(state, words) {
   };
 }
 
+function buildStageTestResult(assessment) {
+  const answers = (assessment && assessment.answers) || [];
+  const total = answers.length;
+  const correct = answers.filter((answer) => answer.isCorrect).length;
+  const accuracy = total ? Math.round((correct / total) * 100) : 0;
+  return { mode: "stage", total, correct, wrong: total - correct, accuracy };
+}
+
 function getRewardStreakText(state) {
   const user = state.user || {};
   const current = Number(user.streakDays || 0);
@@ -131,5 +139,6 @@ function uniqueIds(ids) {
 module.exports = {
   buildAssessmentResult,
   buildDailyReport,
+  buildStageTestResult,
   getRewardStreakText
 };

@@ -25,7 +25,8 @@ const defaultState = {
       themeDefaultVersion: 2,
       sleepTime: "22:00",
       wakeTime: "06:00",
-      wrongReminderEnabled: true
+      wrongReminderEnabled: true,
+      wrongReminderTime: "19:00"
     }
   },
   assessment: {
