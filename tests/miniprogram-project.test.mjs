@@ -107,7 +107,8 @@ assert.doesNotMatch(pageWxml, /{{study\.groupContext\.currentLabel}}/, "word stu
 assert.doesNotMatch(pageWxml, /bindtap="toggleStudyAudio">播放/, "word study should not show a manual play button");
 assert.doesNotMatch(pageWxml, /data-value="1"[^>]*>再听听/, "word study should not reserve a fixed retry button");
 assert.match(pageWxml, /class="primary-button focus-primary" data-value="3" catchtap="markStudy">记住了/, "word study should keep one primary next action");
-assert.match(pageWxml, /pronunciationLoopOptions/, "profile should render playback loop options");
+assert.match(pageWxml, /bindchange="setPronunciationLoopCount"/, "profile should let students pick the playback loop count");
+assert.match(pageWxml, /每日目标[\s\S]*播放循环[\s\S]*睡眠 \/ 起床时间[\s\S]*错词提醒[\s\S]*数据重置/, "profile settings should follow the reference row order");
 assert.doesNotMatch(pageWxml, /learningThemeOptions/, "light-only V2 should not render a dark theme toggle");
 assert.doesNotMatch(pageWxml, /学习页主题/, "light-only V2 should not let students switch to a dark learning theme");
 assert.match(pageWxml, /word-study[\s\S]*learning-view[\s\S]*{{study\.themeClass}}/, "word study should apply the configured learning theme");
@@ -141,7 +142,7 @@ assert.match(meaningRecallTemplate, /catchtap="rememberMeaningRecall">记住了/
 assert.match(pageJs, /scheduleFocusMiss/, "focus pages should auto-mark missed words after reveal");
 assert.match(pageJs, /missMeaningRecallQuestion/, "meaning recall timeout should be recorded as a miss");
 assert.doesNotMatch(pageWxml, /wx:if="{{mixedTransition}}"/, "mixed-review notice should not render on top of the mixed card");
-assert.match(pageWxml, /选择单词水平/, "level page should use the product vocabulary-level language");
+assert.match(pageWxml, /点击切换单词书或学习水平/, "profile book card should be the entry to switch word book / vocabulary level");
 assert.match(pageWxml, /data-enabled="{{option\.enabled}}"/, "disabled vocabulary levels should not be tappable");
 assert.doesNotMatch(pageWxml, /先跳过/, "vocabulary level is required before assessment and should not be skipped");
 const groupReviewTemplate = pageWxml.slice(

@@ -68,109 +68,133 @@
   </view>
 
   <view wx:elif="{{view == 'profile'}}" class="view profile-view">
-    <view class="topbar">
-      <view class="profile-toolbar-spacer"></view>
-      <text class="page-title">我的</text>
-      <view class="profile-toolbar-icons">
-        <view class="ui-icon icon-calendar"></view>
-        <view class="ui-icon icon-bell"></view>
-        <view class="icon-button compact" bindtap="resetData"><view class="ui-icon icon-settings"></view></view>
+    <view class="profile-book-card action-card" hover-class="action-entry-pressed" bindtap="openLevelSelect">
+      <image class="profile-book-image" src="../../assets/v2/illustrations/light-illustration-vocabulary-book@3x.png" mode="aspectFit" />
+      <view class="profile-book-main">
+        <view class="profile-book-titlerow">
+          <text class="profile-book-title">{{profile.bookTitle}}</text>
+          <view class="entry-arrow ui-icon icon-chevron"></view>
+        </view>
+        <view class="profile-book-progressrow">
+          <text class="profile-book-learned">{{profile.learnedCount}}</text>
+          <text class="profile-book-total"> / {{profile.displayTotal}}</text>
+          <text class="profile-book-percent">{{profile.progressPercent}}%</text>
+        </view>
+        <view class="profile-progress-track"><view class="profile-progress-fill" style="width: {{profile.progressPercent}}%"></view></view>
+        <text class="profile-book-hint">点击切换单词书或学习水平</text>
       </view>
     </view>
-    <view class="profile-hero">
-      <view class="profile-book-art"><image class="asset-card-illustration profile-book-image" src="../../assets/v2/illustrations/light-illustration-vocabulary-book@3x.png" mode="aspectFit" /></view>
-      <view>
-        <text class="section-label">当前词书</text>
-        <text class="profile-book">{{profile.activeGroup}}</text>
-        <text class="muted">完整词库 {{profile.total}} 词，体验包 {{profile.miniProgramTotal}} 词</text>
+
+    <view class="profile-card data-card">
+      <text class="section-heading">学习数据</text>
+      <view class="stat-trio">
+        <view class="stat-trio-cell"><text class="stat-trio-value">{{profile.todayDone}}</text><text class="stat-trio-label">今日学习</text></view>
+        <view class="stat-trio-divider"></view>
+        <view class="stat-trio-cell"><text class="stat-trio-value">{{profile.learnedCount}}</text><text class="stat-trio-label">累计学习</text></view>
+        <view class="stat-trio-divider"></view>
+        <view class="stat-trio-cell"><text class="stat-trio-value">{{profile.streakDays}}</text><text class="stat-trio-label">连续打卡</text></view>
       </view>
-      <view class="level-pill" bindtap="openLevelSelect">{{profile.levelLabel}}</view>
-    </view>
-    <view class="profile-grid">
-      <view><text class="metric-value">{{profile.todayDone}}</text><text class="metric-label">今日已学</text></view>
-      <view><text class="metric-value">{{profile.learnedCount}}</text><text class="metric-label">累计单词</text></view>
-      <view><text class="metric-value">{{profile.todayMinutes}}</text><text class="metric-label">今日分钟</text></view>
-      <view><text class="metric-value">{{profile.streakDays}}</text><text class="metric-label">连续天数</text></view>
-    </view>
-    <view class="profile-card">
-      <view class="card-row"><text class="card-title">每日目标</text><text class="muted">当前 {{profile.dailyTargetListCount}} 个 List / {{profile.listWordCount}} 词</text></view>
-      <view class="level-options inline-options">
-        <view wx:for="{{profile.listOptions}}" wx:key="count" class="level-option compact enabled {{item.selected ? 'selected' : ''}}" data-count="{{item.count}}" bindtap="setListGroupCount">
-          <text>{{item.count}} List</text>
+      <view class="cal-week-row" hover-class="action-entry-pressed" bindtap="openMonthProgress">
+        <view wx:for="{{profile.week}}" wx:key="key" class="cal-col">
+          <text class="cal-weekday">{{item.day}}</text>
+          <view class="cal-date {{item.isToday ? 'today' : ''}}"><text>{{item.date}}</text></view>
+          <view class="cal-mark {{item.active ? 'on' : ''}}"></view>
         </view>
       </view>
-    </view>
-    <view class="profile-card">
-      <view class="card-row"><text class="card-title">跟读循环</text><text class="muted">当前 {{profile.pronunciationLoopLabel}}</text></view>
-      <view class="level-options inline-options">
-        <view wx:for="{{profile.pronunciationLoopOptions}}" wx:key="value" class="level-option compact enabled {{item.selected ? 'selected' : ''}}" data-count="{{item.value}}" bindtap="setPronunciationLoopCount">
-          <text>{{item.label}}</text>
-        </view>
+      <view class="wrong-review-row action-entry" hover-class="action-entry-pressed" bindtap="openWrongBook">
+        <image class="asset-row-icon" src="../../assets/v2/icons/shared-icon-wrong-words@3x.png" mode="aspectFit" />
+        <text class="wrong-review-text">{{profile.weakCount}} 个错词待复习</text>
+        <view class="entry-arrow ui-icon icon-chevron"></view>
       </view>
     </view>
-    <view class="profile-card action-card" hover-class="action-entry-pressed" bindtap="openMonthProgress">
-      <view class="card-row"><image class="asset-row-icon" src="../../assets/v2/illustrations/shared-illustration-monthly-calendar@3x.png" mode="aspectFit" /><text class="card-title">学习数据</text><text class="muted">累计打卡 {{profile.checkinDays}} 天</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
-      <view class="week-row">
-        <view wx:for="{{profile.week}}" wx:key="key" class="week-dot {{item.active ? 'active' : ''}}">
-          <text>{{item.day}}</text>
-          <text>{{item.date}}</text>
-        </view>
+
+    <view class="profile-section">
+      <view class="test-section-head">
+        <text class="section-heading">测评</text>
+        <text class="test-hint">入学测：初始水平检测</text>
+        <text class="test-hint">阶段测：已学词检测</text>
       </view>
-      <text class="muted week-summary">最长连续 {{profile.longestStreak}} 天，打卡来自全部历史记录</text>
-    </view>
-    <view class="profile-card profile-test-card">
-      <text class="card-title">测评</text>
       <view class="profile-test-grid">
-        <view class="profile-test-entry action-entry" bindtap="startTest"><image class="asset-row-icon" src="../../assets/v2/illustrations/shared-illustration-assessment-paper@3x.png" mode="aspectFit" /><text class="entry-title">入学测</text><text class="entry-meta">36 题</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
-        <view class="profile-test-entry action-entry" bindtap="startTest"><image class="asset-row-icon" src="../../assets/v2/illustrations/shared-illustration-focus-badge@3x.png" mode="aspectFit" /><text class="entry-title">阶段测</text><text class="entry-meta">30 题</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+        <view class="profile-test-entry action-entry" hover-class="action-entry-pressed" bindtap="startTest"><image class="asset-row-icon" src="../../assets/v2/illustrations/shared-illustration-assessment-paper@3x.png" mode="aspectFit" /><text class="entry-title">入学测</text><text class="entry-meta">36 题</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+        <view class="profile-test-entry action-entry" hover-class="action-entry-pressed" bindtap="startStageTest"><image class="asset-row-icon" src="../../assets/v2/illustrations/shared-illustration-focus-badge@3x.png" mode="aspectFit" /><text class="entry-title">阶段测</text><text class="entry-meta">{{profile.stageTestCount}} 题</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
       </view>
     </view>
-    <view class="profile-list">
-      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openLevelSelect"><view class="ui-icon card-icon icon-level"></view><text class="entry-title">选择单词水平</text><text class="entry-meta">{{profile.startLevelLabel}}</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
-      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="startTest"><image class="asset-row-icon" src="../../assets/v2/illustrations/shared-illustration-assessment-paper@3x.png" mode="aspectFit" /><text class="entry-title">词汇量测试</text><text class="entry-meta">当前 {{profile.vocabulary}}</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
-      <view class="list-button action-entry" hover-class="action-entry-pressed" bindtap="openWrongBook"><image class="asset-row-icon" src="../../assets/v2/icons/shared-icon-wrong-words@3x.png" mode="aspectFit" /><text class="entry-title">错词本</text><text class="entry-meta">{{profile.weakCount}} 个待巩固</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+
+    <view class="profile-section">
+      <text class="section-heading">学习设置</text>
+      <view class="settings-list">
+        <picker class="setting-row" mode="selector" range="{{profile.dailyTargetRange}}" value="{{profile.dailyTargetIndex}}" bindchange="setListGroupCount">
+          <view class="setting-row-inner"><view class="ui-icon setting-icon icon-target"></view><text class="setting-label">每日目标</text><text class="setting-value">{{profile.dailyTargetLabel}}</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+        </picker>
+        <picker class="setting-row" mode="selector" range="{{profile.loopRange}}" value="{{profile.loopIndex}}" bindchange="setPronunciationLoopCount">
+          <view class="setting-row-inner"><view class="ui-icon setting-icon icon-loop"></view><text class="setting-label">播放循环</text><text class="setting-value">{{profile.pronunciationLoopLabel}}</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+        </picker>
+        <view class="setting-row">
+          <view class="setting-row-inner"><view class="ui-icon setting-icon icon-moon"></view><text class="setting-label">睡眠 / 起床时间</text>
+            <view class="setting-value setting-time-pair">
+              <picker mode="time" value="{{profile.sleepTime}}" bindchange="changeSleepTime"><text>{{profile.sleepTime}}</text></picker>
+              <text class="setting-time-sep"> / </text>
+              <picker mode="time" value="{{profile.wakeTime}}" bindchange="changeWakeTime"><text>{{profile.wakeTime}}</text></picker>
+            </view>
+            <view class="entry-arrow ui-icon icon-chevron"></view>
+          </view>
+        </view>
+        <picker class="setting-row" mode="time" value="{{profile.wrongReminderTime}}" bindchange="changeWrongReminderTime">
+          <view class="setting-row-inner"><view class="ui-icon setting-icon icon-bell"></view><text class="setting-label">错词提醒</text><text class="setting-value">{{profile.wrongReminderLabel}}</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+        </picker>
+        <view class="setting-row" hover-class="action-entry-pressed" bindtap="confirmReset">
+          <view class="setting-row-inner"><view class="ui-icon setting-icon icon-reset"></view><text class="setting-label">数据重置</text><text class="setting-value"></text><view class="entry-arrow ui-icon icon-chevron"></view></view>
+        </view>
+      </view>
     </view>
   </view>
 
   <view wx:elif="{{view == 'month-progress'}}" class="view month-progress-view sticky-view">
-    <view class="topbar compact"><view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view><text class="page-title">月度进展</text></view>
-    <view class="month-panel month-hero-panel">
-      <image class="asset-month-illustration" src="../../assets/v2/illustrations/shared-illustration-monthly-calendar@3x.png" mode="aspectFit" />
+    <view class="topbar">
+      <view class="icon-button" bindtap="goBack"><view class="ui-icon icon-back"></view></view>
+      <text class="page-title">学习进展</text>
+      <view class="profile-toolbar-spacer"></view>
+    </view>
+    <view class="month-switcher">
+      <view class="month-nav" hover-class="action-entry-pressed" data-offset="-1" bindtap="shiftProgressMonth"><view class="ui-icon icon-back"></view></view>
       <picker mode="date" fields="month" value="{{monthProgress.pickerValue}}" bindchange="changeProgressMonth">
-        <view class="month-picker">
-          <text class="month-title">{{monthProgress.title}}</text>
-          <view class="month-picker-action"><text>选择年月</text><view class="entry-arrow ui-icon icon-chevron"></view></view>
-        </view>
+        <view class="month-switcher-title"><text>{{monthProgress.title}}</text><view class="ui-icon icon-caret-down"></view></view>
       </picker>
-      <view class="month-switch">
-        <view data-offset="-1" bindtap="shiftProgressMonth">上一月</view>
-        <view>{{monthProgress.checkinDays}} 天打卡</view>
-        <view data-offset="1" bindtap="shiftProgressMonth">下一月</view>
-      </view>
-      <view class="profile-grid month-summary">
-        <view><text class="metric-value">{{monthProgress.checkinDays}}</text><text class="metric-label">打卡天数</text></view>
-        <view><text class="metric-value">{{monthProgress.learnedWords}}</text><text class="metric-label">已学单词</text></view>
-        <view><text class="metric-value">{{monthProgress.completedGroups}}</text><text class="metric-label">完成组数</text></view>
-      </view>
+      <view class="month-nav" hover-class="action-entry-pressed" data-offset="1" bindtap="shiftProgressMonth"><view class="ui-icon icon-chevron"></view></view>
+    </view>
+
+    <view class="month-panel month-cal-panel">
       <view class="month-calendar">
         <text wx:for="{{monthProgress.weekdays}}" wx:key="*this" class="month-weekday">{{item}}</text>
-        <view wx:for="{{monthProgress.cells}}" wx:key="key" class="month-day {{item.blank ? 'blank' : ''}} {{item.active ? 'active' : ''}}">
-          <text wx:if="{{!item.blank}}">{{item.day}}</text>
-          <text wx:if="{{item.active}}" class="month-day-meta">{{item.completedGroups}}组</text>
+        <view wx:for="{{monthProgress.cells}}" wx:key="key" class="month-day {{item.otherMonth ? 'other' : ''}} {{item.active ? 'active' : ''}} {{item.isToday ? 'today' : ''}}">
+          <text>{{item.day}}</text>
         </view>
       </view>
-    </view>
-    <view class="month-panel month-trend-panel">
-      <view class="card-row"><text class="card-title">本月已学单词</text><text class="vocab-number compact">{{monthProgress.learnedWords}}</text></view>
-      <view class="trend-bars">
-        <view wx:for="{{profile.week}}" wx:key="key" class="trend-bar"><text>{{item.date}}</text><view style="height: {{item.active ? 96 : 42}}rpx;"></view></view>
+      <view class="month-legend">
+        <view class="legend-item"><view class="legend-dot done"></view><text>已学完</text></view>
+        <view class="legend-item"><view class="legend-dot todo"></view><text>未学完</text></view>
       </view>
+      <image class="month-leaf" src="../../assets/icons/leaf-sprig.svg" mode="aspectFit" />
     </view>
+
+    <view class="month-panel month-trend-panel">
+      <text class="trend-head">本月已学单词</text>
+      <view class="trend-amount"><text class="trend-amount-num">{{monthProgress.learnedWords}}</text><text class="trend-amount-unit"> 词</text></view>
+      <view class="trend-chart" style="width: {{monthProgress.trend.width}}rpx; height: {{monthProgress.trend.height}}rpx;">
+        <view wx:for="{{monthProgress.trend.segments}}" wx:key="key" class="trend-seg" style="left: {{item.x}}rpx; top: {{item.y}}rpx; width: {{item.width}}rpx; transform: rotate({{item.angle}}deg);"></view>
+        <view wx:for="{{monthProgress.trend.points}}" wx:key="key" class="trend-pt" style="left: {{item.x}}rpx; top: {{item.y}}rpx;"><text class="trend-val">{{item.value}}</text></view>
+      </view>
+      <view class="trend-axis" style="padding: 0 {{monthProgress.trend.padX}}rpx;">
+        <text wx:for="{{monthProgress.trend.points}}" wx:key="key">{{item.label}}</text>
+      </view>
+      <text class="trend-caption">每周一~周日为一周 · 单词数包含新学 + 复习</text>
+    </view>
+
     <view class="month-panel stage-test-panel">
-      <view class="stage-test-copy"><image class="asset-row-icon large" src="../../assets/v2/illustrations/shared-illustration-assessment-paper@3x.png" mode="aspectFit" /><view><text class="card-title">阶段测</text><text class="vocab-number compact">30</text><text class="muted">全面检测已学词效果</text></view></view>
+      <view class="stage-test-copy"><image class="asset-row-icon large" src="../../assets/v2/illustrations/shared-illustration-assessment-paper@3x.png" mode="aspectFit" /><view><text class="card-title">阶段测</text><text class="vocab-number compact">{{monthProgress.stageTestCount}}</text><text class="muted">从已学词中抽题检验掌握度</text></view></view>
       <view class="stage-skill-row"><text>看词辨义</text><text>听音辨义</text><text>中文回忆英文</text></view>
-      <view class="primary-button" bindtap="startTest">开始阶段测</view>
-      <text class="muted stage-note">阶段测不会打断日常学习进度</text>
+      <view class="primary-button" bindtap="startStageTest">开始阶段测</view>
+      <text class="muted stage-note">阶段测不会打断日常学习进度，也不改变你的水平</text>
     </view>
   </view>
 
@@ -197,6 +221,7 @@
       <view class="assess-count"><text class="assess-progress-current">{{test.current}}</text><text class="assess-progress-total"> / {{test.total}}</text></view>
     </view>
     <view class="assess-progress-track"><view class="assess-progress-fill" style="width: {{test.percent}}%"></view></view>
+    <text class="assess-kind">{{test.kindLabel}}</text>
     <text class="assess-prompt">请选择最符合的中文释义</text>
     <text class="assess-word">{{test.question.word}}</text>
     <text wx:if="{{test.question.ipa}}" class="assess-ipa">{{test.question.ipa}}</text>
@@ -216,8 +241,18 @@
       <image class="result-confetti" src="../../assets/v2/effects/shared-effect-laurel-confetti@3x.png" mode="aspectFit" />
       <image class="result-book-check" src="../../assets/v2/illustrations/shared-illustration-assessment-book-check@3x.png" mode="aspectFit" />
     </view>
-    <text class="result-title">测评完成！</text>
-    <view class="result-panel">
+    <text class="result-title">{{testResult.isStage ? '阶段测完成！' : '测评完成！'}}</text>
+    <view wx:if="{{testResult.isStage}}" class="result-panel">
+      <text class="result-cap">已学词检测正确率</text>
+      <text class="result-range">{{testResult.accuracy}}%</text>
+      <view class="result-divider"></view>
+      <text class="result-note">答对 {{testResult.correct}} / {{testResult.total}} 题（不改变你的学习水平）</text>
+      <view class="result-encourage-card">
+        <view class="result-spark">✦</view>
+        <text class="result-encourage-text">{{testResult.encouragement}}</text>
+      </view>
+    </view>
+    <view wx:else class="result-panel">
       <text class="result-cap">你的词汇量范围约为</text>
       <text class="result-range">{{testResult.vocabulary}}</text>
       <view class="result-divider"></view>
@@ -234,8 +269,9 @@
         <text class="result-encourage-text">{{testResult.encouragement}}</text>
       </view>
     </view>
-    <view class="primary-button result-start" bindtap="startDailyLearning" hover-class="home-cta-pressed">开始学习</view>
-    <view class="result-relevel" bindtap="openLevelSelect"><text>重新选择水平</text><view class="ui-icon icon-chevron"></view></view>
+    <view wx:if="{{testResult.isStage}}" class="primary-button result-start" bindtap="openProfile" hover-class="home-cta-pressed">完成</view>
+    <view wx:else class="primary-button result-start" bindtap="startDailyLearning" hover-class="home-cta-pressed">开始学习</view>
+    <view wx:if="{{!testResult.isStage}}" class="result-relevel" bindtap="openLevelSelect"><text>重新选择水平</text><view class="ui-icon icon-chevron"></view></view>
     <image class="asset-landscape level-landscape" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
   </view>
 

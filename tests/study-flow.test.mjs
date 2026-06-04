@@ -26,6 +26,8 @@ const {
   prepareGroupReviewQuestions,
   refillPrecheckCandidateWordIds,
   startAssessment,
+  startStageTest,
+  getStageTestCount,
   startDailyLearning
 } = require("../miniprogram/utils/study-flow.js");
 
@@ -425,3 +427,42 @@ function meaningFor(headword) {
   assert.ok(word, `fixture word should exist: ${headword}`);
   return word.cn.join("，");
 }
+
+// ---- 阶段测 (stage test) ----
+// The stage test draws from already-learned words, tracks how many you've
+// learned, reports mastery, and never re-levels you (unlike the placement test).
+const stageState = structuredClone(defaultState);
+stageState.user.wordLevelId = "senior";
+stageState.user.learningStartLevel = "required";
+const stageWords = words.slice(0, 15);
+stageWords.forEach((word, index) => {
+  stageState.userWordStates[word.id] = { familiarity: (index % 4) + 1, wrongCount: index < 5 ? 2 : 0 };
+});
+
+assert.equal(getStageTestCount(stageState), 15, "stage test length should equal the learned-word count (under the cap)");
+
+startStageTest(stageState);
+assert.equal(stageState.assessment.mode, "stage", "stage test runs in stage mode");
+assert.equal(stageState.assessment.questions.length, 15, "stage test should ask one question per sampled learned word");
+assert.ok(!stageState.assessment.completed, "stage test should not be complete before answering");
+
+let stageGuard = 0;
+while (!stageState.assessment.completed && stageGuard < 50) {
+  const question = getCurrentTestQuestion(stageState);
+  answerAssessmentQuestion(stageState, question.answer);
+  stageGuard += 1;
+}
+assert.equal(stageState.assessment.result.mode, "stage", "completed stage test yields a stage result");
+assert.equal(stageState.assessment.result.total, 15, "stage result counts every answered question");
+assert.equal(stageState.assessment.result.accuracy, 100, "all-correct stage test reports 100% mastery");
+assert.equal(stageState.user.learningStartLevel, "required", "stage test must not change the learning level");
+assert.equal(stageState.user.wordLevelId, "senior", "stage test must not re-confirm the word level");
+
+const cappedState = structuredClone(defaultState);
+words.slice(0, 40).forEach((word) => {
+  cappedState.userWordStates[word.id] = { familiarity: 2, wrongCount: 0 };
+});
+assert.ok(getStageTestCount(cappedState) <= 20, "stage test length is capped so a quick check stays quick");
+
+const unlearnedState = structuredClone(defaultState);
+assert.equal(getStageTestCount(unlearnedState), 0, "a student with no learned words has no stage test to take");

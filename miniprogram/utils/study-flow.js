@@ -1,6 +1,6 @@
 const { testQuestions } = require("../data/test-questions");
 const { words } = require("../data/words");
-const { buildAssessmentResult, buildDailyReport } = require("./report");
+const { buildAssessmentResult, buildDailyReport, buildStageTestResult } = require("./report");
 
 const REVIEW_INTERVAL_DAYS = [1, 2, 4, 7, 15];
 const PRECHECK_WINDOW_SIZE = 9;
@@ -18,15 +18,50 @@ const ASSESSMENT_LAYERS = {
 };
 const ASSESSMENT_TOTAL_QUESTIONS = 36;
 const ASSESSMENT_INITIAL_PER_LAYER = 6;
+// Stage test ("阶段测") samples from the words the student has already learned.
+// Unlike the 36-question placement test, its length tracks how much you've
+// learned (capped so a quick check stays quick) and it never re-levels you.
+const STAGE_TEST_MAX_QUESTIONS = 20;
 
 function startAssessment(state, seed = createAssessmentSeed()) {
   state.assessment = {
+    mode: "placement",
     completed: false,
     currentIndex: 0,
     seed,
     questions: buildInitialAssessmentQuestions(seed),
     answers: [],
     result: null
+  };
+}
+
+function getStageTestWordIds(state) {
+  const states = (state && state.userWordStates) || {};
+  return Object.keys(states)
+    .filter((id) => (states[id].familiarity || 0) > 0 && getWordById(id))
+    // Weakest words first (lowest familiarity, then most-missed), so the check
+    // surfaces what actually needs review rather than a random sample.
+    .map((id) => ({ id, fam: states[id].familiarity || 0, wrong: states[id].wrongCount || 0 }))
+    .sort((a, b) => (a.fam - b.fam) || (b.wrong - a.wrong) || (hashText(a.id) - hashText(b.id)))
+    .slice(0, STAGE_TEST_MAX_QUESTIONS)
+    .map((item) => item.id);
+}
+
+function getStageTestCount(state) {
+  return getStageTestWordIds(state).length;
+}
+
+function startStageTest(state) {
+  const wordIds = getStageTestWordIds(state);
+  const questions = wordIds.map((id, index) => createAssessmentQuestion(getWordById(id), "stage", index));
+  state.assessment = {
+    mode: "stage",
+    completed: questions.length === 0,
+    currentIndex: 0,
+    seed: createAssessmentSeed(),
+    questions,
+    answers: [],
+    result: questions.length === 0 ? buildStageTestResult({ answers: [] }) : null
   };
 }
 
@@ -49,6 +84,15 @@ function answerAssessmentQuestion(state, selected) {
     durationMs: 0
   });
   state.assessment.currentIndex += 1;
+  if (state.assessment.mode === "stage") {
+    // Stage test: fixed-length sample of already-learned words; no adaptive
+    // refill, no re-levelling — just report how many were recalled.
+    if (state.assessment.currentIndex >= state.assessment.questions.length) {
+      state.assessment.completed = true;
+      state.assessment.result = buildStageTestResult(state.assessment);
+    }
+    return;
+  }
   if (state.assessment.answers.length === 18 && state.assessment.questions.length < ASSESSMENT_TOTAL_QUESTIONS) {
     state.assessment.questions = state.assessment.questions.concat(buildAdaptiveAssessmentQuestions(state.assessment.answers, state.assessment.questions, state.assessment.seed));
   }
@@ -150,16 +194,6 @@ function markPrecheck(state, wordId, status) {
     return;
   }
   refillPrecheckCandidateWordIds(state);
-}
-
-function togglePrecheckWord(state, wordId) {
-  if (state.daily.selectedWordIds.includes(wordId)) {
-    state.daily.selectedWordIds = state.daily.selectedWordIds.filter((id) => id !== wordId);
-    return;
-  }
-  if (state.daily.selectedWordIds.length < 3) {
-    state.daily.selectedWordIds = state.daily.selectedWordIds.concat(wordId);
-  }
 }
 
 function autoSelectPrecheckWords(state) {
@@ -1189,10 +1223,11 @@ module.exports = {
   refillPrecheckCandidateWordIds,
   reopenDailyForTarget,
   startAssessment,
+  startStageTest,
+  getStageTestCount,
   startDailyLearning,
   startReviewSession,
   clearReviewSession,
   getWrongReviewWordIds,
-  getDueReviewWordIds,
-  togglePrecheckWord
+  getDueReviewWordIds
 };

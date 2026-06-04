@@ -1,6 +1,6 @@
 # 交互路径自动巡检
 
-生成时间：2026-06-04T04:23:52.235Z
+生成时间：2026-06-04T08:09:25.571Z
 
 ## 契约校验
 
@@ -20,7 +20,7 @@
 
 ## 按钮路径清单
 
-共扫描 68 个点击入口，34 个 handler。
+共扫描 65 个点击入口，34 个 handler。
 
 | 页面 | 按钮/入口 | Handler | 存在 | 触发路径 |
 | --- | --- | --- | --- | --- |
@@ -29,26 +29,23 @@
 | home | (dynamic) | startDailyLearning | yes | navigate/render, starts-flow |
 | home | 选择后可随时在【我的】中更改 | openProfile | yes | navigate/render |
 | home | 个错词待复习 晚间入口已开启 | openWrongBook | yes | navigate/render, updates-ui |
-| profile | (dynamic) | resetData | yes | navigate/render, updates-ui |
 | profile | (dynamic) | openLevelSelect | yes | navigate/render |
-| profile | List | setListGroupCount | yes | navigate/render, updates-settings |
-| profile | (dynamic) | setPronunciationLoopCount | yes | navigate/render, updates-settings |
-| profile | 学习数据 累计打卡 天 | openMonthProgress | yes | navigate/render |
+| profile | (dynamic) | openMonthProgress | yes | navigate/render |
+| profile | 个错词待复习 | openWrongBook | yes | navigate/render, updates-ui |
 | profile | 入学测 36 题 | startTest | yes | navigate/render, starts-flow |
-| profile | 阶段测 30 题 | startTest | yes | navigate/render, starts-flow |
-| profile | (dynamic) | openLevelSelect | yes | navigate/render |
-| profile | 词汇量测试 当前 | startTest | yes | navigate/render, starts-flow |
-| profile | 错词本 个待巩固 | openWrongBook | yes | navigate/render, updates-ui |
+| profile | 阶段测 题 | startStageTest | yes | navigate/render |
+| profile | (dynamic) | confirmReset | yes | navigate/render, updates-ui |
 | month-progress | (dynamic) | goBack | yes | no-state-change |
-| month-progress | 上一月 | shiftProgressMonth | yes | navigate/render |
-| month-progress | 下一月 | shiftProgressMonth | yes | navigate/render |
-| month-progress | 开始阶段测 | startTest | yes | navigate/render, starts-flow |
+| month-progress | (dynamic) | shiftProgressMonth | yes | navigate/render |
+| month-progress | (dynamic) | shiftProgressMonth | yes | navigate/render |
+| month-progress | 开始阶段测 | startStageTest | yes | navigate/render |
 | level-select | 跳过 | skipLevelSelect | yes | navigate/render |
 | level-select | (dynamic) | selectLevel | yes | navigate/render, starts-flow |
 | level-select | 不确定？做个测试 | takeLevelTest | yes | navigate/render, starts-flow |
 | test | (dynamic) | goBack | yes | no-state-change |
 | test | (dynamic) | answerTest | yes | no-state-change |
 | test | 不认识 | answerTest | yes | no-state-change |
+| test-result | 完成 | openProfile | yes | navigate/render |
 | test-result | 开始学习 | startDailyLearning | yes | navigate/render, starts-flow |
 | test-result | 重新选择水平 | openLevelSelect | yes | navigate/render |
 | precheck | (dynamic) | speak | yes | plays-audio |

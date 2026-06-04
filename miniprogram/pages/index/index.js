@@ -32,6 +32,7 @@ const AUTO_MISS_AFTER_REVEAL_MS = 3000;
 const WRONG_EDGE_FEEDBACK_MS = 300;
 const PRECHECK_SWIPE_THRESHOLD = 92;
 const PRECHECK_SWIPE_EXIT_MS = 180;
+const MAX_DAILY_TARGET_LISTS = 100;
 const WORD_LEVEL_OPTIONS = [
   { id: "primary", label: "小学", enabled: false, status: "暂未开放" },
   { id: "junior", label: "初中", enabled: false, status: "暂未开放" },
@@ -42,7 +43,7 @@ const WORD_LEVEL_OPTIONS = [
   { id: "ielts", label: "雅思", enabled: false, status: "暂未开放" }
 ];
 const NAVIGATION_TITLES = {
-  [VIEWS.HOME]: "今日单词",
+  [VIEWS.HOME]: "",
   [VIEWS.PROFILE]: "我的",
   [VIEWS.MONTH_PROGRESS]: "学习进展",
   [VIEWS.LEVEL_SELECT]: "选择单词水平",
@@ -156,6 +157,21 @@ Page({
     // so start it directly instead of bouncing back to level selection.
     this.pendingAfterLevelSelect = "";
     flow.startAssessment(this.state);
+    this.saveAndRender(VIEWS.TEST);
+  },
+
+  startStageTest() {
+    if (!hasSelectedWordLevel(this.state)) {
+      this.saveAndRender(VIEWS.LEVEL_SELECT);
+      return;
+    }
+    if (!flow.getStageTestCount(this.state)) {
+      if (typeof wx !== "undefined" && typeof wx.showToast === "function") {
+        wx.showToast({ title: "先学一些词再来检测", icon: "none" });
+      }
+      return;
+    }
+    flow.startStageTest(this.state);
     this.saveAndRender(VIEWS.TEST);
   },
 
@@ -302,21 +318,6 @@ Page({
     this.setData({ precheckSwipeClass: "" });
   },
 
-  togglePrecheckWord(event) {
-    flow.togglePrecheckWord(this.state, event.currentTarget.dataset.wordId);
-    this.saveAndRender(VIEWS.PRECHECK);
-  },
-
-  autoSelect() {
-    flow.autoSelectPrecheckWords(this.state);
-    this.saveAndRender(VIEWS.PRECHECK);
-  },
-
-  confirmPrecheck() {
-    flow.confirmPrecheck(this.state);
-    this.saveAndRender(VIEWS.WORD_STUDY, { playImmediately: true });
-  },
-
   markStudy(event) {
     this.clearAutoPlayTimer();
     this.stopReadAlong({ silent: true });
@@ -349,20 +350,9 @@ Page({
     this.saveAndRender(VIEWS.WORD_STUDY, { playImmediately: true });
   },
 
-  startReview() {
-    this.clearStudyTransitionTimer();
-    this.setData({ studyTransition: false });
-    flow.prepareGroupReviewQuestions(this.state);
-    this.saveAndRender(VIEWS.GROUP_REVIEW);
-  },
-
   finishReview() {
     flow.prepareAudioQuestions(this.state);
     this.saveAndRender(VIEWS.AUDIO_MEANING, { track: false });
-  },
-
-  answerGroupReview(event) {
-    this.answerReviewChoice("group", event.currentTarget.dataset.value);
   },
 
   rememberGroupReview() {
@@ -373,26 +363,8 @@ Page({
     this.retryReviewQuestion("group");
   },
 
-  nextGroupReview() {
-    this.advanceReviewQuestion("group");
-  },
-
   advanceGroupReview() {
     this.advanceReviewQuestion("group");
-  },
-
-  answerAudio(event) {
-    const question = flow.getCurrentAudioQuestion(this.state);
-    if (!question || question.answered) return;
-    this.cancelPagePlayback();
-    this.clearFocusMissTimer();
-    const result = flow.answerAudioQuestion(this.state, event.currentTarget.dataset.value);
-    if (result.isCorrect) {
-      const phase = flow.moveToNextAudioQuestion(this.state);
-      this.advanceAfterAudioPhase(phase);
-      return;
-    }
-    this.saveAndRender(VIEWS.AUDIO_MEANING);
   },
 
   rememberAudio() {
@@ -405,11 +377,6 @@ Page({
     this.clearFocusMissTimer();
     this.setData({ audioAnswerVisible: false });
     this.playAudioMeaningAndReveal(question.wordId, this.playbackKeyFor(VIEWS.AUDIO_MEANING, question.wordId));
-  },
-
-  nextAudio() {
-    const phase = flow.moveToNextAudioQuestion(this.state);
-    this.advanceAfterAudioPhase(phase);
   },
 
   advanceAfterAudioPhase(phase) {
@@ -624,24 +591,12 @@ Page({
     this.saveAndRender(VIEWS.GROUP_REVIEW);
   },
 
-  answerMixed(event) {
-    this.answerReviewChoice("mixed", event.currentTarget.dataset.value);
-  },
-
   rememberMixedReview() {
     this.rememberReviewQuestion("mixed");
   },
 
   markMixedUnfamiliar() {
     this.retryReviewQuestion("mixed");
-  },
-
-  nextMixed() {
-    this.advanceReviewQuestion("mixed");
-  },
-
-  finishMixedReview() {
-    this.advanceAfterMixedPhase("complete");
   },
 
   renderAfterMixedReview(next) {
@@ -756,59 +711,21 @@ Page({
 
   noop() {},
 
-  clearStudyTransitionTimer() {
-    if (!this.studyTransitionTimer) return;
-    clearTimeout(this.studyTransitionTimer);
-    this.studyTransitionTimer = null;
+  clearTimer(name) {
+    if (!this[name]) return;
+    clearTimeout(this[name]);
+    this[name] = null;
   },
 
-  clearAudioCompletionTimer() {
-    if (!this.audioCompletionTimer) return;
-    clearTimeout(this.audioCompletionTimer);
-    this.audioCompletionTimer = null;
-  },
-
-  clearPrecheckNoticeTimer() {
-    if (!this.precheckNoticeTimer) return;
-    clearTimeout(this.precheckNoticeTimer);
-    this.precheckNoticeTimer = null;
-  },
-
-  clearReviewRevealTimer() {
-    if (!this.reviewRevealTimer) return;
-    clearTimeout(this.reviewRevealTimer);
-    this.reviewRevealTimer = null;
-  },
-
-  clearAudioRevealTimer() {
-    if (!this.audioRevealTimer) return;
-    clearTimeout(this.audioRevealTimer);
-    this.audioRevealTimer = null;
-  },
-
-  clearRecallRevealTimer() {
-    if (!this.recallRevealTimer) return;
-    clearTimeout(this.recallRevealTimer);
-    this.recallRevealTimer = null;
-  },
-
-  clearFocusMissTimer() {
-    if (!this.focusMissTimer) return;
-    clearTimeout(this.focusMissTimer);
-    this.focusMissTimer = null;
-  },
-
-  clearEdgeFeedbackTimer() {
-    if (!this.edgeFeedbackTimer) return;
-    clearTimeout(this.edgeFeedbackTimer);
-    this.edgeFeedbackTimer = null;
-  },
-
-  clearAutoPlayTimer() {
-    if (!this.autoPlayTimer) return;
-    clearTimeout(this.autoPlayTimer);
-    this.autoPlayTimer = null;
-  },
+  clearStudyTransitionTimer() { this.clearTimer("studyTransitionTimer"); },
+  clearAudioCompletionTimer() { this.clearTimer("audioCompletionTimer"); },
+  clearPrecheckNoticeTimer() { this.clearTimer("precheckNoticeTimer"); },
+  clearReviewRevealTimer() { this.clearTimer("reviewRevealTimer"); },
+  clearAudioRevealTimer() { this.clearTimer("audioRevealTimer"); },
+  clearRecallRevealTimer() { this.clearTimer("recallRevealTimer"); },
+  clearFocusMissTimer() { this.clearTimer("focusMissTimer"); },
+  clearEdgeFeedbackTimer() { this.clearTimer("edgeFeedbackTimer"); },
+  clearAutoPlayTimer() { this.clearTimer("autoPlayTimer"); },
 
   stopCurrentAudio() {
     if (this.currentAudioCleanup) {
@@ -849,10 +766,6 @@ Page({
       daily.mixedIndex || 0,
       daily.reviewPhase || ""
     ].join(":");
-  },
-
-  revealCurrentReviewAnswer(wordId, playbackKey) {
-    this.revealFocusAnswer(VIEWS.GROUP_REVIEW, wordId, playbackKey);
   },
 
   scheduleReviewRevealAfterPlayback(wordId, playbackKey) {
@@ -1087,7 +1000,8 @@ Page({
   },
 
   setListGroupCount(event) {
-    const count = Number(event.currentTarget.dataset.count || 1);
+    const index = Number(event.detail.value || 0);
+    const count = Math.min(Math.max(index + 1, 1), MAX_DAILY_TARGET_LISTS);
     if (!this.state.user.settings) this.state.user.settings = {};
     this.state.user.settings.dailyTargetListCount = count;
     this.state.user.settings.listGroupCount = count * 3;
@@ -1101,10 +1015,47 @@ Page({
   },
 
   setPronunciationLoopCount(event) {
-    const count = Number(event.currentTarget.dataset.count || 3);
+    const values = [3, 6, 9, 0];
+    const index = Number(event.detail.value || 0);
+    const count = values[index] !== undefined ? values[index] : 3;
     if (!this.state.user.settings) this.state.user.settings = {};
     this.state.user.settings.pronunciationLoopCount = count;
     this.saveAndRender(VIEWS.PROFILE, { track: false });
+  },
+
+  changeSleepTime(event) {
+    if (!this.state.user.settings) this.state.user.settings = {};
+    this.state.user.settings.sleepTime = event.detail.value;
+    this.saveAndRender(VIEWS.PROFILE, { track: false });
+  },
+
+  changeWakeTime(event) {
+    if (!this.state.user.settings) this.state.user.settings = {};
+    this.state.user.settings.wakeTime = event.detail.value;
+    this.saveAndRender(VIEWS.PROFILE, { track: false });
+  },
+
+  changeWrongReminderTime(event) {
+    if (!this.state.user.settings) this.state.user.settings = {};
+    this.state.user.settings.wrongReminderTime = event.detail.value;
+    this.state.user.settings.wrongReminderEnabled = true;
+    this.saveAndRender(VIEWS.PROFILE, { track: false });
+  },
+
+  confirmReset() {
+    if (typeof wx !== "undefined" && typeof wx.showModal === "function") {
+      wx.showModal({
+        title: "数据重置",
+        content: "将清空全部学习记录与设置，确定继续吗？",
+        confirmText: "重置",
+        confirmColor: "#c0563f",
+        success: (res) => {
+          if (res.confirm) this.resetData();
+        }
+      });
+      return;
+    }
+    this.resetData();
   },
 
   setLearningTheme(event) {
@@ -1190,7 +1141,10 @@ Page({
       });
     }
     if (typeof wx.setNavigationBarTitle === "function") {
-      wx.setNavigationBarTitle({ title: NAVIGATION_TITLES[view] || "今日单词" });
+      // Use the explicit per-view title (including an intentional empty string)
+      // and only fall back for views that have no entry at all.
+      const title = view in NAVIGATION_TITLES ? NAVIGATION_TITLES[view] : "AI 飞轮单词";
+      wx.setNavigationBarTitle({ title });
     }
   },
 
@@ -1599,12 +1553,12 @@ function buildHomeData(state) {
   const wrongBook = buildWrongBookData(state);
   const weakCount = wrongBook.count;
   const learnedCount = wordStates.filter((wordState) => wordState.familiarity > 0).length;
-  const todayDone = state.daily.sessionCompletedWordIds.length;
+  const todayDone = (state.daily.sessionCompletedWordIds || []).length;
   const todayLists = Math.floor(todayDone / 9);
   const planCount = getDailyTargetListCount(state);
   const displayTotal = Math.max(wordDatasetMeta.total || 3500, 3500);
   const progressPercent = Math.min(100, Math.round((learnedCount / Math.max(displayTotal, 1)) * 100));
-  const reviewCount = state.daily.mixedReviewWordIds.length || 0;
+  const reviewCount = (state.daily.mixedReviewWordIds || []).length;
   const nextTask = buildNextTaskText(state, todayLists, weakCount);
   const primaryActionText = buildPrimaryActionText(state, nextTask);
   return {
@@ -1633,7 +1587,7 @@ function buildHomeData(state) {
     primaryActionText,
     streakDays: state.user.streakDays,
     streakText: getRewardStreakText(state),
-    badges: state.user.badges.length ? state.user.badges.join("、") : "今日完成后获得起步徽章",
+    badges: (state.user.badges || []).length ? state.user.badges.join("、") : "今日完成后获得起步徽章",
     groupName: wordDatasetMeta.groupName,
     bookTitle: "高考课标 3500",
     total: wordDatasetMeta.total,
@@ -1649,12 +1603,22 @@ function buildProfileData(state) {
   const learnedCount = wordStates.filter((wordState) => wordState.familiarity > 0).length;
   const wrongBook = buildWrongBookData(state);
   const weakCount = wrongBook.count;
-  const todayDone = state.daily.sessionCompletedWordIds.length;
+  const todayDone = (state.daily.sessionCompletedWordIds || []).length;
   const todayMinutes = todayDone ? Math.max(3, todayDone * 2) : 0;
   const dailyTargetListCount = getDailyTargetListCount(state);
   const checkins = state.user.checkins || {};
   const week = buildCalendarWeek(checkins);
   const checkinDays = Object.keys(checkins).filter((dateKey) => checkins[dateKey] && checkins[dateKey].completed).length;
+  const displayTotal = Math.max(wordDatasetMeta.total || 3500, 3500);
+  const progressPercent = Math.min(100, Math.round((learnedCount / Math.max(displayTotal, 1)) * 100));
+  const settings = state.user.settings || {};
+  const sleepTime = settings.sleepTime || "22:00";
+  const wakeTime = settings.wakeTime || "06:00";
+  const wrongReminderEnabled = settings.wrongReminderEnabled !== false;
+  const wrongReminderTime = settings.wrongReminderTime || "19:00";
+  const loopValues = [3, 6, 9, 0];
+  const currentLoop = Number(settings.pronunciationLoopCount ?? 3);
+  const loopIndex = Math.max(0, loopValues.indexOf(currentLoop));
   return {
     userName: state.user.name,
     vocabulary: result ? result.vocabulary : "未测",
@@ -1662,19 +1626,33 @@ function buildProfileData(state) {
     levelLabel: state.user.wordLevelLabel || "未选择",
     startLevelLabel: state.user.wordLevelLabel || "未选择",
     activeGroup: state.user.activeGroup || wordDatasetMeta.groupName,
+    bookTitle: "高考课标 3500",
     total: wordDatasetMeta.total,
     miniProgramTotal: wordDatasetMeta.miniProgramTotal,
     learnedCount,
+    displayTotal,
+    progressPercent,
+    progressText: `${learnedCount} / ${displayTotal}`,
     weakCount,
     todayDone,
+    stageTestCount: flow.getStageTestCount(state),
     listGroupCount: dailyTargetListCount,
     dailyTargetListCount,
     listWordCount: dailyTargetListCount * 9,
-    listOptions: [1, 2, 3, 4].map((count) => ({ count, selected: count === dailyTargetListCount })),
+    dailyTargetLabel: `${dailyTargetListCount} 个 List`,
+    dailyTargetRange: Array.from({ length: MAX_DAILY_TARGET_LISTS }, (_, index) => `${index + 1} 个 List`),
+    dailyTargetIndex: Math.min(Math.max(dailyTargetListCount - 1, 0), MAX_DAILY_TARGET_LISTS - 1),
     pronunciationLoopLabel: pronunciationLoopLabelFor(state),
     pronunciationLoopOptions: pronunciationLoopOptionsFor(state),
+    loopRange: ["3 遍", "6 遍", "9 遍", "无限循环"],
+    loopIndex,
     learningThemeLabel: learningThemeLabelFor(state),
     learningThemeOptions: learningThemeOptionsFor(state),
+    sleepTime,
+    wakeTime,
+    wrongReminderEnabled,
+    wrongReminderTime,
+    wrongReminderLabel: wrongReminderEnabled ? `每日 ${wrongReminderTime}` : "已关闭",
     todayMinutes,
     totalMinutes: learnedCount * 2,
     streakDays: state.user.streakDays,
@@ -1780,6 +1758,7 @@ function buildCalendarWeek(checkins, now) {
       key: dateKey,
       day,
       date: String(date.getDate()),
+      isToday: dateKey === localDateKey(today),
       active: Boolean(checkin.completed),
       completedGroups: checkin.completedGroups || 0,
       learnedWords: checkin.learnedWords || 0
@@ -1793,33 +1772,98 @@ function buildMonthProgressData(state, cursor) {
   const year = current.getFullYear();
   const month = current.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const firstDay = new Date(year, month, 1).getDay() || 7;
-  const leadingBlanks = firstDay - 1;
+  const prevMonthDays = new Date(year, month, 0).getDate();
+  const leadingCount = new Date(year, month, 1).getDay(); // Sunday-first: 0..6
+  const todayKey = localDateKey(new Date());
   const cells = [];
-  for (let index = 0; index < leadingBlanks; index += 1) {
-    cells.push({ key: `blank-${index}`, blank: true });
+  // Previous-month tail days fill the first week (shown muted).
+  for (let i = 0; i < leadingCount; i += 1) {
+    const day = prevMonthDays - leadingCount + 1 + i;
+    cells.push({ key: `lead-${day}`, day, otherMonth: true });
   }
   for (let day = 1; day <= daysInMonth; day += 1) {
-    const date = new Date(year, month, day);
-    const dateKey = localDateKey(date);
+    const dateKey = localDateKey(new Date(year, month, day));
     const checkin = checkins[dateKey] || {};
     cells.push({
       key: dateKey,
       day,
       active: Boolean(checkin.completed),
+      isToday: dateKey === todayKey,
       completedGroups: checkin.completedGroups || 0,
       learnedWords: checkin.learnedWords || 0
     });
   }
-  const activeCells = cells.filter((cell) => cell.active);
+  // Next-month head days pad the final week to a full row of seven.
+  for (let day = 1; cells.length % 7 !== 0; day += 1) {
+    cells.push({ key: `trail-${day}`, day, otherMonth: true });
+  }
+  const monthCells = cells.filter((cell) => !cell.otherMonth);
+  const activeCells = monthCells.filter((cell) => cell.active);
   return {
-    title: `${year} 年 ${month + 1} 月`,
+    title: `${year}年 ${month + 1}月`,
     pickerValue: `${year}-${String(month + 1).padStart(2, "0")}`,
-    weekdays: ["一", "二", "三", "四", "五", "六", "日"],
+    weekdays: ["日", "一", "二", "三", "四", "五", "六"],
     cells,
     checkinDays: activeCells.length,
     learnedWords: activeCells.reduce((sum, cell) => sum + cell.learnedWords, 0),
-    completedGroups: activeCells.reduce((sum, cell) => sum + cell.completedGroups, 0)
+    completedGroups: activeCells.reduce((sum, cell) => sum + cell.completedGroups, 0),
+    trend: buildMonthTrend(year, month, checkins, todayKey),
+    stageTestCount: flow.getStageTestCount(state)
+  };
+}
+
+// Weeks run Monday..Sunday (per the chart caption). Each week's value is the
+// learned-word total for that week's days inside the displayed month.
+function buildMonthTrend(year, month, checkins, todayKey) {
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstMondayOffset = (new Date(year, month, 1).getDay() + 6) % 7; // Mon=0
+  const weekCount = Math.floor((firstMondayOffset + daysInMonth - 1) / 7) + 1;
+  const values = new Array(weekCount).fill(0);
+  let todayWeek = -1;
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    const weekIndex = Math.floor((firstMondayOffset + day - 1) / 7);
+    const dateKey = localDateKey(new Date(year, month, day));
+    values[weekIndex] += (checkins[dateKey] || {}).learnedWords || 0;
+    if (dateKey === todayKey) todayWeek = weekIndex;
+  }
+  const labels = values.map((_, index) => (index === todayWeek ? "本周" : `第${index + 1}周`));
+  return buildLineChart(values, labels);
+}
+
+const CHART_PAD_X = 30;
+const CHART_PLOT_W = 520;
+const CHART_TOP = 44;
+const CHART_PLOT_H = 150;
+const CHART_LINE_HALF = 2;
+
+function buildLineChart(values, labels) {
+  const count = values.length;
+  const max = Math.max(1, ...values);
+  const points = values.map((value, index) => {
+    const x = CHART_PAD_X + (count > 1 ? index / (count - 1) : 0.5) * CHART_PLOT_W;
+    const y = CHART_TOP + (1 - value / max) * CHART_PLOT_H;
+    return { key: `pt-${index}`, x: Math.round(x), y: Math.round(y), value, label: labels[index] };
+  });
+  const segments = [];
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const from = points[index];
+    const to = points[index + 1];
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    segments.push({
+      key: `seg-${index}`,
+      x: from.x,
+      y: from.y - CHART_LINE_HALF,
+      width: Math.round(Math.sqrt(dx * dx + dy * dy)),
+      angle: Math.round((Math.atan2(dy, dx) * 180 / Math.PI) * 100) / 100
+    });
+  }
+  return {
+    width: CHART_PAD_X * 2 + CHART_PLOT_W,
+    height: CHART_TOP + CHART_PLOT_H + 10,
+    padX: CHART_PAD_X,
+    points,
+    segments
   };
 }
 
@@ -1857,10 +1901,13 @@ function buildTestData(state) {
   const question = flow.getCurrentTestQuestion(state);
   const answered = state.assessment.answers.length;
   const correct = state.assessment.answers.filter((answer) => answer.isCorrect).length;
-  const total = 36;
+  const isStage = state.assessment.mode === "stage";
+  const total = isStage ? (state.assessment.questions.length || 1) : 36;
   const current = Math.min(answered + 1, total);
   return {
     question,
+    isStage,
+    kindLabel: isStage ? "阶段测" : "入学测",
     current,
     total,
     percent: Math.round((current / total) * 100),
@@ -1878,6 +1925,20 @@ function buildTestData(state) {
 
 function buildTestResultData(state) {
   const result = state.assessment.result || {};
+  if (result.mode === "stage") {
+    const accuracy = typeof result.accuracy === "number" ? result.accuracy : 0;
+    const encouragement = accuracy >= 80
+      ? "掌握得很扎实，保持节奏"
+      : (accuracy >= 50 ? "已学词大体记住了，错的明天复习一下" : "趁热打铁复习一遍，很快就稳了");
+    return {
+      isStage: true,
+      total: result.total,
+      correct: result.correct,
+      wrong: result.wrong,
+      accuracy,
+      encouragement
+    };
+  }
   const range = result.vocabularyRange || {};
   const lower = range.lower;
   const upper = range.upper;
@@ -2058,7 +2119,6 @@ function buildFocusPauseData(state) {
 }
 
 function learningThemeClassFor() {
-  // Light-only V2 UI: learning pages always render the light theme.
   return "learning-light";
 }
 
@@ -2100,7 +2160,7 @@ function buildReportData(state) {
   const displayTotal = Math.max(wordDatasetMeta.total || 3500, 3500);
   return Object.assign({}, report, {
     weakWordText: report.weakWords.length ? report.weakWords.map((word) => word.word).join("、") : "本轮没有新增错词",
-    badgeText: state.user.badges.length ? state.user.badges.join("、") : "暂无",
+    badgeText: (state.user.badges || []).length ? state.user.badges.join("、") : "暂无",
     todayLists: Math.max(1, Math.floor((state.daily.sessionCompletedWordIds || []).length / 9)),
     doneWords: (state.daily.sessionCompletedWordIds || []).length,
     doneHours: Math.max(0.1, Math.round((Math.max(3, (state.daily.sessionCompletedWordIds || []).length * 2) / 60) * 10) / 10),

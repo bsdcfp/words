@@ -3,7 +3,7 @@
     "pages/index/index"
   ],
   "window": {
-    "navigationBarTitleText": "今日单词",
+    "navigationBarTitleText": "",
     "navigationBarBackgroundColor": "#fcf9f3",
     "navigationBarTextStyle": "black",
     "navigationStyle": "default",

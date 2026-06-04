@@ -57,6 +57,6 @@ App({
   configureAudioPlayback,
 
   globalData: {
-    appName: "今日单词"
+    appName: "AI 飞轮单词"
   }
 });
