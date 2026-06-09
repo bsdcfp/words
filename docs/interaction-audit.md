@@ -1,6 +1,6 @@
 # 交互路径自动巡检
 
-生成时间：2026-06-04T08:09:25.571Z
+生成时间：2026-06-09T12:14:39.486Z
 
 ## 契约校验
 
@@ -63,7 +63,7 @@
 | group-review | Ⅱ 长按侧边暂停 | handleLearningSurfaceTap | yes | plays-audio, updates-ui |
 | audio-meaning | (dynamic) | noop | yes | no-state-change |
 | audio-meaning | (dynamic) | speak | yes | plays-audio, updates-ui |
-| audio-meaning | 记住了 | rememberAudio | yes | navigate/render, advance-flow, records-answer |
+| audio-meaning | 记住了 | rememberAudio | yes | navigate/render, advance-flow, records-answer, updates-ui |
 | audio-meaning | (dynamic) | handleLearningSurfaceTap | yes | plays-audio, updates-ui |
 | meaning-recall | (dynamic) | noop | yes | no-state-change |
 | meaning-recall | (dynamic) | goBack | yes | no-state-change |

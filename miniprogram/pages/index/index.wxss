@@ -2141,6 +2141,26 @@ image {
   transform: rotate(45deg);
 }
 
+.reveal-sheet-wordrow {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 14rpx;
+  margin-bottom: 10rpx;
+}
+
+.reveal-sheet-word {
+  color: #2c2b26;
+  font-size: 44rpx;
+  font-weight: 800;
+  letter-spacing: 1rpx;
+}
+
+.reveal-sheet-ipa {
+  color: #9b9488;
+  font-size: 24rpx;
+}
+
 .reveal-sheet-meaning {
   margin-top: 0;
   color: #2c2b26;
@@ -2203,6 +2223,19 @@ image {
   width: auto;
   margin: 0;
   z-index: 4;
+}
+
+/* group review: reveal the meaning right under the word (below the "2 秒后揭示"
+   hint) instead of as a bottom sheet. In normal flow inside the focus card, so it
+   sits above the landscape (z -1) and never collides with the bottom button. */
+.learn-spread .reveal-sheet.in-card {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  margin: 28rpx 0 0;
+  z-index: 2;
 }
 
 .learn-spread .focus-actions {

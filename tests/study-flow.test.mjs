@@ -28,7 +28,9 @@ const {
   startAssessment,
   startStageTest,
   getStageTestCount,
-  startDailyLearning
+  startDailyLearning,
+  isInWrongBook,
+  consolidateWordState
 } = require("../miniprogram/utils/study-flow.js");
 
 const abandon = words.find((word) => word.word === "abandon");
@@ -466,3 +468,38 @@ assert.ok(getStageTestCount(cappedState) <= 20, "stage test length is capped so 
 
 const unlearnedState = structuredClone(defaultState);
 assert.equal(getStageTestCount(unlearnedState), 0, "a student with no learned words has no stage test to take");
+
+// ---- 错词本: wrongCount is a lifetime stat; leaving needs 2 consecutive corrects ----
+const wbWord = words.find((word) => word.word === "harvest");
+assert.ok(wbWord, "fixture word should exist: harvest");
+const wbState = structuredClone(defaultState);
+wbState.daily.startedAt = "wb-session";
+wbState.userWordStates[wbWord.id] = { familiarity: 1, correctStreak: 0, wrongCount: 1, lastSeenAt: new Date().toISOString(), lastResult: "wrong" };
+assert.ok(isInWrongBook(wbState.userWordStates[wbWord.id]), "a missed word starts in the wrong book");
+
+function answerWbCorrectly() {
+  wbState.daily.selectedWordIds = [wbWord.id];
+  prepareAudioQuestions(wbState);
+  answerAudioQuestion(wbState, wbWord.cn.join("，"));
+}
+
+answerWbCorrectly();
+assert.equal(wbState.userWordStates[wbWord.id].wrongCount, 1, "a correct answer must NOT erase the lifetime miss count");
+assert.equal(wbState.userWordStates[wbWord.id].correctStreak, 1, "a correct answer advances the streak");
+assert.ok(isInWrongBook(wbState.userWordStates[wbWord.id]), "one correct is not enough to leave the wrong book");
+
+answerWbCorrectly();
+assert.equal(wbState.userWordStates[wbWord.id].correctStreak, 2, "two consecutive corrects");
+assert.ok(!isInWrongBook(wbState.userWordStates[wbWord.id]), "two consecutive corrects graduate the word out of the wrong book");
+assert.equal(wbState.userWordStates[wbWord.id].wrongCount, 1, "wrongCount survives as a lifetime stat after consolidation");
+
+// a fresh miss returns it and bumps the lifetime count
+wbState.userWordStates[wbWord.id].correctStreak = 0;
+wbState.userWordStates[wbWord.id].wrongCount += 1;
+assert.ok(isInWrongBook(wbState.userWordStates[wbWord.id]), "a fresh miss returns the word to the wrong book");
+assert.equal(wbState.userWordStates[wbWord.id].wrongCount, 2, "lifetime miss count accumulates across sessions");
+
+// manual "已掌握" graduates it out without erasing history
+consolidateWordState(wbState.userWordStates[wbWord.id]);
+assert.ok(!isInWrongBook(wbState.userWordStates[wbWord.id]), "manual consolidation removes it from the wrong book");
+assert.equal(wbState.userWordStates[wbWord.id].wrongCount, 2, "manual consolidation keeps the lifetime miss count");

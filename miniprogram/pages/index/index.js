@@ -134,6 +134,7 @@ Page({
     this.clearReviewRevealTimer();
     this.clearReviewAdvanceTimer();
     this.clearAudioRevealTimer();
+    this.clearAudioAdvanceTimer();
     this.clearRecallRevealTimer();
     this.clearFocusMissTimer();
     this.clearEdgeFeedbackTimer();
@@ -403,10 +404,23 @@ Page({
     const question = flow.getCurrentAudioQuestion(this.state);
     if (!question || question.answered) return;
     this.cancelPagePlayback();
+    this.clearAudioRevealTimer();
     this.clearFocusMissTimer();
     flow.answerAudioQuestion(this.state, question.options[0]);
-    const phase = flow.moveToNextAudioQuestion(this.state);
-    this.advanceAfterAudioPhase(phase);
+    // Reveal the spelled word + meaning so the student can confirm they didn't
+    // mishear the audio, hold briefly, then advance to the next question.
+    this.setData({ audioAnswerVisible: true });
+    this.clearAudioAdvanceTimer();
+    this.audioAdvanceTimer = setTimeout(() => {
+      this.audioAdvanceTimer = null;
+      if (this.data.view !== VIEWS.AUDIO_MEANING) return;
+      const phase = flow.moveToNextAudioQuestion(this.state);
+      this.advanceAfterAudioPhase(phase);
+    }, REVIEW_CONFIRM_PAUSE_MS);
+  },
+
+  clearAudioAdvanceTimer() {
+    this.clearTimer("audioAdvanceTimer");
   },
 
   rememberMeaningRecall() {
@@ -970,7 +984,9 @@ Page({
   removeWrongWord(event) {
     const wordId = event.currentTarget.dataset.wordId;
     const wordState = this.state.userWordStates[wordId];
-    if (wordState) wordState.wrongCount = 0;
+    // "已掌握": graduate it out of the wrong book without erasing the lifetime
+    // miss count, by marking it as fully recalled (keeps wrongCount history).
+    if (wordState) flow.consolidateWordState(wordState);
     this.saveAndRender(VIEWS.WRONG_BOOK, { track: false });
   },
 
@@ -2138,7 +2154,7 @@ function buildGroupContext(state) {
 
 function buildWrongBookData(state) {
   const words = objectEntries(state.userWordStates)
-    .filter((entry) => entry[1].wrongCount > 0)
+    .filter((entry) => flow.isInWrongBook(entry[1]))
     .map((entry) => ({ word: flow.getWordById(entry[0]), wordState: entry[1] }))
     .filter((item) => item.word)
     .sort((a, b) => b.wordState.wrongCount - a.wordState.wrongCount)

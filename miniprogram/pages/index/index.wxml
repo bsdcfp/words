@@ -338,11 +338,11 @@
       <text class="ipa">{{review.word.ipa}}</text>
       <view class="sound-orb small" data-word-id="{{review.word.id}}" catchtap="speak"><image class="asset-sound-icon" src="../../assets/v2/icons/shared-icon-sound-wave-round@3x.png" mode="aspectFit" /></view>
       <text wx:if="{{!(reviewAnswerVisible || review.question.answered)}}" class="study-hint">⏱ 2 秒后揭示</text>
+      <view wx:if="{{review.word && (reviewAnswerVisible || review.question.answered)}}" class="reveal-sheet revealed in-card">
+        <view class="reveal-sheet-meaning"><text class="option-line"><text class="option-pos">{{review.word.pos}}</text>{{review.word.meaningText}}</text></view>
+      </view>
     </view>
     <image class="asset-landscape learn-landscape-band" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
-    <view wx:if="{{review.word && (reviewAnswerVisible || review.question.answered)}}" class="reveal-sheet revealed">
-      <view class="reveal-sheet-meaning"><text class="option-line"><text class="option-pos">{{review.word.pos}}</text>{{review.word.meaningText}}</text></view>
-    </view>
     <view class="focus-actions">
       <view wx:if="{{review.isMixed}}" class="primary-button focus-primary" catchtap="rememberMixedReview">记住了</view>
       <view wx:else class="primary-button focus-primary" catchtap="rememberGroupReview">记住了</view>
@@ -359,6 +359,7 @@
     </view>
     <image class="asset-landscape learn-landscape-band" src="../../assets/v2/backgrounds/light-bg-landscape-strip@3x.png" mode="aspectFill" />
     <view wx:if="{{audioAnswerVisible || audio.question.answered}}" class="reveal-sheet revealed">
+      <view class="reveal-sheet-wordrow"><text class="reveal-sheet-word">{{audio.word.word}}</text><text wx:if="{{audio.word.ipa}}" class="reveal-sheet-ipa">{{audio.word.ipa}}</text></view>
       <view class="reveal-sheet-meaning">
         <text class="option-line"><text class="option-pos">{{audio.word.pos}}</text>{{audio.word.meaningText}}</text>
       </view>

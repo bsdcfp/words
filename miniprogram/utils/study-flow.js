@@ -22,6 +22,8 @@ const ASSESSMENT_INITIAL_PER_LAYER = 6;
 // Unlike the 36-question placement test, its length tracks how much you've
 // learned (capped so a quick check stays quick) and it never re-levels you.
 const STAGE_TEST_MAX_QUESTIONS = 20;
+// Consecutive correct recalls required for a missed word to leave the 错词本.
+const WRONG_BOOK_CONSOLIDATE_STREAK = 2;
 
 function startAssessment(state, seed = createAssessmentSeed()) {
   state.assessment = {
@@ -354,10 +356,28 @@ function moveToNextMeaningRecallQuestion(state) {
    These reuse the mixed-review question engine but run as their own session,
    fully decoupled from the daily new-word flow (state.daily.*). They share the
    mixed* slots only as the runtime queue and are flagged by state.reviewSession. */
+// A word sits in the 错词本 once it has been missed (wrongCount > 0) and has NOT
+// yet been recalled correctly WRONG_BOOK_CONSOLIDATE_STREAK times in a row since.
+// This keeps wrongCount as a pure lifetime miss stat while still letting words
+// graduate out of the wrong book once they are genuinely re-consolidated.
+function isInWrongBook(wordState) {
+  return Boolean(
+    wordState &&
+    (wordState.wrongCount || 0) > 0 &&
+    (wordState.correctStreak || 0) < WRONG_BOOK_CONSOLIDATE_STREAK
+  );
+}
+
+// Manual "已掌握": graduate the word out of the wrong book without erasing the
+// lifetime miss count (history is preserved), by marking it as fully recalled.
+function consolidateWordState(wordState) {
+  if (!wordState) return;
+  wordState.correctStreak = Math.max(wordState.correctStreak || 0, WRONG_BOOK_CONSOLIDATE_STREAK);
+}
+
 function getWrongReviewWordIds(state, limit = 9) {
   return Object.keys(state.userWordStates || {})
-    .filter((wordId) => (state.userWordStates[wordId].wrongCount || 0) > 0)
-    .filter((wordId) => getWordById(wordId))
+    .filter((wordId) => isInWrongBook(state.userWordStates[wordId]) && getWordById(wordId))
     .sort((a, b) => (state.userWordStates[b].wrongCount || 0) - (state.userWordStates[a].wrongCount || 0))
     .slice(0, limit);
 }
@@ -798,12 +818,15 @@ function answerChoiceQuestion(state, question, selectedCn, type) {
   const word = getWordById(question.wordId);
   const isCorrect = word.cn.join("，") === selectedCn;
   const current = state.userWordStates[word.id] || defaultWordState();
-  // Unified pass/fail rule (product-mechanism-v2.md): a pass (记住了/已记住) clears
-  // the word from the 错词本; a fail adds it. Same logic for every review type.
+  // wrongCount is a monotonic lifetime miss counter: a correct answer never
+  // erases it (only a miss increments it). Wrong-book membership is derived
+  // separately via isInWrongBook — a word leaves the 错词本 only after
+  // WRONG_BOOK_CONSOLIDATE_STREAK consecutive correct answers (tracked by
+  // correctStreak), not after a single lucky pass.
   const answeredState = Object.assign({}, current, {
     familiarity: isCorrect ? Math.min(current.familiarity + 1, 5) : Math.max(current.familiarity - 1, 0),
     correctStreak: isCorrect ? current.correctStreak + 1 : 0,
-    wrongCount: isCorrect ? 0 : current.wrongCount + 1,
+    wrongCount: isCorrect ? current.wrongCount : current.wrongCount + 1,
     lastSeenAt: new Date().toISOString(),
     lastResult: isCorrect ? "correct" : "wrong"
   }, masteryPatch(current, type, question.mode, isCorrect));
@@ -1229,5 +1252,7 @@ module.exports = {
   startReviewSession,
   clearReviewSession,
   getWrongReviewWordIds,
-  getDueReviewWordIds
+  getDueReviewWordIds,
+  isInWrongBook,
+  consolidateWordState
 };

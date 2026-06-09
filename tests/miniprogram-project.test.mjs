@@ -150,7 +150,8 @@ const groupReviewTemplate = pageWxml.slice(
   pageWxml.indexOf("<view wx:elif=\"{{view == 'audio-meaning'}}\"")
 );
 assert.match(groupReviewTemplate, /wx:if="{{review\.word && \(reviewAnswerVisible \|\| review\.question\.answered\)}}"/, "group review should keep the meaning hidden until reveal");
-assert.match(groupReviewTemplate, /class="reveal-sheet revealed"/, "group review should reveal the meaning in the shared bottom sheet (same as listening)");
+assert.match(groupReviewTemplate, /class="reveal-sheet revealed in-card"/, "group review should reveal the meaning inline under the word (below the hint), not as a bottom sheet");
+assert.match(groupReviewTemplate, /review-focus-card[\s\S]*reveal-sheet revealed in-card[\s\S]*asset-landscape learn-landscape-band/, "the revealed meaning should sit in the word card, before (above) the landscape layer");
 assert.doesNotMatch(pageWxml, /{{review\.groupContext\.currentLabel}}/, "review should hide current group labels in focus mode");
 assert.doesNotMatch(pageWxml, /{{review\.groupContext\.mixedLabel}}/, "mixed review should hide source group labels in focus mode");
 assert.doesNotMatch(groupReviewTemplate, /bindtap="openDetail">看词卡/, "group review should not show a word-card button");
